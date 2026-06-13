@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getProfile } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
@@ -49,8 +50,13 @@ export default async function DashboardPage() {
           <Card label="Status" value="Aktivno" />
         </div>
 
-        <div className="mt-8 rounded-2xl border border-dashed border-slate-300 bg-white p-6 text-sm text-slate-500">
-          Naslednji korak: dodajanje zaposlenih in pregled ur (gradimo zdaj).
+        <div className="mt-8 flex flex-wrap gap-3">
+          <Link
+            href="/dashboard/zaposleni"
+            className="rounded-xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white hover:bg-slate-800"
+          >
+            Upravljaj zaposlene
+          </Link>
         </div>
       </div>
     </main>
