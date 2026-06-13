@@ -9,7 +9,7 @@ export async function proxy(request: NextRequest) {
 
 export const config = {
   matcher: [
-    // Teci na vseh poteh razen statičnih datotek in slik.
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    // Teci na vseh poteh razen statičnih datotek, slik in PWA datotek (manifest, sw.js, ikone).
+    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|webmanifest|js|txt|woff2?)$).*)",
   ],
 };
