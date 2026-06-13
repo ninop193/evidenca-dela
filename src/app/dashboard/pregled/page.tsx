@@ -104,7 +104,7 @@ export default async function MonthlyOverviewPage({
 
       <div className="mx-auto max-w-5xl px-4 py-8">
         {/* Mesečna navigacija */}
-        <div className="mb-6 flex items-center justify-center gap-4">
+        <div className="mb-4 flex items-center justify-center gap-4">
           <Link
             href={`/dashboard/pregled?month=${shiftMonth(month, -1)}`}
             className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm hover:bg-slate-100"
@@ -119,6 +119,22 @@ export default async function MonthlyOverviewPage({
             className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm hover:bg-slate-100"
           >
             Naslednji →
+          </Link>
+        </div>
+
+        {/* Izvoz evidence */}
+        <div className="mb-6 flex items-center justify-center gap-3">
+          <a
+            href={`/dashboard/pregled/excel?month=${month}`}
+            className="rounded-lg bg-green-700 px-4 py-2 text-sm font-semibold text-white hover:bg-green-800"
+          >
+            ⬇ Izvozi Excel
+          </a>
+          <Link
+            href={`/dashboard/pregled/print?month=${month}`}
+            className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800"
+          >
+            🖨 PDF / Natisni
           </Link>
         </div>
 
