@@ -29,6 +29,13 @@ export default function Home() {
             Prijava
           </Link>
         </div>
+
+        <p className="mt-8 text-sm text-slate-500">
+          Brezplačno orodje:{" "}
+          <Link href="/kalkulator" className="font-semibold text-emerald-700 underline">
+            Bruto-neto kalkulator plače
+          </Link>
+        </p>
       </div>
     </main>
   );
