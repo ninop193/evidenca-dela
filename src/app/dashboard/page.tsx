@@ -57,6 +57,12 @@ export default async function DashboardPage() {
           >
             Upravljaj zaposlene
           </Link>
+          <Link
+            href="/dashboard/ure"
+            className="rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-semibold text-slate-900 hover:bg-slate-100"
+          >
+            Pregled ur
+          </Link>
         </div>
       </div>
     </main>
