@@ -63,6 +63,18 @@ export default async function DashboardPage() {
           >
             Pregled ur
           </Link>
+          <Link
+            href="/dashboard/pregled"
+            className="rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-semibold text-slate-900 hover:bg-slate-100"
+          >
+            Mesečni pregled
+          </Link>
+          <Link
+            href="/dashboard/odsotnosti"
+            className="rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-semibold text-slate-900 hover:bg-slate-100"
+          >
+            Odsotnosti
+          </Link>
         </div>
       </div>
     </main>
