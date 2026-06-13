@@ -46,11 +46,19 @@ export default async function HoursPage() {
   return (
     <main className="min-h-screen bg-slate-50">
       <header className="border-b border-slate-200 bg-white">
-        <div className="mx-auto flex max-w-5xl items-center gap-3 px-4 py-4">
-          <Link href="/dashboard" className="text-sm text-slate-500 hover:text-slate-900">
-            ← Nazaj
+        <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-4">
+          <div className="flex items-center gap-3">
+            <Link href="/dashboard" className="text-sm text-slate-500 hover:text-slate-900">
+              ← Nazaj
+            </Link>
+            <h1 className="text-lg font-bold text-slate-900">Pregled ur</h1>
+          </div>
+          <Link
+            href="/dashboard/ure/nov"
+            className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800"
+          >
+            + Ročni vnos
           </Link>
-          <h1 className="text-lg font-bold text-slate-900">Pregled ur</h1>
         </div>
       </header>
 
@@ -71,6 +79,7 @@ export default async function HoursPage() {
                   <th className="px-4 py-3 font-medium">Ure</th>
                   <th className="px-4 py-3 font-medium">Nadure</th>
                   <th className="px-4 py-3 font-medium">Status</th>
+                  <th className="px-4 py-3 font-medium"></th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
@@ -100,6 +109,14 @@ export default async function HoursPage() {
                           v obdelavi
                         </span>
                       )}
+                    </td>
+                    <td className="px-4 py-3 text-right">
+                      <Link
+                        href={`/dashboard/ure/${r.id}`}
+                        className="text-sm font-medium text-slate-600 underline hover:text-slate-900"
+                      >
+                        Uredi
+                      </Link>
                     </td>
                   </tr>
                 ))}
