@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect, notFound } from "next/navigation";
 import { getProfile } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
+import { Card } from "@/components/ui";
 import EntryForm from "../EntryForm";
 
 // ISO → "HH:MM" po slovenskem času (za prednastavitev v obrazcu).
@@ -37,14 +38,13 @@ export default async function EditEntryPage({
   if (!entry) notFound();
 
   return (
-    <main className="flex min-h-screen justify-center bg-slate-50 px-4 py-10">
-      <div className="w-full max-w-md">
-        <Link href="/dashboard/ure" className="text-sm text-slate-500 hover:text-slate-900">
-          ← Nazaj na pregled
-        </Link>
-        <h1 className="mt-3 text-2xl font-bold text-slate-900">Uredi vnos</h1>
+    <main className="mx-auto max-w-md px-4 py-10">
+      <Link href="/dashboard/ure" className="text-sm text-slate-500 hover:text-slate-900">
+        ← Nazaj na pregled
+      </Link>
+      <h1 className="mt-3 text-2xl font-bold tracking-tight text-slate-900">Uredi vnos</h1>
 
-        <div className="mt-6">
+      <Card className="mt-6 p-6">
           <EntryForm
             mode="edit"
             entryId={entry.id}
@@ -69,8 +69,7 @@ export default async function EditEntryPage({
               notes: entry.notes ?? "",
             }}
           />
-        </div>
-      </div>
+      </Card>
     </main>
   );
 }

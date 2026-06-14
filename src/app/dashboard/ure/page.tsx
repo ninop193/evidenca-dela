@@ -1,12 +1,9 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
-import { getProfile } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
+import { Badge, Card, buttonClasses } from "@/components/ui";
 
 const fmtDate = (d: string) =>
-  new Intl.DateTimeFormat("sl-SI", { timeZone: "Europe/Ljubljana" }).format(
-    new Date(d + "T00:00:00"),
-  );
+  new Intl.DateTimeFormat("sl-SI", { timeZone: "Europe/Ljubljana" }).format(new Date(d + "T00:00:00"));
 const fmtTime = (iso: string | null) =>
   iso
     ? new Intl.DateTimeFormat("sl-SI", {
@@ -28,10 +25,6 @@ type Row = {
 };
 
 export default async function HoursPage() {
-  const profile = await getProfile();
-  if (!profile) redirect("/login");
-  if (profile.role !== "admin") redirect("/zigosanje");
-
   const supabase = await createClient();
   const { data } = await supabase
     .from("time_entries")
@@ -44,87 +37,90 @@ export default async function HoursPage() {
   const rows = (data ?? []) as unknown as Row[];
 
   return (
-    <main className="min-h-screen bg-slate-50">
-      <header className="border-b border-slate-200 bg-white">
-        <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-4">
-          <div className="flex items-center gap-3">
-            <Link href="/dashboard" className="text-sm text-slate-500 hover:text-slate-900">
-              ← Nazaj
-            </Link>
-            <h1 className="text-lg font-bold text-slate-900">Pregled ur</h1>
-          </div>
-          <Link
-            href="/dashboard/ure/nov"
-            className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800"
-          >
-            + Ročni vnos
-          </Link>
+    <main className="mx-auto max-w-6xl px-4 py-8">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900">Pregled ur</h1>
+          <p className="mt-1 text-sm text-slate-500">Zadnji vnosi delovnega časa.</p>
         </div>
-      </header>
+        <Link href="/dashboard/ure/nov" className={buttonClasses("primary")}>
+          ＋ Ročni vnos
+        </Link>
+      </div>
 
-      <div className="mx-auto max-w-5xl px-4 py-8">
+      <div className="mt-6">
         {rows.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-8 text-center text-slate-500">
-            Še ni zabeleženih ur. Ko zaposleni žigosajo, se vnosi prikažejo tukaj.
-          </div>
+          <Card className="grid place-items-center px-6 py-16 text-center">
+            <div className="grid h-12 w-12 place-items-center rounded-2xl bg-brand-50 text-2xl text-brand-600">
+              ⏱
+            </div>
+            <p className="mt-4 font-medium text-slate-900">Še ni zabeleženih ur</p>
+            <p className="mt-1 text-sm text-slate-500">
+              Ko zaposleni žigosajo ali vneseš ročno, se vnosi prikažejo tukaj.
+            </p>
+          </Card>
         ) : (
-          <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-white">
-            <table className="w-full text-left text-sm">
-              <thead className="border-b border-slate-200 bg-slate-50 text-slate-500">
-                <tr>
-                  <th className="px-4 py-3 font-medium">Datum</th>
-                  <th className="px-4 py-3 font-medium">Zaposleni</th>
-                  <th className="px-4 py-3 font-medium">Prihod</th>
-                  <th className="px-4 py-3 font-medium">Odhod</th>
-                  <th className="px-4 py-3 font-medium">Ure</th>
-                  <th className="px-4 py-3 font-medium">Nadure</th>
-                  <th className="px-4 py-3 font-medium">Status</th>
-                  <th className="px-4 py-3 font-medium"></th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {rows.map((r) => (
-                  <tr key={r.id}>
-                    <td className="px-4 py-3 text-slate-900">{fmtDate(r.date)}</td>
-                    <td className="px-4 py-3 text-slate-700">
-                      {r.employees?.full_name ?? "—"}
-                    </td>
-                    <td className="px-4 py-3 text-slate-600">{fmtTime(r.clock_in)}</td>
-                    <td className="px-4 py-3 text-slate-600">{fmtTime(r.clock_out)}</td>
-                    <td className="px-4 py-3 font-medium text-slate-900">
-                      {r.clock_out == null
-                        ? "v teku"
-                        : `${(r.total_worked_hours ?? 0).toFixed(2)}`}
-                    </td>
-                    <td className="px-4 py-3 text-slate-600">
-                      {(r.overtime_hours ?? 0).toFixed(2)}
-                    </td>
-                    <td className="px-4 py-3">
-                      {r.confirmed ? (
-                        <span className="rounded bg-green-100 px-2 py-0.5 text-xs text-green-700">
-                          potrjeno
-                        </span>
-                      ) : (
-                        <span className="rounded bg-slate-100 px-2 py-0.5 text-xs text-slate-500">
-                          v obdelavi
-                        </span>
-                      )}
-                    </td>
-                    <td className="px-4 py-3 text-right">
-                      <Link
-                        href={`/dashboard/ure/${r.id}`}
-                        className="text-sm font-medium text-slate-600 underline hover:text-slate-900"
-                      >
-                        Uredi
-                      </Link>
-                    </td>
+          <Card className="overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-sm">
+                <thead className="border-b border-slate-100 bg-slate-50/60 text-slate-500">
+                  <tr>
+                    <Th>Datum</Th>
+                    <Th>Zaposleni</Th>
+                    <Th>Prihod</Th>
+                    <Th>Odhod</Th>
+                    <Th right>Ure</Th>
+                    <Th right>Nadure</Th>
+                    <Th>Status</Th>
+                    <Th right> </Th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody className="divide-y divide-slate-50">
+                  {rows.map((r) => (
+                    <tr key={r.id} className="transition hover:bg-slate-50/60">
+                      <td className="px-4 py-3.5 text-slate-900">{fmtDate(r.date)}</td>
+                      <td className="px-4 py-3.5 text-slate-700">{r.employees?.full_name ?? "—"}</td>
+                      <td className="px-4 py-3.5 text-slate-600">{fmtTime(r.clock_in)}</td>
+                      <td className="px-4 py-3.5 text-slate-600">{fmtTime(r.clock_out)}</td>
+                      <td className="px-4 py-3.5 text-right font-semibold text-slate-900 tabular-nums">
+                        {r.clock_out == null ? (
+                          <Badge tone="brand">v teku</Badge>
+                        ) : (
+                          (r.total_worked_hours ?? 0).toFixed(2)
+                        )}
+                      </td>
+                      <td className="px-4 py-3.5 text-right text-slate-600 tabular-nums">
+                        {(r.overtime_hours ?? 0).toFixed(2)}
+                      </td>
+                      <td className="px-4 py-3.5">
+                        <Badge tone={r.confirmed ? "green" : "slate"}>
+                          {r.confirmed ? "potrjeno" : "v obdelavi"}
+                        </Badge>
+                      </td>
+                      <td className="px-4 py-3.5 text-right">
+                        <Link
+                          href={`/dashboard/ure/${r.id}`}
+                          className="text-sm font-medium text-brand-600 hover:text-brand-700"
+                        >
+                          Uredi
+                        </Link>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </Card>
         )}
       </div>
     </main>
+  );
+}
+
+function Th({ children, right }: { children: React.ReactNode; right?: boolean }) {
+  return (
+    <th className={"px-4 py-3 text-xs font-semibold uppercase tracking-wide " + (right ? "text-right" : "")}>
+      {children}
+    </th>
   );
 }

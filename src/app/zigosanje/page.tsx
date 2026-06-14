@@ -43,16 +43,21 @@ export default async function ZigosanjePage() {
 
   return (
     <main className="flex min-h-screen flex-col bg-slate-50">
-      <header className="border-b border-slate-200 bg-white">
-        <div className="mx-auto flex max-w-md items-center justify-between px-4 py-4">
-          <div>
-            <p className="text-xs text-slate-500">Pozdravljen</p>
-            <h1 className="text-base font-bold text-slate-900">
-              {profile.full_name ?? "Zaposleni"}
-            </h1>
+      <header className="sticky top-0 z-20 border-b border-slate-200 bg-white/85 backdrop-blur">
+        <div className="mx-auto flex max-w-md items-center justify-between px-4 py-3.5">
+          <div className="flex items-center gap-2.5">
+            <span className="grid h-8 w-8 place-items-center rounded-lg bg-brand-600 shadow-soft">
+              <span className="block h-3 w-3 rounded-full border-2 border-white" />
+            </span>
+            <div>
+              <p className="text-xs text-slate-500">Pozdravljen</p>
+              <h1 className="text-sm font-bold leading-tight text-slate-900">
+                {profile.full_name ?? "Zaposleni"}
+              </h1>
+            </div>
           </div>
           <form action={signOut}>
-            <button className="rounded-lg border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-100">
+            <button className="rounded-lg px-3 py-1.5 text-sm font-medium text-slate-600 ring-1 ring-slate-200 hover:bg-slate-100">
               Odjava
             </button>
           </form>

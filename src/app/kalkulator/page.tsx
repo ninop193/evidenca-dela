@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Calculator from "./Calculator";
 import { PLACA_CONFIG } from "@/lib/placa";
+import { Wordmark, buttonClasses } from "@/components/ui";
 
 export const metadata: Metadata = {
   title: `Bruto-neto kalkulator plače ${PLACA_CONFIG.leto} | Izračun neto plače`,
@@ -69,14 +70,13 @@ export default function KalkulatorPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      <header className="border-b border-slate-200 bg-white">
-        <div className="mx-auto flex max-w-2xl items-center justify-between px-4 py-4">
-          <Link href="/" className="flex items-center gap-1.5 font-bold text-slate-900">
-            <span className="inline-block h-2 w-2 rounded-full bg-emerald-600" />
-            Evidenca dela
+      <header className="sticky top-0 z-20 border-b border-slate-100 bg-white/80 backdrop-blur">
+        <div className="mx-auto flex max-w-2xl items-center justify-between px-4 py-3.5">
+          <Link href="/">
+            <Wordmark />
           </Link>
-          <Link href="/login" className="text-sm font-medium text-slate-600 hover:text-slate-900">
-            Prijava
+          <Link href="/register" className={buttonClasses("primary", "sm")}>
+            Začni brezplačno
           </Link>
         </div>
       </header>

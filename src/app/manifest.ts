@@ -10,7 +10,7 @@ export default function manifest(): MetadataRoute.Manifest {
     start_url: "/zigosanje",
     display: "standalone",
     background_color: "#f8fafc",
-    theme_color: "#059669",
+    theme_color: "#1d4ed8",
     lang: "sl",
     orientation: "portrait",
     icons: [

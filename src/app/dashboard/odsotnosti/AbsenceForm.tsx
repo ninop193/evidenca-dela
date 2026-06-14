@@ -58,7 +58,7 @@ export default function AbsenceForm({
           name="employeeId"
           required
           defaultValue=""
-          className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-base text-slate-900 outline-none focus:border-slate-900"
+          className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-base text-slate-900 outline-none focus:ring-2 focus:ring-brand-500"
         >
           <option value="" disabled>
             Izberi zaposlenega
@@ -74,11 +74,11 @@ export default function AbsenceForm({
       <div className="grid grid-cols-2 gap-3">
         <label className="block">
           <span className="mb-1 block text-sm font-medium text-slate-700">Od *</span>
-          <input name="dateFrom" type="date" required className="w-full rounded-xl border border-slate-300 px-3 py-2.5 text-base text-slate-900 outline-none focus:border-slate-900" />
+          <input name="dateFrom" type="date" required className="w-full rounded-xl border border-slate-300 px-3 py-2.5 text-base text-slate-900 outline-none focus:ring-2 focus:ring-brand-500" />
         </label>
         <label className="block">
           <span className="mb-1 block text-sm font-medium text-slate-700">Do *</span>
-          <input name="dateTo" type="date" required className="w-full rounded-xl border border-slate-300 px-3 py-2.5 text-base text-slate-900 outline-none focus:border-slate-900" />
+          <input name="dateTo" type="date" required className="w-full rounded-xl border border-slate-300 px-3 py-2.5 text-base text-slate-900 outline-none focus:ring-2 focus:ring-brand-500" />
         </label>
       </div>
 
@@ -92,7 +92,7 @@ export default function AbsenceForm({
           step="0.25"
           required
           placeholder="npr. 8 za en dan, 40 za teden"
-          className="w-full rounded-xl border border-slate-300 px-3 py-2.5 text-base text-slate-900 outline-none focus:border-slate-900"
+          className="w-full rounded-xl border border-slate-300 px-3 py-2.5 text-base text-slate-900 outline-none focus:ring-2 focus:ring-brand-500"
         />
       </label>
 
@@ -103,7 +103,7 @@ export default function AbsenceForm({
           required
           defaultValue="letni_dopust"
           onChange={(e) => setCategory(DEFAULT_CATEGORY[e.target.value] ?? category)}
-          className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-base text-slate-900 outline-none focus:border-slate-900"
+          className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-base text-slate-900 outline-none focus:ring-2 focus:ring-brand-500"
         >
           {Object.entries(TYPE_LABELS).map(([v, l]) => (
             <option key={v} value={v}>
@@ -120,7 +120,7 @@ export default function AbsenceForm({
           required
           value={category}
           onChange={(e) => setCategory(e.target.value)}
-          className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-base text-slate-900 outline-none focus:border-slate-900"
+          className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-base text-slate-900 outline-none focus:ring-2 focus:ring-brand-500"
         >
           {Object.entries(CATEGORY_LABELS).map(([v, l]) => (
             <option key={v} value={v}>
@@ -132,7 +132,7 @@ export default function AbsenceForm({
 
       <label className="block">
         <span className="mb-1 block text-sm font-medium text-slate-700">Opomba (neobvezno)</span>
-        <input name="reason" className="w-full rounded-xl border border-slate-300 px-3 py-2.5 text-base text-slate-900 outline-none focus:border-slate-900" />
+        <input name="reason" className="w-full rounded-xl border border-slate-300 px-3 py-2.5 text-base text-slate-900 outline-none focus:ring-2 focus:ring-brand-500" />
       </label>
 
       {error && <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
@@ -140,7 +140,7 @@ export default function AbsenceForm({
       <button
         type="submit"
         disabled={loading}
-        className="w-full rounded-xl bg-slate-900 py-3 text-base font-semibold text-white hover:bg-slate-800 disabled:opacity-50"
+        className="w-full rounded-xl bg-brand-600 py-3 text-base font-semibold text-white shadow-soft transition hover:bg-brand-700 disabled:opacity-50"
       >
         {loading ? "Shranjujem…" : "Shrani odsotnost"}
       </button>

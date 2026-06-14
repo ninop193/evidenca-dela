@@ -85,7 +85,7 @@ export default function EntryForm({
           name="employeeId"
           required
           defaultValue={initial?.employeeId ?? ""}
-          className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-base text-slate-900 outline-none focus:border-slate-900"
+          className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-base text-slate-900 outline-none focus:ring-2 focus:ring-brand-500"
         >
           <option value="" disabled>
             Izberi zaposlenega
@@ -119,7 +119,7 @@ export default function EntryForm({
           <select
             name="workTimeType"
             defaultValue={initial?.workTimeType ?? "polni"}
-            className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-base text-slate-900 outline-none focus:border-slate-900"
+            className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-base text-slate-900 outline-none focus:ring-2 focus:ring-brand-500"
           >
             <option value="polni">Polni</option>
             <option value="krajsi">Krajši</option>
@@ -170,7 +170,7 @@ export default function EntryForm({
         <button
           type="submit"
           disabled={loading}
-          className="flex-1 rounded-xl bg-slate-900 py-3 text-base font-semibold text-white hover:bg-slate-800 disabled:opacity-50"
+          className="flex-1 rounded-xl bg-brand-600 py-3 text-base font-semibold text-white shadow-soft transition hover:bg-brand-700 disabled:opacity-50"
         >
           {loading ? "Shranjujem…" : mode === "edit" ? "Shrani spremembe" : "Shrani vnos"}
         </button>
@@ -223,7 +223,7 @@ function Field({
         required={required}
         placeholder={placeholder}
         defaultValue={defaultValue}
-        className="w-full rounded-xl border border-slate-300 px-3 py-2.5 text-base text-slate-900 outline-none focus:border-slate-900 focus:ring-2 focus:ring-slate-900/10"
+        className="w-full rounded-xl border border-slate-300 px-3 py-2.5 text-base text-slate-900 outline-none focus:ring-2 focus:ring-brand-500"
       />
     </label>
   );

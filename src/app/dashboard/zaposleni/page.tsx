@@ -1,13 +1,8 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
-import { getProfile } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
+import { Badge, Card, buttonClasses } from "@/components/ui";
 
 export default async function EmployeesPage() {
-  const profile = await getProfile();
-  if (!profile) redirect("/login");
-  if (profile.role !== "admin") redirect("/zigosanje");
-
   const supabase = await createClient();
   const { data: employees } = await supabase
     .from("employees")
@@ -15,75 +10,73 @@ export default async function EmployeesPage() {
     .order("created_at", { ascending: true });
 
   return (
-    <main className="min-h-screen bg-slate-50">
-      <header className="border-b border-slate-200 bg-white">
-        <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-4">
-          <div className="flex items-center gap-3">
-            <Link href="/dashboard" className="text-sm text-slate-500 hover:text-slate-900">
-              ← Nazaj
-            </Link>
-            <h1 className="text-lg font-bold text-slate-900">Zaposleni</h1>
-          </div>
-          <Link
-            href="/dashboard/zaposleni/nov"
-            className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800"
-          >
-            + Dodaj zaposlenega
-          </Link>
+    <main className="mx-auto max-w-6xl px-4 py-8">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900">Zaposleni</h1>
+          <p className="mt-1 text-sm text-slate-500">Upravljaj delavce in njihove podatke.</p>
         </div>
-      </header>
+        <Link href="/dashboard/zaposleni/nov" className={buttonClasses("primary")}>
+          ＋ Dodaj zaposlenega
+        </Link>
+      </div>
 
-      <div className="mx-auto max-w-5xl px-4 py-8">
+      <div className="mt-6">
         {!employees || employees.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-8 text-center text-slate-500">
-            Še nimaš dodanih zaposlenih.
-            <br />
-            Klikni <strong>„+ Dodaj zaposlenega“</strong> zgoraj.
-          </div>
+          <Card className="grid place-items-center px-6 py-16 text-center">
+            <div className="grid h-12 w-12 place-items-center rounded-2xl bg-brand-50 text-2xl text-brand-600">
+              👤
+            </div>
+            <p className="mt-4 font-medium text-slate-900">Še nimaš dodanih zaposlenih</p>
+            <p className="mt-1 text-sm text-slate-500">Dodaj prvega in mu omogoči žigosanje.</p>
+            <Link href="/dashboard/zaposleni/nov" className={buttonClasses("primary") + " mt-5"}>
+              ＋ Dodaj zaposlenega
+            </Link>
+          </Card>
         ) : (
-          <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
-            <table className="w-full text-left text-sm">
-              <thead className="border-b border-slate-200 bg-slate-50 text-slate-500">
-                <tr>
-                  <th className="px-4 py-3 font-medium">Ime in priimek</th>
-                  <th className="px-4 py-3 font-medium">Delovno mesto</th>
-                  <th className="px-4 py-3 font-medium">EMŠO</th>
-                  <th className="px-4 py-3 font-medium">Davčna</th>
-                  <th className="px-4 py-3 font-medium">Status</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {employees.map((e) => (
-                  <tr key={e.id}>
-                    <td className="px-4 py-3 font-medium text-slate-900">
-                      {e.full_name}
-                      {e.is_management && (
-                        <span className="ml-2 rounded bg-amber-100 px-1.5 py-0.5 text-xs text-amber-700">
-                          poslovodna
-                        </span>
-                      )}
-                    </td>
-                    <td className="px-4 py-3 text-slate-600">{e.job_title ?? "—"}</td>
-                    <td className="px-4 py-3 text-slate-600">{e.emso ?? "—"}</td>
-                    <td className="px-4 py-3 text-slate-600">{e.tax_id ?? "—"}</td>
-                    <td className="px-4 py-3">
-                      <span
-                        className={
-                          e.active
-                            ? "rounded bg-green-100 px-2 py-0.5 text-xs text-green-700"
-                            : "rounded bg-slate-100 px-2 py-0.5 text-xs text-slate-500"
-                        }
-                      >
-                        {e.active ? "Aktiven" : "Neaktiven"}
-                      </span>
-                    </td>
+          <Card className="overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-sm">
+                <thead className="border-b border-slate-100 bg-slate-50/60 text-slate-500">
+                  <tr>
+                    <Th>Ime in priimek</Th>
+                    <Th>Delovno mesto</Th>
+                    <Th>EMŠO</Th>
+                    <Th>Davčna</Th>
+                    <Th>Status</Th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody className="divide-y divide-slate-50">
+                  {employees.map((e) => (
+                    <tr key={e.id} className="transition hover:bg-slate-50/60">
+                      <td className="px-4 py-3.5 font-medium text-slate-900">
+                        {e.full_name}
+                        {e.is_management && (
+                          <Badge tone="amber" className="ml-2">
+                            poslovodna
+                          </Badge>
+                        )}
+                      </td>
+                      <td className="px-4 py-3.5 text-slate-600">{e.job_title ?? "—"}</td>
+                      <td className="px-4 py-3.5 text-slate-600">{e.emso ?? "—"}</td>
+                      <td className="px-4 py-3.5 text-slate-600">{e.tax_id ?? "—"}</td>
+                      <td className="px-4 py-3.5">
+                        <Badge tone={e.active ? "green" : "slate"}>
+                          {e.active ? "Aktiven" : "Neaktiven"}
+                        </Badge>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </Card>
         )}
       </div>
     </main>
   );
+}
+
+function Th({ children }: { children: React.ReactNode }) {
+  return <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide">{children}</th>;
 }
