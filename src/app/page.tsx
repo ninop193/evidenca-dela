@@ -7,16 +7,63 @@ import {
   ShieldCheck,
   Smartphone,
   Square,
+  Clock,
+  PenLine,
+  Lock,
 } from "lucide-react";
 import { Aurora } from "@/components/Aurora";
+import { Reveal } from "@/components/Reveal";
+import { Faq, type FaqItem } from "@/components/Faq";
 import { Wordmark } from "@/components/ui";
 
 const delay = (s: number) => ({ animationDelay: `${s}s` });
 
+const FAQ: FaqItem[] = [
+  {
+    q: "Je evidenca zakonsko ustrezna (ZEPDSV)?",
+    a: "Da. Vsebuje vsa polja po 13. in 18. členu ZEPDSV (konsolidirano z novelo ZEPDSV-B): čas prihoda in odhoda, redne ure, nadure, nočne, nedeljske in praznične ure ter odsotnosti z vrsto nadomestila. Pripravljeno za inšpekcijo IRSD.",
+  },
+  {
+    q: "Kako hitro lahko začnem?",
+    a: "Registracija in prvi žig v manj kot 5 minutah. Brez klicev, brez pogodb, brez dolgega nastavljanja — ustvariš podjetje, dodaš zaposlene in začneš.",
+  },
+  {
+    q: "Koliko stane?",
+    a: "Fiksna mesečna cena na podjetje — ne na zaposlenega. Naj imaš dva ali pet zaposlenih, plačaš enako. Brez skritih stroškov in brez vezave.",
+  },
+  {
+    q: "Ali zaposleni potrebujejo posebno aplikacijo iz trgovine?",
+    a: "Ne. Aplikacijo si v dveh tapih dodajo na domači zaslon telefona in žigosajo z enim gumbom. Brez App Store ali Google Play.",
+  },
+  {
+    q: "Kaj če zaposleni pozabi žigosati?",
+    a: "Delodajalec lahko kadarkoli ročno vnese ali popravi ure za nazaj. Pozabljen odhod sistem samodejno označi za pregled, da evidenca ostane urejena.",
+  },
+  {
+    q: "Kje so shranjeni podatki?",
+    a: "V EU (Frankfurt), skladno z GDPR. Vsako podjetje vidi izključno svoje podatke — stroga izolacija med podjetji od prve sekunde.",
+  },
+  {
+    q: "Ali lahko izvozim evidenco za inšpekcijo?",
+    a: "Da. Mesečno evidenco izvoziš v PDF ali Excel z enim klikom — urejeno, z vsemi zakonskimi polji in podpisnim mestom.",
+  },
+];
+
 export default function Home() {
+  const faqJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: FAQ.map((f) => ({
+      "@type": "Question",
+      name: f.q,
+      acceptedAnswer: { "@type": "Answer", text: f.a },
+    })),
+  };
+
   return (
     <div className="relative min-h-screen overflow-x-hidden text-slate-800">
       <Aurora />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
 
       {/* NAV */}
       <header className="sticky top-0 z-30 px-4 pt-4">
@@ -29,10 +76,7 @@ export default function Home() {
             <Link href="/login" className="rounded-full px-3 py-1.5 font-medium text-slate-600 transition hover:bg-white/60 hover:text-slate-900">
               Prijava
             </Link>
-            <Link
-              href="/register"
-              className="rounded-full bg-brand-600 px-4 py-1.5 font-semibold text-white shadow-[0_6px_20px_-6px_rgba(29,78,216,0.7)] transition hover:bg-brand-500"
-            >
+            <Link href="/register" className="rounded-full bg-brand-600 px-4 py-1.5 font-semibold text-white shadow-[0_6px_20px_-6px_rgba(29,78,216,0.7)] transition hover:bg-brand-500">
               Začni
             </Link>
           </nav>
@@ -56,17 +100,11 @@ export default function Home() {
             izvoziš evidenco za inšpekcijo. Fiksna cena, brez onboardinga.
           </p>
           <div className="reveal mt-9 flex flex-col gap-3 sm:flex-row" style={delay(0.24)}>
-            <Link
-              href="/register"
-              className="glow-pulse group inline-flex items-center justify-center gap-2 rounded-full bg-brand-600 px-6 py-3.5 text-base font-semibold text-white transition hover:bg-brand-500"
-            >
+            <Link href="/register" className="glow-pulse group inline-flex items-center justify-center gap-2 rounded-full bg-brand-600 px-6 py-3.5 text-base font-semibold text-white transition hover:bg-brand-500">
               Začni brezplačno
               <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
             </Link>
-            <Link
-              href="/kalkulator"
-              className="glass iris-edge sheen inline-flex items-center justify-center gap-2 rounded-full px-6 py-3.5 text-base font-semibold text-slate-800 transition hover:bg-white/70"
-            >
+            <Link href="/kalkulator" className="glass iris-edge sheen inline-flex items-center justify-center gap-2 rounded-full px-6 py-3.5 text-base font-semibold text-slate-800 transition hover:bg-white/70">
               Kalkulator plače
             </Link>
           </div>
@@ -82,47 +120,91 @@ export default function Home() {
         </div>
       </section>
 
+      {/* STATISTIKE — nujnost */}
+      <section className="mx-auto max-w-5xl px-5 py-8">
+        <div className="grid gap-4 sm:grid-cols-3">
+          {[
+            { big: "1.145", small: "kršitev evidenc, ki jih je IRSD zabeležil v letu 2024" },
+            { big: "€300–8.000", small: "globe za mikro podjetja brez ustrezne evidence" },
+            { big: "< 5 min", small: "od registracije do prvega žiga prihoda" },
+          ].map((s, i) => (
+            <Reveal key={s.big} delay={i * 90}>
+              <div className="glass iris-edge sheen rounded-2xl px-6 py-7 text-center">
+                <p className="text-3xl font-extrabold tracking-tight text-brand-600 sm:text-4xl">{s.big}</p>
+                <p className="mt-2 text-sm leading-snug text-slate-600">{s.small}</p>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+      </section>
+
       {/* FEATURES */}
       <section className="mx-auto max-w-6xl px-5 py-12">
         <div className="grid gap-5 sm:grid-cols-3">
-          <Feature icon={<Smartphone className="h-5 w-5" />} title="Žigosanje z enim tapom" text="Velik gumb na telefonu — prihod, odhod, odmor. Brez izobraževanja, brez navodil." d={0} />
-          <Feature icon={<FileSpreadsheet className="h-5 w-5" />} title="Pripravljeno za inšpekcijo" text="Vsa zakonska polja po ZEPDSV. Mesečno evidenco izvoziš v PDF ali Excel z enim klikom." d={0.1} />
-          <Feature icon={<Wallet className="h-5 w-5" />} title="Fiksna cena" text="En znesek na podjetje — ne na zaposlenega. S.p. z dvema ali pet ljudi plača enako." d={0.2} />
+          {[
+            { icon: <Smartphone className="h-5 w-5" />, title: "Žigosanje z enim tapom", text: "Velik gumb na telefonu — prihod, odhod, odmor. Brez izobraževanja, brez navodil." },
+            { icon: <FileSpreadsheet className="h-5 w-5" />, title: "Pripravljeno za inšpekcijo", text: "Vsa zakonska polja po ZEPDSV. Mesečno evidenco izvoziš v PDF ali Excel z enim klikom." },
+            { icon: <Wallet className="h-5 w-5" />, title: "Fiksna cena", text: "En znesek na podjetje — ne na zaposlenega. S.p. z dvema ali pet ljudi plača enako." },
+          ].map((f, i) => (
+            <Reveal key={f.title} delay={i * 100}>
+              <Feature icon={f.icon} title={f.title} text={f.text} />
+            </Reveal>
+          ))}
         </div>
       </section>
 
       {/* HOW */}
       <section className="mx-auto max-w-5xl px-5 py-16">
-        <h2 className="text-center text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
-          Od registracije do prvega žiga v 5 minutah
-        </h2>
+        <Reveal>
+          <h2 className="text-center text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+            Od registracije do prvega žiga v 5 minutah
+          </h2>
+        </Reveal>
         <div className="mt-12 grid gap-6 sm:grid-cols-3">
-          <Step n={1} title="Registriraj podjetje" text="Ustvari račun in poimenuj podjetje. Brez klicev in pogodb." />
-          <Step n={2} title="Dodaj zaposlene" text="Vpiši ime in email. Zaposleni dobi dostop na telefon." />
-          <Step n={3} title="Začnite žigosati" text="Zaposleni tapne 'Prihod', ti spremljaš ure v živo." />
+          {[
+            { n: 1, title: "Registriraj podjetje", text: "Ustvari račun in poimenuj podjetje. Brez klicev in pogodb.", icon: <PenLine className="h-5 w-5" /> },
+            { n: 2, title: "Dodaj zaposlene", text: "Vpiši ime in email. Zaposleni dobi dostop na telefon.", icon: <Smartphone className="h-5 w-5" /> },
+            { n: 3, title: "Začnite žigosati", text: "Zaposleni tapne 'Prihod', ti spremljaš ure v živo.", icon: <Clock className="h-5 w-5" /> },
+          ].map((s, i) => (
+            <Reveal key={s.n} delay={i * 100}>
+              <Step n={s.n} title={s.title} text={s.text} icon={s.icon} />
+            </Reveal>
+          ))}
         </div>
+      </section>
+
+      {/* FAQ */}
+      <section className="mx-auto max-w-3xl px-5 py-16">
+        <Reveal>
+          <h2 className="text-center text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+            Pogosta vprašanja
+          </h2>
+          <p className="mt-2 text-center text-slate-500">Vse, kar moraš vedeti pred začetkom.</p>
+        </Reveal>
+        <Reveal delay={80} className="mt-8">
+          <Faq items={FAQ} />
+        </Reveal>
       </section>
 
       {/* CTA */}
       <section className="mx-auto max-w-5xl px-5 py-16">
-        <div className="glass-strong iris-edge sheen relative overflow-hidden rounded-[2rem] px-8 py-14 text-center">
-          <div className="absolute -top-24 left-1/2 h-56 w-[28rem] -translate-x-1/2 rounded-full bg-brand-400/40 blur-3xl" />
-          <div className="relative">
-            <h2 className="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
-              Zaščiti se pred globo. Še danes.
-            </h2>
-            <p className="mx-auto mt-3 max-w-md text-slate-600">
-              Inšpektorat je lani zabeležil 1.145 kršitev evidenc. Uredi svojo v nekaj minutah.
-            </p>
-            <Link
-              href="/register"
-              className="glow-pulse mt-8 inline-flex items-center gap-2 rounded-full bg-brand-600 px-7 py-3.5 text-base font-semibold text-white transition hover:bg-brand-500"
-            >
-              Začni brezplačno
-              <ArrowRight className="h-4 w-4" />
-            </Link>
+        <Reveal>
+          <div className="glass-strong iris-edge sheen relative overflow-hidden rounded-[2rem] px-8 py-14 text-center">
+            <div className="absolute -top-24 left-1/2 h-56 w-[28rem] -translate-x-1/2 rounded-full bg-brand-400/40 blur-3xl" />
+            <div className="relative">
+              <h2 className="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
+                Zaščiti se pred globo. Še danes.
+              </h2>
+              <p className="mx-auto mt-3 max-w-md text-slate-600">
+                Uredi svojo evidenco v nekaj minutah — preden potrka inšpektor.
+              </p>
+              <Link href="/register" className="glow-pulse mt-8 inline-flex items-center gap-2 rounded-full bg-brand-600 px-7 py-3.5 text-base font-semibold text-white transition hover:bg-brand-500">
+                Začni brezplačno
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
           </div>
-        </div>
+        </Reveal>
       </section>
 
       {/* FOOTER */}
@@ -149,12 +231,9 @@ function Trust({ children }: { children: React.ReactNode }) {
   );
 }
 
-function Feature({ icon, title, text, d }: { icon: React.ReactNode; title: string; text: string; d: number }) {
+function Feature({ icon, title, text }: { icon: React.ReactNode; title: string; text: string }) {
   return (
-    <div
-      className="reveal glass iris-edge sheen rounded-3xl p-6 transition duration-300 hover:-translate-y-1 hover:bg-white/70"
-      style={delay(d)}
-    >
+    <div className="glass iris-edge sheen h-full rounded-3xl p-6 transition duration-300 hover:-translate-y-1 hover:bg-white/70">
       <div className="grid h-12 w-12 place-items-center rounded-2xl bg-gradient-to-br from-brand-500 to-brand-700 text-white shadow-[0_8px_22px_-6px_rgba(29,78,216,0.6)]">
         {icon}
       </div>
@@ -164,11 +243,14 @@ function Feature({ icon, title, text, d }: { icon: React.ReactNode; title: strin
   );
 }
 
-function Step({ n, title, text }: { n: number; title: string; text: string }) {
+function Step({ n, title, text, icon }: { n: number; title: string; text: string; icon: React.ReactNode }) {
   return (
-    <div className="glass iris-edge sheen rounded-2xl p-6 text-center">
-      <div className="mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-gradient-to-br from-brand-500 to-brand-700 text-lg font-bold text-white shadow-[0_8px_24px_-6px_rgba(29,78,216,0.6)]">
-        {n}
+    <div className="glass iris-edge sheen h-full rounded-2xl p-6 text-center">
+      <div className="relative mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-gradient-to-br from-brand-500 to-brand-700 text-white shadow-[0_8px_24px_-6px_rgba(29,78,216,0.6)]">
+        {icon}
+        <span className="absolute -right-1.5 -top-1.5 grid h-5 w-5 place-items-center rounded-full bg-white text-xs font-bold text-brand-600 ring-1 ring-brand-100">
+          {n}
+        </span>
       </div>
       <h3 className="mt-4 font-semibold text-slate-900">{title}</h3>
       <p className="mt-1 text-sm text-slate-600">{text}</p>
@@ -191,7 +273,7 @@ function PhoneMock() {
             <div className="absolute inset-2 rounded-full ring-2 ring-white/40" />
             <div className="absolute inset-0 rounded-full bg-gradient-to-t from-transparent to-white/25" />
             <div className="relative text-center">
-              <Square className="mx-auto h-8 w-8 fill-white" />
+              <Square className="mx-auto h-8 w-8 fill-white" strokeWidth={0} />
               <div className="mt-1.5 text-lg font-bold">Odhod</div>
             </div>
           </div>

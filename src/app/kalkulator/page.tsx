@@ -3,6 +3,8 @@ import Link from "next/link";
 import Calculator from "./Calculator";
 import { PLACA_CONFIG } from "@/lib/placa";
 import { Aurora } from "@/components/Aurora";
+import { Reveal } from "@/components/Reveal";
+import { Faq } from "@/components/Faq";
 import { Wordmark, buttonClasses } from "@/components/ui";
 
 export const metadata: Metadata = {
@@ -32,12 +34,24 @@ const faq = [
     a: "Od bruto plače se odštejejo prispevki zaposlenega (22,10 %) in akontacija dohodnine (po lestvici, ob upoštevanju splošne olajšave). Razlika je neto plača — znesek izplačila.",
   },
   {
-    q: "Koliko znašajo prispevki delodajalca?",
-    a: "Delodajalec na bruto plačo dodatno plača 16,10 % prispevkov. Skupni strošek delodajalca je torej bruto plača + 16,10 %.",
+    q: "Kakšna je razlika med bruto in neto plačo?",
+    a: "Bruto plača je dogovorjeni znesek pred odbitki. Neto plača je tisto, kar zaposleni dejansko prejme na račun, potem ko se odštejejo prispevki in dohodnina.",
+  },
+  {
+    q: "Koliko znašajo prispevki zaposlenega?",
+    a: "Prispevki za socialno varnost, ki bremenijo zaposlenega, skupaj znašajo 22,10 % bruto plače (pokojninsko, zdravstveno, zaposlovanje in starševsko varstvo).",
+  },
+  {
+    q: "Koliko stane zaposleni delodajalca?",
+    a: "Delodajalec na bruto plačo dodatno plača 16,10 % prispevkov. Skupni strošek delodajalca je torej bruto plača + 16,10 % — kalkulator ti ta znesek izračuna samodejno.",
+  },
+  {
+    q: "Kako se obračuna dohodnina?",
+    a: "Akontacija dohodnine se obračuna po progresivni dohodninski lestvici od osnove (bruto minus prispevki minus splošna olajšava). Višja kot je plača, višja je stopnja na presežek.",
   },
   {
     q: "Ali kalkulator upošteva olajšave za otroke?",
-    a: "Osnovni izračun upošteva splošno olajšavo. Olajšave za vzdrževane družinske člane (otroke) trenutno niso vključene — za uradni izračun se posvetuj z računovodjo.",
+    a: "Osnovni izračun upošteva splošno olajšavo. Olajšave za vzdrževane družinske člane (otroke) trenutno niso vključene — za uradni izračun se posvetuj z računovodjo ali preveri pri FURS.",
   },
 ];
 
@@ -92,34 +106,33 @@ export default function KalkulatorPage() {
           strošek delodajalca. Brezplačno, brez registracije.
         </p>
 
-        <div className="mt-8">
+        <Reveal className="mt-8">
           <Calculator />
-        </div>
+        </Reveal>
 
         {/* SEO besedilo + FAQ */}
-        <section className="mt-12 space-y-6">
-          <div>
-            <h2 className="text-xl font-bold text-slate-900">Kako deluje izračun plače?</h2>
-            <p className="mt-2 text-sm leading-relaxed text-slate-600">
-              V Sloveniji se neto plača izračuna tako, da se od bruto plače najprej odštejejo
-              prispevki za socialno varnost, ki bremenijo zaposlenega (skupaj 22,10 %). Nato se
-              izračuna osnova za dohodnino, od katere se odšteje splošna olajšava, in se po
-              dohodninski lestvici obračuna akontacija dohodnine. Kar ostane, je neto plača.
-              Delodajalec poleg tega plača še 16,10 % prispevkov, kar predstavlja njegov skupni
-              strošek dela.
-            </p>
-          </div>
+        <section className="mt-14 space-y-10">
+          <Reveal>
+            <div className="glass iris-edge sheen rounded-2xl p-6">
+              <h2 className="text-xl font-bold text-slate-900">Kako deluje izračun plače?</h2>
+              <p className="mt-2 text-sm leading-relaxed text-slate-600">
+                V Sloveniji se neto plača izračuna tako, da se od bruto plače najprej odštejejo
+                prispevki za socialno varnost, ki bremenijo zaposlenega (skupaj 22,10 %). Nato se
+                izračuna osnova za dohodnino, od katere se odšteje splošna olajšava, in se po
+                dohodninski lestvici obračuna akontacija dohodnine. Kar ostane, je neto plača.
+                Delodajalec poleg tega plača še 16,10 % prispevkov, kar predstavlja njegov skupni
+                strošek dela.
+              </p>
+            </div>
+          </Reveal>
 
           <div>
-            <h2 className="text-xl font-bold text-slate-900">Pogosta vprašanja</h2>
-            <dl className="mt-3 space-y-4">
-              {faq.map((f) => (
-                <div key={f.q}>
-                  <dt className="font-semibold text-slate-900">{f.q}</dt>
-                  <dd className="mt-1 text-sm text-slate-600">{f.a}</dd>
-                </div>
-              ))}
-            </dl>
+            <Reveal>
+              <h2 className="text-xl font-bold text-slate-900">Pogosta vprašanja</h2>
+            </Reveal>
+            <Reveal delay={80} className="mt-4">
+              <Faq items={faq} defaultOpen={null} />
+            </Reveal>
           </div>
         </section>
       </div>
