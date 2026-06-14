@@ -10,7 +10,7 @@ import { Aurora } from "@/components/Aurora";
 import { Wordmark } from "@/components/ui";
 
 const fieldCls =
-  "w-full rounded-xl bg-white/5 px-3.5 py-2.5 text-[15px] text-white ring-1 ring-white/10 placeholder:text-slate-500 outline-none transition focus:ring-2 focus:ring-brand-400";
+  "w-full rounded-xl bg-white/70 px-3.5 py-2.5 text-[15px] text-slate-900 ring-1 ring-white/80 shadow-[inset_0_1px_2px_rgba(120,130,200,0.08)] placeholder:text-slate-400 outline-none transition focus:ring-2 focus:ring-brand-500";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -51,15 +51,15 @@ export default function RegisterPage() {
   }
 
   return (
-    <main className="relative grid min-h-screen place-items-center px-4 py-10 text-slate-100">
+    <main className="relative grid min-h-screen place-items-center px-4 py-10 text-slate-800">
       <Aurora />
       <div className="reveal w-full max-w-md">
         <div className="mb-6 flex justify-center">
-          <Link href="/"><Wordmark dark /></Link>
+          <Link href="/"><Wordmark /></Link>
         </div>
-        <div className="glass glass-edge rounded-3xl p-7">
-          <h1 className="text-xl font-bold text-white">Registracija podjetja</h1>
-          <p className="mt-1 text-sm text-slate-400">Ustvari račun in začni z evidenco v nekaj minutah.</p>
+        <div className="glass iris-edge sheen rounded-3xl p-7">
+          <h1 className="text-xl font-bold text-slate-900">Registracija podjetja</h1>
+          <p className="mt-1 text-sm text-slate-500">Ustvari račun in začni z evidenco v nekaj minutah.</p>
 
           <form onSubmit={handleSubmit} className="mt-6 space-y-4">
             <L label="Ime podjetja">
@@ -81,13 +81,13 @@ export default function RegisterPage() {
             </div>
 
             {error && (
-              <p className="rounded-lg bg-red-500/15 px-3 py-2 text-sm text-red-300 ring-1 ring-red-500/20">{error}</p>
+              <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600 ring-1 ring-red-100">{error}</p>
             )}
 
             <button
               type="submit"
               disabled={loading}
-              className="group flex w-full items-center justify-center gap-2 rounded-xl bg-brand-600 py-3 text-base font-semibold text-white transition hover:bg-brand-500 disabled:opacity-50"
+              className="group flex w-full items-center justify-center gap-2 rounded-full bg-brand-600 py-3 text-base font-semibold text-white shadow-[0_10px_30px_-8px_rgba(29,78,216,0.6)] transition hover:bg-brand-500 disabled:opacity-50"
             >
               {loading ? "Ustvarjam račun…" : "Ustvari račun"}
               {!loading && <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />}
@@ -95,9 +95,9 @@ export default function RegisterPage() {
           </form>
         </div>
 
-        <p className="mt-5 text-center text-sm text-slate-400">
+        <p className="mt-5 text-center text-sm text-slate-500">
           Že imaš račun?{" "}
-          <Link href="/login" className="font-semibold text-brand-300 hover:text-brand-200">
+          <Link href="/login" className="font-semibold text-brand-600 hover:text-brand-700">
             Prijava
           </Link>
         </p>
@@ -109,9 +109,9 @@ export default function RegisterPage() {
 function L({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
   return (
     <label className="block">
-      <span className="mb-1.5 block text-sm font-medium text-slate-300">
+      <span className="mb-1.5 block text-sm font-medium text-slate-700">
         {label}
-        {hint && <span className="ml-1 text-xs text-slate-500">· {hint}</span>}
+        {hint && <span className="ml-1 text-xs text-slate-400">· {hint}</span>}
       </span>
       {children}
     </label>

@@ -13,21 +13,24 @@
   --color-brand-800: #1c388f;
   --color-brand-900: #1c3473;
 
-  /* Iridescenca za liquid glass */
-  --color-iris-cyan: #22d3ee;
-  --color-iris-violet: #a855f7;
+  /* Holografski pasteli (živi) */
+  --color-holo-rose: #ff8fd6;
+  --color-holo-sky: #7caeff;
+  --color-holo-mint: #74f7c0;
+  --color-holo-violet: #b98bff;
+  --color-holo-peach: #ffb583;
 
   --font-sans: var(--font-jakarta);
   --font-mono: var(--font-geist-mono);
 
   --shadow-soft: 0 1px 2px rgba(16, 24, 40, 0.04), 0 1px 3px rgba(16, 24, 40, 0.06);
-  --shadow-card: 0 1px 2px rgba(16, 24, 40, 0.04), 0 4px 16px -4px rgba(16, 24, 40, 0.08);
-  --shadow-lift: 0 8px 30px -8px rgba(29, 78, 216, 0.25);
+  --shadow-glass: 0 12px 40px -12px rgba(80, 90, 170, 0.28), 0 2px 8px -2px rgba(80, 90, 170, 0.12);
+  --shadow-lift: 0 18px 50px -16px rgba(47, 99, 255, 0.45);
 }
 
 :root {
-  --background: #ffffff;
-  --foreground: #0b1220;
+  --background: #f3f4fb;
+  --foreground: #0e1530;
 }
 
 html {
@@ -42,105 +45,123 @@ body {
 }
 
 ::selection {
-  background: rgba(47, 99, 255, 0.3);
-  color: #fff;
+  background: rgba(47, 99, 255, 0.22);
+  color: #0e1530;
 }
 
-/* ───────────────────────── Liquid Glass ───────────────────────── */
+/* ───────────────── Svetlo holografsko liquid glass ───────────────── */
 
-/* Temna steklena plošča (za marketing/auth na temni podlagi) */
 .glass {
-  background: rgba(255, 255, 255, 0.06);
-  backdrop-filter: blur(18px) saturate(160%);
-  -webkit-backdrop-filter: blur(18px) saturate(160%);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.7);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.16),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.2),
-    0 24px 60px -24px rgba(0, 0, 0, 0.7);
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    inset 0 -8px 24px -12px rgba(120, 130, 200, 0.18),
+    var(--shadow-glass);
 }
 .glass-strong {
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(24px) saturate(180%);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.68);
+  backdrop-filter: blur(26px) saturate(200%);
+  -webkit-backdrop-filter: blur(26px) saturate(200%);
+  border: 1px solid rgba(255, 255, 255, 0.85);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.22),
-    0 30px 70px -28px rgba(0, 0, 0, 0.75);
+    inset 0 1px 0 rgba(255, 255, 255, 1),
+    var(--shadow-glass);
 }
-/* Specular svetlobni rob na vrhu plošče */
-.glass-edge {
+
+/* Iridescenten gradient rob (oljni sij) */
+.iris-edge {
   position: relative;
 }
-.glass-edge::before {
+.iris-edge::before {
   content: "";
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  padding: 1px;
-  background: linear-gradient(140deg, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0) 40%);
+  padding: 1.25px;
+  background: linear-gradient(135deg, rgba(255, 150, 215, 0.9), rgba(140, 175, 255, 0.7) 35%, rgba(140, 255, 220, 0.7) 65%, rgba(200, 150, 255, 0.9));
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
   pointer-events: none;
 }
 
-/* ───────────────────────── Aurora ozadje ───────────────────────── */
-.aurora-orb {
+/* Glossy odsev na vrhu (specular sheen) */
+.sheen {
+  position: relative;
+  overflow: hidden;
+}
+.sheen::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.65), rgba(255, 255, 255, 0) 42%);
+  pointer-events: none;
+}
+
+/* Holografsko ozadje */
+.holo-orb {
   position: absolute;
   border-radius: 9999px;
-  filter: blur(70px);
-  opacity: 0.55;
+  filter: blur(64px);
+  opacity: 0.92;
   will-change: transform;
+}
+.holo-sheen {
+  background:
+    conic-gradient(from 120deg at 35% 25%, rgba(255, 143, 214, 0.55), rgba(124, 174, 255, 0.55), rgba(116, 247, 192, 0.5), rgba(185, 139, 255, 0.55), rgba(255, 181, 131, 0.5), rgba(255, 143, 214, 0.55));
+  mix-blend-mode: soft-light;
 }
 .grain {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
 }
 
-/* ───────────────────────── Animacije ───────────────────────── */
+/* ───────────────── Animacije ───────────────── */
 @keyframes fadeUp {
   from { opacity: 0; transform: translateY(18px); }
   to { opacity: 1; transform: none; }
 }
 @keyframes floatA {
   0%, 100% { transform: translate(0, 0) scale(1); }
-  50% { transform: translate(40px, -30px) scale(1.08); }
+  50% { transform: translate(50px, -34px) scale(1.1); }
 }
 @keyframes floatB {
   0%, 100% { transform: translate(0, 0) scale(1); }
-  50% { transform: translate(-50px, 40px) scale(1.12); }
+  50% { transform: translate(-56px, 44px) scale(1.14); }
+}
+@keyframes hueShift {
+  to { filter: hue-rotate(360deg); }
 }
 @keyframes glowPulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(47, 99, 255, 0.45), var(--shadow-lift); }
-  50% { box-shadow: 0 0 44px 6px rgba(47, 99, 255, 0.4), var(--shadow-lift); }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(47, 99, 255, 0.4), var(--shadow-lift); }
+  50% { box-shadow: 0 0 50px 8px rgba(47, 99, 255, 0.35), var(--shadow-lift); }
 }
-@keyframes shimmer {
-  to { background-position: 200% center; }
-}
-@keyframes spinSlow {
-  to { transform: rotate(360deg); }
+@keyframes shimmer { to { background-position: 200% center; } }
+@keyframes floatY {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
 }
 
-.reveal {
-  opacity: 0;
-  animation: fadeUp 0.8s cubic-bezier(0.16, 0.84, 0.44, 1) forwards;
-}
-.float-a { animation: floatA 14s ease-in-out infinite; }
-.float-b { animation: floatB 18s ease-in-out infinite; }
-.glow-pulse { animation: glowPulse 3.5s ease-in-out infinite; }
+.reveal { opacity: 0; animation: fadeUp 0.8s cubic-bezier(0.16, 0.84, 0.44, 1) forwards; }
+.float-a { animation: floatA 16s ease-in-out infinite; }
+.float-b { animation: floatB 20s ease-in-out infinite; }
+.float-y { animation: floatY 6s ease-in-out infinite; }
+.glow-pulse { animation: glowPulse 3.6s ease-in-out infinite; }
+.hue-spin { animation: hueShift 18s linear infinite; }
 
-/* Iridescentno besedilo */
-.text-iris {
-  background: linear-gradient(100deg, #fff 10%, #8ab1ff 40%, #22d3ee 60%, #a855f7 90%);
+.text-holo {
+  background: linear-gradient(100deg, #1d4ed8 0%, #7c3aed 40%, #06b6d4 70%, #1d4ed8 100%);
   background-size: 200% auto;
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  animation: shimmer 6s linear infinite;
+  animation: shimmer 7s linear infinite;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .reveal, .float-a, .float-b, .glow-pulse, .text-iris {
+  .reveal, .float-a, .float-b, .float-y, .glow-pulse, .hue-spin, .text-holo {
     animation: none !important;
     opacity: 1 !important;
   }

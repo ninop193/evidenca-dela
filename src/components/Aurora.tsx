@@ -1,21 +1,33 @@
-// Temno "aurora" ozadje za liquid-glass površine (marketing, prijava).
+// Svetlo holografsko ozadje — živ pastelni mavrični mesh z iridescenco.
 export function Aurora() {
   return (
-    <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden bg-[#020617]">
+    <div
+      className="pointer-events-none fixed inset-0 -z-10 overflow-hidden"
+      style={{ background: "linear-gradient(135deg, #eef0ff 0%, #fdeaf7 45%, #eafff6 100%)" }}
+    >
       <div
-        className="aurora-orb float-a"
-        style={{ width: 560, height: 560, left: "-8%", top: "-12%", background: "radial-gradient(circle, #2f63ff, transparent 70%)" }}
+        className="holo-orb float-a"
+        style={{ width: 720, height: 720, left: "-12%", top: "-18%", background: "radial-gradient(circle, var(--color-holo-rose), transparent 66%)" }}
       />
       <div
-        className="aurora-orb float-b"
-        style={{ width: 520, height: 520, right: "-6%", top: "6%", background: "radial-gradient(circle, #a855f7, transparent 70%)" }}
+        className="holo-orb float-b"
+        style={{ width: 660, height: 660, right: "-10%", top: "-10%", background: "radial-gradient(circle, var(--color-holo-sky), transparent 66%)" }}
       />
       <div
-        className="aurora-orb float-a"
-        style={{ width: 620, height: 620, left: "22%", bottom: "-26%", background: "radial-gradient(circle, #22d3ee, transparent 70%)", animationDelay: "-7s" }}
+        className="holo-orb float-a"
+        style={{ width: 760, height: 760, left: "8%", bottom: "-30%", background: "radial-gradient(circle, var(--color-holo-violet), transparent 66%)", animationDelay: "-7s" }}
       />
-      <div className="grain absolute inset-0 opacity-[0.13] mix-blend-overlay" />
-      <div className="absolute inset-0 bg-gradient-to-b from-[#020617]/10 via-[#020617]/40 to-[#020617]" />
+      <div
+        className="holo-orb float-b"
+        style={{ width: 620, height: 620, right: "2%", bottom: "-22%", background: "radial-gradient(circle, var(--color-holo-mint), transparent 66%)", animationDelay: "-4s" }}
+      />
+      <div
+        className="holo-orb float-y"
+        style={{ width: 520, height: 520, left: "38%", top: "28%", background: "radial-gradient(circle, var(--color-holo-peach), transparent 66%)", opacity: 0.7 }}
+      />
+      <div className="holo-sheen hue-spin absolute inset-0 opacity-70" />
+      <div className="grain absolute inset-0 opacity-[0.05]" />
+      <div className="absolute inset-0 bg-white/10" />
     </div>
   );
 }
