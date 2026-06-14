@@ -126,10 +126,16 @@ export function Badge({
 /* Brand wordmark                                                              */
 /* -------------------------------------------------------------------------- */
 
-export function Wordmark({ className }: { className?: string }) {
+export function Wordmark({ className, dark }: { className?: string; dark?: boolean }) {
   return (
-    <span className={cn("inline-flex items-center gap-2 font-semibold text-slate-900", className)}>
-      <span className="grid h-6 w-6 place-items-center rounded-lg bg-brand-600 shadow-soft">
+    <span
+      className={cn(
+        "inline-flex items-center gap-2 font-bold tracking-tight",
+        dark ? "text-white" : "text-slate-900",
+        className,
+      )}
+    >
+      <span className="grid h-6 w-6 place-items-center rounded-lg bg-gradient-to-br from-brand-400 to-brand-600 shadow-[0_4px_14px_-2px_rgba(47,99,255,0.6)]">
         <span className="block h-2.5 w-2.5 rounded-full border-2 border-white" />
       </span>
       Evidenca dela
