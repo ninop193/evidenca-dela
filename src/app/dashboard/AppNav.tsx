@@ -22,8 +22,8 @@ export default function AppNav({ companyName }: { companyName: string }) {
     exact ? pathname === href : pathname === href || pathname.startsWith(href + "/") || pathname === href;
 
   return (
-    <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/85 backdrop-blur">
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
+    <header className="sticky top-0 z-30 px-3 pt-3">
+      <div className="glass iris-edge mx-auto flex max-w-6xl items-center justify-between rounded-full px-4 py-2.5">
         <div className="flex items-center gap-6">
           <Link href="/dashboard">
             <Wordmark />
@@ -34,10 +34,10 @@ export default function AppNav({ companyName }: { companyName: string }) {
                 key={it.href}
                 href={it.href}
                 className={cn(
-                  "rounded-lg px-3 py-1.5 text-sm font-medium transition",
+                  "rounded-full px-3 py-1.5 text-sm font-medium transition",
                   isActive(it.href, it.exact)
-                    ? "bg-brand-50 text-brand-700"
-                    : "text-slate-600 hover:bg-slate-100 hover:text-slate-900",
+                    ? "bg-brand-600 text-white shadow-[0_6px_16px_-6px_rgba(29,78,216,0.7)]"
+                    : "text-slate-600 hover:bg-white/60 hover:text-slate-900",
                 )}
               >
                 {it.label}
@@ -51,13 +51,13 @@ export default function AppNav({ companyName }: { companyName: string }) {
             {companyName}
           </span>
           <form action={signOut}>
-            <button className="rounded-lg px-3 py-1.5 text-sm font-medium text-slate-600 ring-1 ring-slate-200 hover:bg-slate-100">
+            <button className="rounded-full bg-white/60 px-3 py-1.5 text-sm font-medium text-slate-700 ring-1 ring-white/70 transition hover:bg-white/80">
               Odjava
             </button>
           </form>
           <button
             onClick={() => setOpen((v) => !v)}
-            className="rounded-lg p-2 text-slate-600 ring-1 ring-slate-200 md:hidden"
+            className="rounded-full bg-white/60 p-2 text-slate-600 ring-1 ring-white/70 md:hidden"
             aria-label="Meni"
           >
             <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -69,17 +69,17 @@ export default function AppNav({ companyName }: { companyName: string }) {
 
       {/* Mobilni meni */}
       {open && (
-        <nav className="border-t border-slate-100 px-4 py-2 md:hidden">
+        <nav className="glass iris-edge mx-auto mt-2 max-w-6xl rounded-2xl p-2 md:hidden">
           {ITEMS.map((it) => (
             <Link
               key={it.href}
               href={it.href}
               onClick={() => setOpen(false)}
               className={cn(
-                "block rounded-lg px-3 py-2 text-sm font-medium",
+                "block rounded-xl px-3 py-2 text-sm font-medium",
                 isActive(it.href, it.exact)
-                  ? "bg-brand-50 text-brand-700"
-                  : "text-slate-700 hover:bg-slate-100",
+                  ? "bg-brand-600 text-white"
+                  : "text-slate-700 hover:bg-white/60",
               )}
             >
               {it.label}

@@ -13,22 +13,22 @@ type Size = "sm" | "md" | "lg";
 
 const VARIANTS: Record<Variant, string> = {
   primary:
-    "bg-brand-600 text-white shadow-soft hover:bg-brand-700 active:bg-brand-800",
+    "bg-brand-600 text-white shadow-[0_8px_22px_-8px_rgba(29,78,216,0.7)] hover:bg-brand-500 active:bg-brand-700",
   secondary:
-    "bg-white text-slate-800 ring-1 ring-slate-200 shadow-soft hover:bg-slate-50 hover:ring-slate-300",
-  ghost: "text-slate-600 hover:bg-slate-100 hover:text-slate-900",
-  danger: "bg-white text-red-600 ring-1 ring-red-200 hover:bg-red-50",
+    "glass sheen text-slate-800 hover:bg-white/75",
+  ghost: "text-slate-600 hover:bg-white/60 hover:text-slate-900",
+  danger: "bg-white/70 text-red-600 ring-1 ring-red-200 hover:bg-red-50",
 };
 
 const SIZES: Record<Size, string> = {
-  sm: "h-9 px-3.5 text-sm rounded-lg gap-1.5",
-  md: "h-11 px-5 text-sm rounded-xl gap-2",
-  lg: "h-12 px-6 text-base rounded-xl gap-2",
+  sm: "h-9 px-4 text-sm rounded-full gap-1.5",
+  md: "h-11 px-5 text-sm rounded-full gap-2",
+  lg: "h-12 px-6 text-base rounded-full gap-2",
 };
 
 export function buttonClasses(variant: Variant = "primary", size: Size = "md") {
   return cn(
-    "inline-flex items-center justify-center font-semibold transition-all duration-150",
+    "inline-flex items-center justify-center font-semibold transition-all duration-200 cursor-pointer",
     "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/40 focus-visible:ring-offset-1",
     "disabled:opacity-50 disabled:pointer-events-none select-none",
     VARIANTS[variant],
@@ -46,15 +46,12 @@ export function Button({
 }
 
 /* -------------------------------------------------------------------------- */
-/* Card                                                                        */
+/* Card — frosted glass                                                        */
 /* -------------------------------------------------------------------------- */
 
 export function Card({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
   return (
-    <div
-      className={cn("rounded-2xl bg-white ring-1 ring-slate-200/80 shadow-card", className)}
-      {...props}
-    />
+    <div className={cn("glass-strong iris-edge rounded-2xl", className)} {...props} />
   );
 }
 
@@ -63,15 +60,20 @@ export function Card({ className, ...props }: React.HTMLAttributes<HTMLDivElemen
 /* -------------------------------------------------------------------------- */
 
 export const inputClasses = cn(
-  "w-full rounded-xl border-0 bg-white px-3.5 py-2.5 text-[15px] text-slate-900",
-  "ring-1 ring-slate-200 shadow-soft placeholder:text-slate-400",
-  "transition focus:outline-none focus:ring-2 focus:ring-brand-500",
+  "w-full rounded-xl bg-white/70 px-3.5 py-2.5 text-[15px] text-slate-900",
+  "ring-1 ring-white/80 shadow-[inset_0_1px_2px_rgba(120,130,200,0.08)] placeholder:text-slate-400",
+  "outline-none transition focus:ring-2 focus:ring-brand-500",
 );
 
 export const Input = React.forwardRef<HTMLInputElement, React.InputHTMLAttributes<HTMLInputElement>>(
   function Input({ className, ...props }, ref) {
     return <input ref={ref} className={cn(inputClasses, className)} {...props} />;
   },
+);
+
+export const selectClasses = cn(
+  "w-full rounded-xl bg-white/70 px-3.5 py-2.5 text-[15px] text-slate-900",
+  "ring-1 ring-white/80 outline-none transition focus:ring-2 focus:ring-brand-500",
 );
 
 export function Field({
@@ -98,11 +100,11 @@ export function Field({
 
 type BadgeTone = "brand" | "green" | "amber" | "slate" | "red";
 const TONES: Record<BadgeTone, string> = {
-  brand: "bg-brand-50 text-brand-700 ring-brand-100",
-  green: "bg-emerald-50 text-emerald-700 ring-emerald-100",
-  amber: "bg-amber-50 text-amber-700 ring-amber-100",
-  slate: "bg-slate-100 text-slate-600 ring-slate-200",
-  red: "bg-red-50 text-red-700 ring-red-100",
+  brand: "bg-brand-50/80 text-brand-700 ring-brand-200/60",
+  green: "bg-emerald-50/80 text-emerald-700 ring-emerald-200/60",
+  amber: "bg-amber-50/80 text-amber-700 ring-amber-200/60",
+  slate: "bg-white/70 text-slate-600 ring-slate-200/70",
+  red: "bg-red-50/80 text-red-700 ring-red-200/60",
 };
 
 export function Badge({

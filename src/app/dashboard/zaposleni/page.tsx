@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Users, UserPlus } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { Badge, Card, buttonClasses } from "@/components/ui";
 
@@ -17,27 +18,27 @@ export default async function EmployeesPage() {
           <p className="mt-1 text-sm text-slate-500">Upravljaj delavce in njihove podatke.</p>
         </div>
         <Link href="/dashboard/zaposleni/nov" className={buttonClasses("primary")}>
-          ＋ Dodaj zaposlenega
+          <UserPlus className="h-4 w-4" /> Dodaj zaposlenega
         </Link>
       </div>
 
       <div className="mt-6">
         {!employees || employees.length === 0 ? (
           <Card className="grid place-items-center px-6 py-16 text-center">
-            <div className="grid h-12 w-12 place-items-center rounded-2xl bg-brand-50 text-2xl text-brand-600">
-              👤
+            <div className="grid h-12 w-12 place-items-center rounded-2xl bg-gradient-to-br from-brand-500 to-brand-700 text-white">
+              <Users className="h-6 w-6" />
             </div>
             <p className="mt-4 font-medium text-slate-900">Še nimaš dodanih zaposlenih</p>
             <p className="mt-1 text-sm text-slate-500">Dodaj prvega in mu omogoči žigosanje.</p>
             <Link href="/dashboard/zaposleni/nov" className={buttonClasses("primary") + " mt-5"}>
-              ＋ Dodaj zaposlenega
+              <UserPlus className="h-4 w-4" /> Dodaj zaposlenega
             </Link>
           </Card>
         ) : (
           <Card className="overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm">
-                <thead className="border-b border-slate-100 bg-slate-50/60 text-slate-500">
+                <thead className="border-b border-slate-100 bg-white/45 text-slate-500">
                   <tr>
                     <Th>Ime in priimek</Th>
                     <Th>Delovno mesto</Th>
@@ -48,7 +49,7 @@ export default async function EmployeesPage() {
                 </thead>
                 <tbody className="divide-y divide-slate-50">
                   {employees.map((e) => (
-                    <tr key={e.id} className="transition hover:bg-slate-50/60">
+                    <tr key={e.id} className="transition hover:bg-white/45">
                       <td className="px-4 py-3.5 font-medium text-slate-900">
                         {e.full_name}
                         {e.is_management && (

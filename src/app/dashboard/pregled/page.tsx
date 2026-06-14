@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Download, Printer, ChevronLeft, ChevronRight } from "lucide-react";
 import { getProfile } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { Card, buttonClasses } from "@/components/ui";
@@ -88,24 +89,24 @@ export default async function MonthlyOverviewPage({
         </div>
         <div className="flex items-center gap-2">
           <a href={`/dashboard/pregled/excel?month=${month}`} className={buttonClasses("secondary", "sm")}>
-            ⬇ Excel
+            <Download className="h-4 w-4" /> Excel
           </a>
           <Link href={`/dashboard/pregled/print?month=${month}`} className={buttonClasses("primary", "sm")}>
-            🖨 PDF
+            <Printer className="h-4 w-4" /> PDF
           </Link>
         </div>
       </div>
 
       {/* Mesečna navigacija */}
       <div className="mt-6 flex items-center justify-center gap-2">
-        <Link href={`/dashboard/pregled?month=${shiftMonth(month, -1)}`} className={buttonClasses("secondary", "sm")}>
-          ←
+        <Link href={`/dashboard/pregled?month=${shiftMonth(month, -1)}`} className={buttonClasses("secondary", "sm") + " !px-3"}>
+          <ChevronLeft className="h-4 w-4" />
         </Link>
         <span className="min-w-44 text-center text-base font-semibold capitalize text-slate-900">
           {monthLabel(month)}
         </span>
-        <Link href={`/dashboard/pregled?month=${shiftMonth(month, 1)}`} className={buttonClasses("secondary", "sm")}>
-          →
+        <Link href={`/dashboard/pregled?month=${shiftMonth(month, 1)}`} className={buttonClasses("secondary", "sm") + " !px-3"}>
+          <ChevronRight className="h-4 w-4" />
         </Link>
       </div>
 
@@ -143,7 +144,7 @@ export default async function MonthlyOverviewPage({
                       </thead>
                       <tbody className="divide-y divide-slate-50">
                         {list.map((e) => (
-                          <tr key={e.id} className="hover:bg-slate-50/60">
+                          <tr key={e.id} className="hover:bg-white/45">
                             <td className="px-4 py-2.5 capitalize text-slate-700">{fmtDate(e.date)}</td>
                             <td className="px-4 py-2.5 text-slate-600">{fmtTime(e.clock_in)}</td>
                             <td className="px-4 py-2.5 text-slate-600">{fmtTime(e.clock_out)}</td>
@@ -164,7 +165,7 @@ export default async function MonthlyOverviewPage({
                         ))}
                       </tbody>
                       <tfoot>
-                        <tr className="border-t border-slate-200 bg-slate-50/60 font-semibold text-slate-900">
+                        <tr className="border-t border-slate-200 bg-white/45 font-semibold text-slate-900">
                           <td className="px-4 py-2.5" colSpan={3}>
                             Skupaj
                           </td>

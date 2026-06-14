@@ -1,6 +1,8 @@
 import { redirect } from "next/navigation";
 import { getProfile } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
+import { Aurora } from "@/components/Aurora";
+import { Wordmark } from "@/components/ui";
 import { signOut } from "../(auth)/actions";
 import ClockWidget from "./ClockWidget";
 
@@ -42,25 +44,23 @@ export default async function ZigosanjePage() {
   }
 
   return (
-    <main className="flex min-h-screen flex-col bg-slate-50">
-      <header className="sticky top-0 z-20 border-b border-slate-200 bg-white/85 backdrop-blur">
-        <div className="mx-auto flex max-w-md items-center justify-between px-4 py-3.5">
+    <main className="relative flex min-h-screen flex-col text-slate-800">
+      <Aurora />
+      <header className="sticky top-0 z-20 px-3 pt-3">
+        <div className="glass iris-edge mx-auto flex max-w-md items-center justify-between rounded-full px-4 py-2.5">
           <div className="flex items-center gap-2.5">
-            <span className="grid h-8 w-8 place-items-center rounded-lg bg-brand-600 shadow-soft">
-              <span className="block h-3 w-3 rounded-full border-2 border-white" />
-            </span>
-            <div>
-              <p className="text-xs text-slate-500">Pozdravljen</p>
-              <h1 className="text-sm font-bold leading-tight text-slate-900">
-                {profile.full_name ?? "Zaposleni"}
-              </h1>
-            </div>
+            <Wordmark className="text-sm" />
           </div>
-          <form action={signOut}>
-            <button className="rounded-lg px-3 py-1.5 text-sm font-medium text-slate-600 ring-1 ring-slate-200 hover:bg-slate-100">
-              Odjava
-            </button>
-          </form>
+          <div className="flex items-center gap-3">
+            <span className="hidden text-sm font-medium text-slate-500 xs:block">
+              {profile.full_name?.split(" ")[0] ?? "Zaposleni"}
+            </span>
+            <form action={signOut}>
+              <button className="rounded-full bg-white/60 px-3 py-1.5 text-sm font-medium text-slate-700 ring-1 ring-white/70 hover:bg-white/80">
+                Odjava
+              </button>
+            </form>
+          </div>
         </div>
       </header>
 

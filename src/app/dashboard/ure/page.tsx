@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Clock, Plus } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { Badge, Card, buttonClasses } from "@/components/ui";
 
@@ -44,15 +45,15 @@ export default async function HoursPage() {
           <p className="mt-1 text-sm text-slate-500">Zadnji vnosi delovnega časa.</p>
         </div>
         <Link href="/dashboard/ure/nov" className={buttonClasses("primary")}>
-          ＋ Ročni vnos
+          <Plus className="h-4 w-4" /> Ročni vnos
         </Link>
       </div>
 
       <div className="mt-6">
         {rows.length === 0 ? (
           <Card className="grid place-items-center px-6 py-16 text-center">
-            <div className="grid h-12 w-12 place-items-center rounded-2xl bg-brand-50 text-2xl text-brand-600">
-              ⏱
+            <div className="grid h-12 w-12 place-items-center rounded-2xl bg-gradient-to-br from-brand-500 to-brand-700 text-white">
+              <Clock className="h-6 w-6" />
             </div>
             <p className="mt-4 font-medium text-slate-900">Še ni zabeleženih ur</p>
             <p className="mt-1 text-sm text-slate-500">
@@ -63,7 +64,7 @@ export default async function HoursPage() {
           <Card className="overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm">
-                <thead className="border-b border-slate-100 bg-slate-50/60 text-slate-500">
+                <thead className="border-b border-slate-100 bg-white/45 text-slate-500">
                   <tr>
                     <Th>Datum</Th>
                     <Th>Zaposleni</Th>
@@ -77,7 +78,7 @@ export default async function HoursPage() {
                 </thead>
                 <tbody className="divide-y divide-slate-50">
                   {rows.map((r) => (
-                    <tr key={r.id} className="transition hover:bg-slate-50/60">
+                    <tr key={r.id} className="transition hover:bg-white/45">
                       <td className="px-4 py-3.5 text-slate-900">{fmtDate(r.date)}</td>
                       <td className="px-4 py-3.5 text-slate-700">{r.employees?.full_name ?? "—"}</td>
                       <td className="px-4 py-3.5 text-slate-600">{fmtTime(r.clock_in)}</td>

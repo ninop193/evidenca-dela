@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Calculator from "./Calculator";
 import { PLACA_CONFIG } from "@/lib/placa";
+import { Aurora } from "@/components/Aurora";
 import { Wordmark, buttonClasses } from "@/components/ui";
 
 export const metadata: Metadata = {
@@ -64,14 +65,15 @@ export default function KalkulatorPage() {
   };
 
   return (
-    <main className="min-h-screen bg-slate-50">
+    <main className="relative min-h-screen text-slate-800">
+      <Aurora />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      <header className="sticky top-0 z-20 border-b border-slate-100 bg-white/80 backdrop-blur">
-        <div className="mx-auto flex max-w-2xl items-center justify-between px-4 py-3.5">
+      <header className="sticky top-0 z-20 px-3 pt-3">
+        <div className="glass iris-edge mx-auto flex max-w-2xl items-center justify-between rounded-full px-4 py-2.5">
           <Link href="/">
             <Wordmark />
           </Link>
@@ -122,7 +124,7 @@ export default function KalkulatorPage() {
         </section>
       </div>
 
-      <footer className="border-t border-slate-200 bg-white py-8 text-center text-sm text-slate-500">
+      <footer className="py-8 text-center text-sm text-slate-500">
         Evidenca dela — preprosta evidenca delovnega časa za mikro podjetja.
       </footer>
     </main>

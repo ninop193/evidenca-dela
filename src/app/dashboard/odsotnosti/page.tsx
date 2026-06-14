@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Palmtree, Plus } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { Card, buttonClasses } from "@/components/ui";
 import { TYPE_LABELS, CATEGORY_LABELS } from "./labels";
@@ -35,15 +36,15 @@ export default async function AbsencesPage() {
           <p className="mt-1 text-sm text-slate-500">Dopust, bolniška in druge odsotnosti.</p>
         </div>
         <Link href="/dashboard/odsotnosti/nov" className={buttonClasses("primary")}>
-          ＋ Nova odsotnost
+          <Plus className="h-4 w-4" /> Nova odsotnost
         </Link>
       </div>
 
       <div className="mt-6">
         {rows.length === 0 ? (
           <Card className="grid place-items-center px-6 py-16 text-center">
-            <div className="grid h-12 w-12 place-items-center rounded-2xl bg-brand-50 text-2xl text-brand-600">
-              🌴
+            <div className="grid h-12 w-12 place-items-center rounded-2xl bg-gradient-to-br from-brand-500 to-brand-700 text-white">
+              <Palmtree className="h-6 w-6" />
             </div>
             <p className="mt-4 font-medium text-slate-900">Še ni vnesenih odsotnosti</p>
             <p className="mt-1 text-sm text-slate-500">Dodaj dopust ali bolniško za zaposlenega.</p>
@@ -52,7 +53,7 @@ export default async function AbsencesPage() {
           <Card className="overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm">
-                <thead className="border-b border-slate-100 bg-slate-50/60 text-slate-500">
+                <thead className="border-b border-slate-100 bg-white/45 text-slate-500">
                   <tr>
                     <Th>Zaposleni</Th>
                     <Th>Obdobje</Th>
@@ -64,7 +65,7 @@ export default async function AbsencesPage() {
                 </thead>
                 <tbody className="divide-y divide-slate-50">
                   {rows.map((r) => (
-                    <tr key={r.id} className="transition hover:bg-slate-50/60">
+                    <tr key={r.id} className="transition hover:bg-white/45">
                       <td className="px-4 py-3.5 font-medium text-slate-900">{r.employees?.full_name ?? "—"}</td>
                       <td className="px-4 py-3.5 text-slate-600">
                         {fmtDate(r.date_from)} – {fmtDate(r.date_to)}

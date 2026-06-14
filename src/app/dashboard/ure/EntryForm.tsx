@@ -85,7 +85,7 @@ export default function EntryForm({
           name="employeeId"
           required
           defaultValue={initial?.employeeId ?? ""}
-          className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-base text-slate-900 outline-none focus:ring-2 focus:ring-brand-500"
+          className="w-full rounded-xl bg-white/70 px-3.5 py-2.5 text-[15px] text-slate-900 ring-1 ring-white/80 outline-none transition focus:ring-2 focus:ring-brand-500"
         >
           <option value="" disabled>
             Izberi zaposlenega
@@ -119,7 +119,7 @@ export default function EntryForm({
           <select
             name="workTimeType"
             defaultValue={initial?.workTimeType ?? "polni"}
-            className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-base text-slate-900 outline-none focus:ring-2 focus:ring-brand-500"
+            className="w-full rounded-xl bg-white/70 px-3.5 py-2.5 text-[15px] text-slate-900 ring-1 ring-white/80 outline-none transition focus:ring-2 focus:ring-brand-500"
           >
             <option value="polni">Polni</option>
             <option value="krajsi">Krajši</option>
@@ -145,7 +145,7 @@ export default function EntryForm({
       </button>
 
       {showAdvanced && (
-        <div className="space-y-4 rounded-xl border border-slate-200 bg-slate-50 p-4">
+        <div className="space-y-4 rounded-2xl bg-white/50 ring-1 ring-white/70 p-4">
           <div className="grid grid-cols-2 gap-3">
             <Field label="Nočne ure" name="nightHours" type="number" step="0.25" defaultValue={initial?.nightHours} placeholder="0" />
             <Field label="Nedeljske ure" name="sundayHours" type="number" step="0.25" defaultValue={initial?.sundayHours} placeholder="0" />
@@ -170,7 +170,7 @@ export default function EntryForm({
         <button
           type="submit"
           disabled={loading}
-          className="flex-1 rounded-xl bg-brand-600 py-3 text-base font-semibold text-white shadow-soft transition hover:bg-brand-700 disabled:opacity-50"
+          className="flex-1 rounded-full bg-brand-600 py-3 text-base font-semibold text-white shadow-[0_10px_30px_-8px_rgba(29,78,216,0.6)] transition hover:bg-brand-500 disabled:opacity-50"
         >
           {loading ? "Shranjujem…" : mode === "edit" ? "Shrani spremembe" : "Shrani vnos"}
         </button>
@@ -223,7 +223,7 @@ function Field({
         required={required}
         placeholder={placeholder}
         defaultValue={defaultValue}
-        className="w-full rounded-xl border border-slate-300 px-3 py-2.5 text-base text-slate-900 outline-none focus:ring-2 focus:ring-brand-500"
+        className="w-full rounded-xl bg-white/70 px-3.5 py-2.5 text-[15px] text-slate-900 ring-1 ring-white/80 outline-none transition focus:ring-2 focus:ring-brand-500"
       />
     </label>
   );

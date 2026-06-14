@@ -81,7 +81,7 @@ function Cell({
   strong?: boolean;
 }) {
   return (
-    <div className="rounded-2xl bg-white p-4 ring-1 ring-slate-200/80 shadow-soft">
+    <div className="glass-strong iris-edge rounded-2xl p-4">
       <p className="text-xs text-slate-500">
         {label} <span className="text-slate-400">· {sub}</span>
       </p>
