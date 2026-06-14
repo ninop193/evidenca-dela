@@ -120,20 +120,27 @@ export default function ClockWidget({
         <span className="absolute inset-5 rounded-full bg-gradient-to-t from-transparent via-transparent to-white/45" />
         <span className="absolute inset-5 rounded-full ring-1 ring-white/40" />
 
-        {/* vsebina — optično centrirano */}
-        <span className="relative flex flex-col items-center justify-center leading-none text-white">
-          {loading ? (
-            <Loader2 className="mb-2 h-7 w-7 animate-spin" />
-          ) : isOpen ? (
-            <Square className="mb-2 h-6 w-6 fill-white" strokeWidth={0} />
-          ) : (
-            <Play className="mb-2 ml-0.5 h-7 w-7 fill-white" strokeWidth={0} />
-          )}
-          <span className="text-[1.7rem] font-bold tracking-tight">
+        {/* vsebina — napis je fiksno na sredini; ikona lebdi nad njim, števec pod njim */}
+        <span className="absolute inset-0 grid place-items-center text-white">
+          {/* ikona nad sredino */}
+          <span className="pointer-events-none absolute left-1/2 top-[27%] -translate-x-1/2 -translate-y-1/2">
+            {loading ? (
+              <Loader2 className="h-7 w-7 animate-spin" />
+            ) : isOpen ? (
+              <Square className="h-6 w-6 fill-white" strokeWidth={0} />
+            ) : (
+              <Play className="ml-0.5 h-7 w-7 fill-white" strokeWidth={0} />
+            )}
+          </span>
+
+          {/* napis — geometrijsko središče */}
+          <span className="text-[2rem] font-bold leading-none tracking-tight">
             {isOpen ? "Odhod" : "Prihod"}
           </span>
+
+          {/* živ števec pod sredino */}
           {isOpen && (
-            <span className="mt-2 font-mono text-base tabular-nums text-white/90">
+            <span className="pointer-events-none absolute left-1/2 top-[73%] -translate-x-1/2 -translate-y-1/2 font-mono text-base tabular-nums text-white/90">
               {elapsedStr(openSince, now)}
             </span>
           )}
