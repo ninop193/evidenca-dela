@@ -8,6 +8,7 @@ import { registerCompany } from "../actions";
 import { createClient } from "@/lib/supabase/client";
 import { Aurora } from "@/components/Aurora";
 import { Wordmark } from "@/components/ui";
+import { GoogleButton } from "@/components/GoogleButton";
 
 const fieldCls =
   "w-full rounded-xl bg-white/70 px-3.5 py-2.5 text-[15px] text-slate-900 ring-1 ring-white/80 shadow-[inset_0_1px_2px_rgba(120,130,200,0.08)] placeholder:text-slate-400 outline-none transition focus:ring-2 focus:ring-brand-500";
@@ -93,6 +94,13 @@ export default function RegisterPage() {
               {!loading && <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />}
             </button>
           </form>
+
+          <div className="my-5 flex items-center gap-3 text-xs text-slate-400">
+            <span className="h-px flex-1 bg-slate-200/70" />
+            ali
+            <span className="h-px flex-1 bg-slate-200/70" />
+          </div>
+          <GoogleButton label="Registracija z Googlom" />
         </div>
 
         <p className="mt-5 text-center text-sm text-slate-500">
