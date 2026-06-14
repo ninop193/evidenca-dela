@@ -38,21 +38,38 @@ export async function clockIn(): Promise<ActionResult> {
   const { supabase, employee } = await getEmployee();
   if (!employee) return { error: "Ni najdenega zaposlenega." };
 
-  // Prepreči dvojni prihod (že odprt vnos).
-  const { data: open } = await supabase
+  const today = todayLjubljana();
+
+  // Poišči vse odprte vnose (brez odhoda).
+  const { data: openEntries } = await supabase
     .from("time_entries")
-    .select("id")
+    .select("id, date, clock_in")
     .eq("employee_id", employee.id)
-    .is("clock_out", null)
-    .limit(1);
-  if (open && open.length > 0) {
+    .is("clock_out", null);
+
+  // Že odprt vnos za DANES → prepreči dvojni prihod.
+  if ((openEntries ?? []).some((e) => e.date === today)) {
     return { error: "Prihod je že zabeležen." };
+  }
+
+  // Pozabljen odhod iz prejšnjega dne → samodejno zaključi in označi za pregled.
+  const stale = (openEntries ?? []).filter((e) => e.date !== today);
+  for (const s of stale) {
+    await supabase
+      .from("time_entries")
+      .update({
+        clock_out: s.clock_in,
+        hours_count: 0,
+        total_worked_hours: 0,
+        notes: "Samodejno zaprto – manjka odhod. Prosimo, popravite ure.",
+      })
+      .eq("id", s.id);
   }
 
   const { error } = await supabase.from("time_entries").insert({
     company_id: employee.company_id,
     employee_id: employee.id,
-    date: todayLjubljana(),
+    date: today,
     clock_in: new Date().toISOString(),
   });
   if (error) return { error: "Napaka pri beleženju prihoda." };
