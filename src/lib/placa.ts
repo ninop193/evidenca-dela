@@ -3,13 +3,13 @@
 //
 // ⚠️ POMEMBNO: vse stopnje in olajšave so REGULIRANE številke (FURS).
 // Preden kalkulator javno promoviraš, jih POTRDI pri FURS za tekoče leto.
-// Spodnje vrednosti so izhodišče za leto 2025 in NISO pravno preverjene.
+// Spodnje vrednosti so izhodišče in NISO pravno preverjene za leto 2026.
 //
 // Vir za preverjanje: FURS – Dohodnina, prispevki za socialno varnost.
 // =============================================================================
 
 export const PLACA_CONFIG = {
-  leto: 2025,
+  leto: 2026,
 
   // Prispevki za socialno varnost (delež bruto plače)
   prispevkiDelojemalca: 0.221, // 22,10 % (bremenijo zaposlenega)
