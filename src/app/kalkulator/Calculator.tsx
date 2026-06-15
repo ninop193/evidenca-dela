@@ -57,7 +57,7 @@ export default function Calculator() {
         <div className="relative">
           <h2 className="text-lg font-bold text-white">Vodiš evidenco ur ročno?</h2>
           <p className="mx-auto mt-1.5 max-w-sm text-sm text-slate-300">
-            Naša aplikacija beleži ure in odsotnosti skladno z ZEPDSV — zaposleni žigosajo z enim
+            Naša aplikacija beleži ure in odsotnosti skladno z ZEPDSV, zaposleni žigosajo z enim
             tapom, ti izvoziš evidenco za inšpekcijo.
           </p>
           <Link href="/register" className={buttonClasses("primary", "lg") + " mt-5"}>
@@ -124,7 +124,7 @@ function EmailCapture() {
         Dobi brezplačen mesec preizkusa evidence ur
       </p>
       <p className="mt-1 text-xs text-slate-500">
-        Pusti email in pošljemo ti dostop — brez obveznosti.
+        Pusti email in pošljemo ti dostop, brez obveznosti.
       </p>
       <form onSubmit={submit} className="mt-3 flex flex-col gap-2 sm:flex-row">
         <Input

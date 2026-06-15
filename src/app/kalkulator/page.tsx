@@ -5,12 +5,13 @@ import { PLACA_CONFIG } from "@/lib/placa";
 import { Aurora } from "@/components/Aurora";
 import { Reveal } from "@/components/Reveal";
 import { Faq } from "@/components/Faq";
+import { Footer } from "@/components/Footer";
 import { Wordmark, buttonClasses } from "@/components/ui";
 
 export const metadata: Metadata = {
   title: `Bruto-neto kalkulator plače ${PLACA_CONFIG.leto} | Izračun neto plače`,
   description:
-    "Brezplačen bruto-neto kalkulator plače za Slovenijo. Izračunaj neto plačo iz bruto zneska — prispevki, dohodnina in strošek delodajalca. Hitro in preprosto.",
+    "Brezplačen bruto-neto kalkulator plače za Slovenijo. Izračunaj neto plačo iz bruto zneska, prispevki, dohodnina in strošek delodajalca. Hitro in preprosto.",
   keywords: [
     "bruto neto kalkulator",
     "izračun neto plače",
@@ -22,7 +23,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: `Bruto-neto kalkulator plače ${PLACA_CONFIG.leto}`,
     description:
-      "Izračunaj neto plačo iz bruto zneska — prispevki, dohodnina in strošek delodajalca.",
+      "Izračunaj neto plačo iz bruto zneska, prispevki, dohodnina in strošek delodajalca.",
     type: "website",
     locale: "sl_SI",
   },
@@ -31,7 +32,7 @@ export const metadata: Metadata = {
 const faq = [
   {
     q: "Kako izračunam neto plačo iz bruto?",
-    a: "Od bruto plače se odštejejo prispevki zaposlenega (22,10 %) in akontacija dohodnine (po lestvici, ob upoštevanju splošne olajšave). Razlika je neto plača — znesek izplačila.",
+    a: "Od bruto plače se odštejejo prispevki zaposlenega (22,10 %) in akontacija dohodnine (po lestvici, ob upoštevanju splošne olajšave). Razlika je neto plača, znesek izplačila.",
   },
   {
     q: "Kakšna je razlika med bruto in neto plačo?",
@@ -43,7 +44,7 @@ const faq = [
   },
   {
     q: "Koliko stane zaposleni delodajalca?",
-    a: "Delodajalec na bruto plačo dodatno plača 16,10 % prispevkov. Skupni strošek delodajalca je torej bruto plača + 16,10 % — kalkulator ti ta znesek izračuna samodejno.",
+    a: "Delodajalec na bruto plačo dodatno plača 16,10 % prispevkov. Skupni strošek delodajalca je torej bruto plača + 16,10 %, kalkulator ti ta znesek izračuna samodejno.",
   },
   {
     q: "Kako se obračuna dohodnina?",
@@ -51,7 +52,7 @@ const faq = [
   },
   {
     q: "Ali kalkulator upošteva olajšave za otroke?",
-    a: "Osnovni izračun upošteva splošno olajšavo. Olajšave za vzdrževane družinske člane (otroke) trenutno niso vključene — za uradni izračun se posvetuj z računovodjo ali preveri pri FURS.",
+    a: "Osnovni izračun upošteva splošno olajšavo. Olajšave za vzdrževane družinske člane (otroke) trenutno niso vključene, za uradni izračun se posvetuj z računovodjo ali preveri pri FURS.",
   },
 ];
 
@@ -137,9 +138,7 @@ export default function KalkulatorPage() {
         </section>
       </div>
 
-      <footer className="py-8 text-center text-sm text-slate-500">
-        Evidenca dela — preprosta evidenca delovnega časa za mikro podjetja.
-      </footer>
+      <Footer />
     </main>
   );
 }

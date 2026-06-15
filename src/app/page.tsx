@@ -14,6 +14,7 @@ import {
 import { Aurora } from "@/components/Aurora";
 import { Reveal } from "@/components/Reveal";
 import { Faq, type FaqItem } from "@/components/Faq";
+import { Footer } from "@/components/Footer";
 import { Wordmark } from "@/components/ui";
 
 const delay = (s: number) => ({ animationDelay: `${s}s` });
@@ -25,11 +26,11 @@ const FAQ: FaqItem[] = [
   },
   {
     q: "Kako hitro lahko začnem?",
-    a: "Registracija in prvi žig v manj kot 5 minutah. Brez klicev, brez pogodb, brez dolgega nastavljanja — ustvariš podjetje, dodaš zaposlene in začneš.",
+    a: "Registracija in prvi žig v manj kot 5 minutah. Brez klicev in pogodb. Ustvariš podjetje, dodaš zaposlene in začneš.",
   },
   {
     q: "Koliko stane?",
-    a: "Fiksna mesečna cena na podjetje — ne na zaposlenega. Naj imaš dva ali pet zaposlenih, plačaš enako. Brez skritih stroškov in brez vezave.",
+    a: "Fiksna mesečna cena na podjetje, ne na zaposlenega. Naj imaš dva ali pet zaposlenih, plačaš enako. Brez skritih stroškov in brez vezave.",
   },
   {
     q: "Ali zaposleni potrebujejo posebno aplikacijo iz trgovine?",
@@ -41,11 +42,11 @@ const FAQ: FaqItem[] = [
   },
   {
     q: "Kje so shranjeni podatki?",
-    a: "V EU (Frankfurt), skladno z GDPR. Vsako podjetje vidi izključno svoje podatke — stroga izolacija med podjetji od prve sekunde.",
+    a: "V EU (Frankfurt), skladno z GDPR. Vsako podjetje vidi izključno svoje podatke. Med podjetji velja stroga izolacija od prve sekunde.",
   },
   {
     q: "Ali lahko izvozim evidenco za inšpekcijo?",
-    a: "Da. Mesečno evidenco izvoziš v PDF ali Excel z enim klikom — urejeno, z vsemi zakonskimi polji in podpisnim mestom.",
+    a: "Da. Mesečno evidenco izvoziš v PDF ali Excel z enim klikom. Dokument je urejen, z vsemi zakonskimi polji in mestom za podpis.",
   },
 ];
 
@@ -120,7 +121,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* STATISTIKE — nujnost */}
+      {/* STATISTIKE, nujnost */}
       <section className="mx-auto max-w-5xl px-5 py-8">
         <div className="grid gap-4 sm:grid-cols-3">
           {[
@@ -142,9 +143,9 @@ export default function Home() {
       <section className="mx-auto max-w-6xl px-5 py-12">
         <div className="grid gap-5 sm:grid-cols-3">
           {[
-            { icon: <Smartphone className="h-5 w-5" />, title: "Žigosanje z enim tapom", text: "Velik gumb na telefonu — prihod, odhod, odmor. Brez izobraževanja, brez navodil." },
+            { icon: <Smartphone className="h-5 w-5" />, title: "Žigosanje z enim tapom", text: "Velik gumb na telefonu za prihod, odhod in odmor. Brez izobraževanja in brez navodil." },
             { icon: <FileSpreadsheet className="h-5 w-5" />, title: "Pripravljeno za inšpekcijo", text: "Vsa zakonska polja po ZEPDSV. Mesečno evidenco izvoziš v PDF ali Excel z enim klikom." },
-            { icon: <Wallet className="h-5 w-5" />, title: "Fiksna cena", text: "En znesek na podjetje — ne na zaposlenega. S.p. z dvema ali pet ljudi plača enako." },
+            { icon: <Wallet className="h-5 w-5" />, title: "Fiksna cena", text: "En znesek na podjetje, ne na zaposlenega. S.p. z dvema ali pet ljudi plača enako." },
           ].map((f, i) => (
             <Reveal key={f.title} delay={i * 100}>
               <Feature icon={f.icon} title={f.title} text={f.text} />
@@ -154,7 +155,7 @@ export default function Home() {
       </section>
 
       {/* HOW */}
-      <section className="mx-auto max-w-5xl px-5 py-16">
+      <section id="kako" className="mx-auto max-w-5xl px-5 py-16">
         <Reveal>
           <h2 className="text-center text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
             Od registracije do prvega žiga v 5 minutah
@@ -173,8 +174,52 @@ export default function Home() {
         </div>
       </section>
 
+      {/* VSEBINA — za koga / zakon */}
+      <section id="zakon" className="mx-auto max-w-5xl px-5 py-16">
+        <div className="grid gap-5 lg:grid-cols-2">
+          <Reveal>
+            <article className="glass iris-edge sheen h-full rounded-3xl p-7">
+              <h2 className="text-xl font-bold tracking-tight text-slate-900 sm:text-2xl">
+                Za koga je evidenca dela
+              </h2>
+              <p className="mt-3 text-sm leading-relaxed text-slate-600">
+                Narejena je za manjše delodajalce, ki morajo voditi evidenco delovnega časa, pa
+                nimajo časa za zapletene kadrovske programe. Uporabljajo jo samostojni podjetniki
+                z zaposlenimi, družinska podjetja in mikro podjetja do pet zaposlenih.
+              </p>
+              <p className="mt-3 text-sm leading-relaxed text-slate-600">
+                Med strankami so gostinski lokali in kavarne, frizerski in kozmetični saloni,
+                mizarstva, gradbena podjetja, avtoservisi, trgovine in storitvena podjetja.
+                Povsod, kjer ljudje prihajajo in odhajajo z dela, aplikacija nadomesti ročno
+                vodenje na papirju ali v Excelu.
+              </p>
+            </article>
+          </Reveal>
+
+          <Reveal delay={100}>
+            <article className="glass iris-edge sheen h-full rounded-3xl p-7">
+              <h2 className="text-xl font-bold tracking-tight text-slate-900 sm:text-2xl">
+                Kaj zahteva zakon (ZEPDSV)
+              </h2>
+              <p className="mt-3 text-sm leading-relaxed text-slate-600">
+                Od leta 2023 mora vsak delodajalec voditi dnevno evidenco delovnega časa za
+                vsakega zaposlenega. Novela ZEPDSV-B, ki velja od aprila 2025, te zahteve dodatno
+                zaostruje.
+              </p>
+              <p className="mt-3 text-sm leading-relaxed text-slate-600">
+                Za vsak delovni dan je treba zabeležiti čas prihoda in odhoda, število opravljenih
+                ur, nadure ter ure nočnega, nedeljskega in prazničnega dela. Voditi je treba tudi
+                odsotnosti z vrsto nadomestila, na primer dopust ali bolniško. Če evidenca ob
+                obisku inšpektorja ni urejena, sledi globa, ki za mikro podjetja znaša od 300 do
+                8.000 evrov.
+              </p>
+            </article>
+          </Reveal>
+        </div>
+      </section>
+
       {/* FAQ */}
-      <section className="mx-auto max-w-3xl px-5 py-16">
+      <section id="vprasanja" className="mx-auto max-w-3xl px-5 py-16">
         <Reveal>
           <h2 className="text-center text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
             Pogosta vprašanja
@@ -196,7 +241,7 @@ export default function Home() {
                 Zaščiti se pred globo. Še danes.
               </h2>
               <p className="mx-auto mt-3 max-w-md text-slate-600">
-                Uredi svojo evidenco v nekaj minutah — preden potrka inšpektor.
+                Uredi svojo evidenco v nekaj minutah, preden potrka inšpektor.
               </p>
               <Link href="/register" className="glow-pulse mt-8 inline-flex items-center gap-2 rounded-full bg-brand-600 px-7 py-3.5 text-base font-semibold text-white transition hover:bg-brand-500">
                 Začni brezplačno
@@ -207,15 +252,7 @@ export default function Home() {
         </Reveal>
       </section>
 
-      {/* FOOTER */}
-      <footer className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-5 py-10 text-sm text-slate-500 sm:flex-row">
-        <Wordmark className="text-sm" />
-        <div className="flex items-center gap-5">
-          <Link href="/kalkulator" className="hover:text-slate-900">Kalkulator plače</Link>
-          <Link href="/login" className="hover:text-slate-900">Prijava</Link>
-        </div>
-        <p className="text-slate-400">© {new Date().getFullYear()} Evidenca dela</p>
-      </footer>
+      <Footer />
     </div>
   );
 }
