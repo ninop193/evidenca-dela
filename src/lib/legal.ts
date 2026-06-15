@@ -7,8 +7,6 @@ export const COMPANY = {
   maticna: "9885552000",
   davcna: "SI43277292",
   ddv: true,
-  // TODO: potrdi točen osnovni kapital (privzeto = zakonski minimum za d.o.o.). Vir: AJPES/akt o ustanovitvi.
-  osnovniKapital: "7.500,00 EUR",
   register: "Poslovni register Slovenije (AJPES)",
   email: "nino.pavalec01@gmail.com", // TODO: zamenjaj z uradnim kontaktom NextEre
   product: "Evidenca dela",

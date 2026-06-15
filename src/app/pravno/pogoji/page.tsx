@@ -27,8 +27,6 @@ export default function PogojiPage() {
           <br />
           Davčna številka: {COMPANY.davcna} (zavezanec za DDV)
           <br />
-          Osnovni kapital: {COMPANY.osnovniKapital}
-          <br />
           Vpis v register: {COMPANY.register}
           <br />
           E-naslov: {COMPANY.email}
