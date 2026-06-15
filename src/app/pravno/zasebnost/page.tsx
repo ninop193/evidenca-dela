@@ -26,6 +26,8 @@ export default function ZasebnostPage() {
           <br />
           Matična številka: {COMPANY.maticna} · Davčna številka: {COMPANY.davcna}
           <br />
+          Vpis v register: {COMPANY.register}
+          <br />
           E-naslov: {COMPANY.email}
         </p>
       </LSection>
