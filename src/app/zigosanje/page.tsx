@@ -18,7 +18,7 @@ export default async function ZigosanjePage() {
   const supabase = await createClient();
   const { data: company } = await supabase
     .from("companies")
-    .select("subscription_status, trial_ends_at")
+    .select("subscription_status, trial_ends_at, current_period_end")
     .eq("id", profile.company_id)
     .single();
   const access = getAccess(company ?? {});
