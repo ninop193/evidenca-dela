@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://delovit.si"),
+  metadataBase: new URL("https://www.delovit.si"),
   title: "Delovit | Evidenca delovnega časa za mikro podjetja",
   description:
     "Preprosta evidenca delovnega časa za mikro podjetja in s.p., skladno z ZEPDSV. Fiksna cena, brez onboardinga.",

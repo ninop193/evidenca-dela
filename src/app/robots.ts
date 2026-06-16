@@ -7,6 +7,6 @@ export default function robots(): MetadataRoute.Robots {
       allow: "/",
       disallow: ["/dashboard", "/zigosanje", "/dobrodosli", "/auth"],
     },
-    sitemap: "https://delovit.si/sitemap.xml",
+    sitemap: "https://www.delovit.si/sitemap.xml",
   };
 }
