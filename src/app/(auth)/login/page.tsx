@@ -55,7 +55,12 @@ export default function LoginPage() {
               <input name="email" type="email" required placeholder="ti@podjetje.si" className={fieldCls} />
             </label>
             <label className="block">
-              <span className="mb-1.5 block text-sm font-medium text-slate-700">Geslo</span>
+              <div className="mb-1.5 flex items-center justify-between">
+                <span className="text-sm font-medium text-slate-700">Geslo</span>
+                <Link href="/pozabljeno-geslo" className="text-xs font-medium text-brand-600 hover:text-brand-700">
+                  Pozabljeno geslo?
+                </Link>
+              </div>
               <input name="password" type="password" required placeholder="••••••••" className={fieldCls} />
             </label>
 
