@@ -23,7 +23,7 @@ export default function PozabljenoGesloPage() {
 
     const supabase = createClient();
     const { error: err } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/auth/callback?next=/ponastavi-geslo`,
+      redirectTo: `${window.location.origin}/auth/reset`,
     });
     setLoading(false);
     if (err) {
