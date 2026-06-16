@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { ArrowLeft, CheckCircle2, AlertTriangle } from "lucide-react";
+import { ArrowLeft, ArrowRight, CheckCircle2, AlertTriangle } from "lucide-react";
 import { getProfile } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { getAccess, PLAN, eur } from "@/lib/billing";
@@ -15,10 +15,17 @@ const fmtDate = (d: string) =>
     new Date(d),
   );
 
-export default async function NarocninaPage() {
+export default async function NarocninaPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ welcome?: string }>;
+}) {
   const profile = await getProfile();
   if (!profile) redirect("/login");
   if (profile.role !== "admin") redirect("/zigosanje");
+
+  const sp = await searchParams;
+  const welcome = sp.welcome === "1";
 
   const supabase = await createClient();
   const { data: company } = await supabase
@@ -35,7 +42,9 @@ export default async function NarocninaPage() {
       : access.state === "past_due"
         ? "Plačilo ni uspelo"
         : access.state === "trialing"
-          ? `Še ${access.trialDaysLeft} dni brezplačnega preizkusa`
+          ? welcome
+            ? "Dobrodošel v Delovit 🎉"
+            : `Še ${access.trialDaysLeft} dni brezplačnega preizkusa`
           : access.state === "trial_expired"
             ? "Tvoj brezplačni preizkus je potekel"
             : "Aktiviraj naročnino";
@@ -46,7 +55,9 @@ export default async function NarocninaPage() {
       : access.state === "past_due"
         ? "Zadnje plačilo ni uspelo. Posodobi plačilno sredstvo, da ohraniš dostop."
         : access.state === "trialing"
-          ? "Med preizkusom imaš poln dostop. Naroči se že zdaj in nadaljuj brez prekinitve."
+          ? welcome
+            ? `Tvoj 14-dnevni brezplačni preizkus je aktiven. Nadaljuj brezplačno ali se naroči že zdaj, kakor ti ustreza.`
+            : "Med preizkusom imaš poln dostop. Naroči se že zdaj in nadaljuj brez prekinitve."
           : "Za nadaljevanje izberi paket. Tvoji podatki so shranjeni in spet dostopni takoj po plačilu.";
 
   return (
@@ -106,7 +117,31 @@ export default async function NarocninaPage() {
           </div>
         ) : (
           <>
-            <div className="mt-10">
+            {access.state === "trialing" && (
+              <div className="mx-auto mt-9 max-w-md">
+                <Link
+                  href="/dashboard"
+                  className="glass-strong iris-edge sheen group flex items-center justify-between gap-3 rounded-2xl px-5 py-4 transition hover:bg-white/70"
+                >
+                  <span>
+                    <span className="block font-semibold text-slate-900">Nadaljuj brezplačno</span>
+                    <span className="block text-sm text-slate-500">
+                      Poln dostop {access.trialDaysLeft} dni, brez kartice
+                    </span>
+                  </span>
+                  <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-brand-600 text-white transition group-hover:bg-brand-500">
+                    <ArrowRight className="h-4 w-4" />
+                  </span>
+                </Link>
+                <div className="my-6 flex items-center gap-3 text-xs font-medium uppercase tracking-wide text-slate-400">
+                  <span className="h-px flex-1 bg-slate-300/60" />
+                  ali se naroči zdaj
+                  <span className="h-px flex-1 bg-slate-300/60" />
+                </div>
+              </div>
+            )}
+
+            <div className={access.state === "trialing" ? "" : "mt-10"}>
               <SubscribeButtons />
             </div>
             <div className="mt-8 text-center text-sm text-slate-500">

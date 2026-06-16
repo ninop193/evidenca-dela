@@ -60,7 +60,7 @@ export default function DobrodosliPage() {
       setLoading(false);
       return;
     }
-    router.push("/dashboard");
+    router.push("/narocnina?welcome=1");
     router.refresh();
   }
 
