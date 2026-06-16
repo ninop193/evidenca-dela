@@ -8,8 +8,8 @@ export const COMPANY = {
   davcna: "SI43277292",
   ddv: true,
   register: "Poslovni register Slovenije (AJPES)",
-  email: "nino.pavalec01@gmail.com", // TODO: zamenjaj z uradnim kontaktom NextEre
-  product: "Evidenca dela",
+  email: "podpora@delovit.si", // ustvari ta poštni predal na Neoserv
+  product: "Delovit",
   court: "Maribor",
 };
 

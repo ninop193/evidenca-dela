@@ -3,10 +3,10 @@ import type { MetadataRoute } from "next";
 // Opis aplikacije za "Dodaj na domači zaslon" (PWA).
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Evidenca delovnega časa",
-    short_name: "Evidenca",
+    name: "Delovit",
+    short_name: "Delovit",
     description:
-      "Evidenca delovnega časa za mikro podjetja. Žigosanje prihoda in odhoda z enim gumbom.",
+      "Delovit, evidenca delovnega časa za mikro podjetja. Žigosanje prihoda in odhoda z enim gumbom.",
     start_url: "/zigosanje",
     display: "standalone",
     background_color: "#f8fafc",

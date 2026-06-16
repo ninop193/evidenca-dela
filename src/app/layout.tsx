@@ -15,13 +15,14 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Evidenca delovnega časa",
+  metadataBase: new URL("https://delovit.si"),
+  title: "Delovit | Evidenca delovnega časa za mikro podjetja",
   description:
-    "Preprosta evidenca delovnega časa za mikro podjetja in s.p. — skladno z ZEPDSV. Fiksna cena, brez onboardinga.",
+    "Preprosta evidenca delovnega časa za mikro podjetja in s.p., skladno z ZEPDSV. Fiksna cena, brez onboardinga.",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "Evidenca",
+    title: "Delovit",
   },
 };
 

@@ -72,7 +72,7 @@ export async function GET(req: NextRequest) {
   );
 
   const wb = new ExcelJS.Workbook();
-  wb.creator = "Evidenca dela";
+  wb.creator = "Delovit";
   wb.created = new Date();
 
   for (const [idx, emp] of report.employees.entries()) {

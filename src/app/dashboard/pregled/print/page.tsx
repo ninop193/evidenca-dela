@@ -93,7 +93,7 @@ export default async function PrintPage({
               <div>
                 <div className="mb-1 flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-emerald-700">
                   <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-600" />
-                  Evidenca dela
+                  Delovit
                 </div>
                 <h1 className="text-xl font-bold leading-tight text-slate-900">
                   {report.company.name}

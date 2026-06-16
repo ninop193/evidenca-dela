@@ -45,7 +45,7 @@ export function Footer() {
         </div>
 
         <div className="mt-10 flex flex-col items-start justify-between gap-2 border-t border-white/50 pt-6 text-xs text-slate-500 sm:flex-row sm:items-center">
-          <p>© {year} Evidenca dela. Storitev zagotavlja NextEra d.o.o.</p>
+          <p>© {year} Delovit. Storitev zagotavlja NextEra d.o.o.</p>
           <p>Skladno z ZEPDSV in novelo ZEPDSV-B. Podatki shranjeni v EU.</p>
         </div>
       </div>

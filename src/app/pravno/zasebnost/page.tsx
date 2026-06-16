@@ -3,8 +3,8 @@ import { LegalPage, LSection } from "@/components/LegalPage";
 import { COMPANY } from "@/lib/legal";
 
 export const metadata: Metadata = {
-  title: "Politika zasebnosti | Evidenca dela",
-  description: "Politika zasebnosti in obdelava osebnih podatkov pri storitvi Evidenca dela (NextEra d.o.o.).",
+  title: "Politika zasebnosti | Delovit",
+  description: "Politika zasebnosti in obdelava osebnih podatkov pri storitvi Delovit (NextEra d.o.o.).",
 };
 
 export default function ZasebnostPage() {

@@ -3,8 +3,8 @@ import { LegalPage, LSection } from "@/components/LegalPage";
 import { COMPANY } from "@/lib/legal";
 
 export const metadata: Metadata = {
-  title: "Pogoji uporabe | Evidenca dela",
-  description: "Pogoji uporabe storitve Evidenca dela, ki jo zagotavlja NextEra d.o.o.",
+  title: "Pogoji uporabe | Delovit",
+  description: "Pogoji uporabe storitve Delovit, ki jo zagotavlja NextEra d.o.o.",
 };
 
 export default function PogojiPage() {
