@@ -62,7 +62,8 @@ export default async function HoursPage() {
           </Card>
         ) : (
           <Card className="overflow-hidden">
-            <div className="overflow-x-auto">
+            {/* Desktop: tabela */}
+            <div className="hidden overflow-x-auto md:block">
               <table className="w-full text-left text-sm">
                 <thead className="border-b border-slate-100 bg-white/45 text-slate-500">
                   <tr>
@@ -111,6 +112,46 @@ export default async function HoursPage() {
                 </tbody>
               </table>
             </div>
+
+            {/* Mobilno: kartice */}
+            <ul className="divide-y divide-slate-100 md:hidden">
+              {rows.map((r) => (
+                <li key={r.id} className="p-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className="font-semibold text-slate-900">{fmtDate(r.date)}</p>
+                      <p className="text-sm text-slate-500">{r.employees?.full_name ?? "—"}</p>
+                    </div>
+                    <Link
+                      href={`/dashboard/ure/${r.id}`}
+                      className="shrink-0 text-sm font-medium text-brand-600 hover:text-brand-700"
+                    >
+                      Uredi
+                    </Link>
+                  </div>
+                  <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-sm">
+                    <span className="text-slate-600">
+                      {fmtTime(r.clock_in)} – {fmtTime(r.clock_out)}
+                    </span>
+                    <span className="font-semibold text-slate-900 tabular-nums">
+                      {r.clock_out == null ? "" : `${(r.total_worked_hours ?? 0).toFixed(2)} h`}
+                    </span>
+                    {(r.overtime_hours ?? 0) > 0 && (
+                      <span className="text-slate-500 tabular-nums">
+                        nad. {(r.overtime_hours ?? 0).toFixed(2)}
+                      </span>
+                    )}
+                    {r.clock_out == null ? (
+                      <Badge tone="brand">v teku</Badge>
+                    ) : (
+                      <Badge tone={r.confirmed ? "green" : "slate"}>
+                        {r.confirmed ? "potrjeno" : "v obdelavi"}
+                      </Badge>
+                    )}
+                  </div>
+                </li>
+              ))}
+            </ul>
           </Card>
         )}
       </div>

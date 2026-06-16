@@ -36,7 +36,8 @@ export default async function EmployeesPage() {
           </Card>
         ) : (
           <Card className="overflow-hidden">
-            <div className="overflow-x-auto">
+            {/* Desktop: tabela */}
+            <div className="hidden overflow-x-auto md:block">
               <table className="w-full text-left text-sm">
                 <thead className="border-b border-slate-100 bg-white/45 text-slate-500">
                   <tr>
@@ -71,6 +72,33 @@ export default async function EmployeesPage() {
                 </tbody>
               </table>
             </div>
+
+            {/* Mobilno: kartice */}
+            <ul className="divide-y divide-slate-100 md:hidden">
+              {employees.map((e) => (
+                <li key={e.id} className="p-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <p className="font-semibold text-slate-900">
+                      {e.full_name}
+                      {e.is_management && (
+                        <Badge tone="amber" className="ml-2">poslovodna</Badge>
+                      )}
+                    </p>
+                    <Badge tone={e.active ? "green" : "slate"}>
+                      {e.active ? "Aktiven" : "Neaktiven"}
+                    </Badge>
+                  </div>
+                  <dl className="mt-2 grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-sm">
+                    <dt className="text-slate-400">Delovno mesto</dt>
+                    <dd className="text-slate-700">{e.job_title ?? "—"}</dd>
+                    <dt className="text-slate-400">EMŠO</dt>
+                    <dd className="text-slate-700">{e.emso ?? "—"}</dd>
+                    <dt className="text-slate-400">Davčna</dt>
+                    <dd className="text-slate-700">{e.tax_id ?? "—"}</dd>
+                  </dl>
+                </li>
+              ))}
+            </ul>
           </Card>
         )}
       </div>

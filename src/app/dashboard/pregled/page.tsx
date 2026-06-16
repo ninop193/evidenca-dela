@@ -127,7 +127,51 @@ export default async function MonthlyOverviewPage({
                 {list.length === 0 ? (
                   <p className="px-5 py-8 text-center text-sm text-slate-400">Ni vnosov za ta mesec.</p>
                 ) : (
-                  <div className="overflow-x-auto">
+                  <>
+                  {/* Mobilno: kartice po dnevih + povzetek */}
+                  <ul className="divide-y divide-slate-100 md:hidden">
+                    {list.map((e) => {
+                      const extra: string[] = [];
+                      if ((e.overtime_hours ?? 0) > 0) extra.push(`nad. ${(e.overtime_hours ?? 0).toFixed(2)}`);
+                      if ((e.night_hours ?? 0) > 0) extra.push(`noč. ${(e.night_hours ?? 0).toFixed(2)}`);
+                      if ((e.sunday_hours ?? 0) > 0) extra.push(`ned. ${(e.sunday_hours ?? 0).toFixed(2)}`);
+                      if ((e.holiday_hours ?? 0) > 0) extra.push(`prazn. ${(e.holiday_hours ?? 0).toFixed(2)}`);
+                      return (
+                        <li key={e.id} className="px-4 py-3">
+                          <div className="flex items-center justify-between gap-3">
+                            <div>
+                              <p className="font-medium capitalize text-slate-800">{fmtDate(e.date)}</p>
+                              <p className="text-xs text-slate-500">{fmtTime(e.clock_in)} – {fmtTime(e.clock_out)}</p>
+                            </div>
+                            <div className="flex shrink-0 items-center gap-3">
+                              <span className="font-semibold text-slate-900 tabular-nums">{(e.total_worked_hours ?? 0).toFixed(2)} h</span>
+                              <Link href={`/dashboard/ure/${e.id}`} className="text-xs font-medium text-brand-600">uredi</Link>
+                            </div>
+                          </div>
+                          {extra.length > 0 && (
+                            <div className="mt-1 flex flex-wrap gap-x-3 text-xs text-slate-500 tabular-nums">
+                              {extra.map((x) => <span key={x}>{x}</span>)}
+                            </div>
+                          )}
+                        </li>
+                      );
+                    })}
+                  </ul>
+                  <div className="border-t border-slate-200 bg-white/45 px-4 py-3 text-sm md:hidden">
+                    <div className="flex items-center justify-between font-semibold text-slate-900">
+                      <span>Skupaj</span>
+                      <span className="tabular-nums">{sum(list, "total_worked_hours").toFixed(2)} h</span>
+                    </div>
+                    <div className="mt-1 flex flex-wrap gap-x-3 text-xs text-slate-500 tabular-nums">
+                      <span>nadure {sum(list, "overtime_hours").toFixed(2)}</span>
+                      <span>nočne {sum(list, "night_hours").toFixed(2)}</span>
+                      <span>nedeljske {sum(list, "sunday_hours").toFixed(2)}</span>
+                      <span>praznične {sum(list, "holiday_hours").toFixed(2)}</span>
+                    </div>
+                  </div>
+
+                  {/* Desktop: tabela */}
+                  <div className="hidden overflow-x-auto md:block">
                     <table className="w-full text-left text-sm">
                       <thead className="text-slate-500">
                         <tr className="border-b border-slate-100">
@@ -179,6 +223,7 @@ export default async function MonthlyOverviewPage({
                       </tfoot>
                     </table>
                   </div>
+                  </>
                 )}
               </Card>
             );

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Palmtree, Plus } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
-import { Card, buttonClasses } from "@/components/ui";
+import { Badge, Card, buttonClasses } from "@/components/ui";
 import { TYPE_LABELS, CATEGORY_LABELS } from "./labels";
 import DeleteAbsenceButton from "./DeleteAbsenceButton";
 
@@ -51,7 +51,8 @@ export default async function AbsencesPage() {
           </Card>
         ) : (
           <Card className="overflow-hidden">
-            <div className="overflow-x-auto">
+            {/* Desktop: tabela */}
+            <div className="hidden overflow-x-auto md:block">
               <table className="w-full text-left text-sm">
                 <thead className="border-b border-slate-100 bg-white/45 text-slate-500">
                   <tr>
@@ -87,6 +88,32 @@ export default async function AbsencesPage() {
                 </tbody>
               </table>
             </div>
+
+            {/* Mobilno: kartice */}
+            <ul className="divide-y divide-slate-100 md:hidden">
+              {rows.map((r) => (
+                <li key={r.id} className="p-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className="font-semibold text-slate-900">{r.employees?.full_name ?? "—"}</p>
+                      <p className="text-sm text-slate-500">
+                        {fmtDate(r.date_from)} – {fmtDate(r.date_to)}
+                      </p>
+                    </div>
+                    <div className="flex shrink-0 items-center gap-3">
+                      <span className="font-semibold text-slate-900 tabular-nums">
+                        {r.unworked_hours.toFixed(2)} h
+                      </span>
+                      <DeleteAbsenceButton id={r.id} />
+                    </div>
+                  </div>
+                  <div className="mt-2 flex flex-wrap gap-1.5">
+                    <Badge tone="brand">{TYPE_LABELS[r.compensation_type] ?? r.compensation_type}</Badge>
+                    <Badge tone="slate">{CATEGORY_LABELS[r.compensation_category] ?? r.compensation_category}</Badge>
+                  </div>
+                </li>
+              ))}
+            </ul>
           </Card>
         )}
       </div>
