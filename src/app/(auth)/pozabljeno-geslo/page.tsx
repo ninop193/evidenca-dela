@@ -80,11 +80,13 @@ export default function PozabljenoGesloPage() {
             </>
           )}
         </div>
-        <p className="mt-5 text-center text-sm text-slate-500">
-          <Link href="/login" className="font-semibold text-brand-600 hover:text-brand-700">
-            Nazaj na prijavo
-          </Link>
-        </p>
+        {!sent && (
+          <p className="mt-5 text-center text-sm text-slate-500">
+            <Link href="/login" className="font-semibold text-brand-600 hover:text-brand-700">
+              Nazaj na prijavo
+            </Link>
+          </p>
+        )}
       </div>
     </main>
   );
