@@ -28,6 +28,7 @@ export function Footer() {
           <div>
             <h3 className="text-sm font-semibold text-slate-900">Spoznaj</h3>
             <ul className="mt-3 space-y-2 text-sm text-slate-600">
+              <li><Link href="/#cena" className="hover:text-brand-700">Cena</Link></li>
               <li><Link href="/#kako" className="hover:text-brand-700">Kako deluje</Link></li>
               <li><Link href="/#vprasanja" className="hover:text-brand-700">Pogosta vprašanja</Link></li>
               <li><Link href="/#zakon" className="hover:text-brand-700">Kaj zahteva zakon</Link></li>

@@ -15,6 +15,7 @@ import { Aurora } from "@/components/Aurora";
 import { Reveal } from "@/components/Reveal";
 import { Faq, type FaqItem } from "@/components/Faq";
 import { Footer } from "@/components/Footer";
+import { Pricing } from "@/components/Pricing";
 import { Wordmark } from "@/components/ui";
 
 const delay = (s: number) => ({ animationDelay: `${s}s` });
@@ -71,6 +72,9 @@ export default function Home() {
         <div className="glass iris-edge sheen mx-auto flex max-w-5xl items-center justify-between rounded-full px-5 py-2.5">
           <Wordmark />
           <nav className="flex items-center gap-1 text-sm">
+            <Link href="/#cena" className="hidden rounded-full px-3 py-1.5 font-medium text-slate-600 transition hover:bg-white/60 hover:text-slate-900 sm:block">
+              Cena
+            </Link>
             <Link href="/kalkulator" className="hidden rounded-full px-3 py-1.5 font-medium text-slate-600 transition hover:bg-white/60 hover:text-slate-900 sm:block">
               Kalkulator
             </Link>
@@ -109,7 +113,10 @@ export default function Home() {
               Kalkulator plače
             </Link>
           </div>
-          <div className="reveal mt-9 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-slate-500" style={delay(0.32)}>
+          <p className="reveal mt-3 text-sm font-medium text-brand-700" style={delay(0.28)}>
+            14 dni brezplačno · brez kartice · prekličeš kadarkoli
+          </p>
+          <div className="reveal mt-7 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-slate-500" style={delay(0.32)}>
             <Trust>Fiksna cena na podjetje</Trust>
             <Trust>Postavljeno v 5 minutah</Trust>
             <Trust>Podatki v EU</Trust>
@@ -173,6 +180,9 @@ export default function Home() {
           ))}
         </div>
       </section>
+
+      {/* CENA */}
+      <Pricing />
 
       {/* VSEBINA — za koga / zakon */}
       <section id="zakon" className="mx-auto max-w-5xl px-5 py-16">

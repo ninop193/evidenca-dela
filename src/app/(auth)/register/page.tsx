@@ -61,6 +61,9 @@ export default function RegisterPage() {
         <div className="glass iris-edge sheen rounded-3xl p-7">
           <h1 className="text-xl font-bold text-slate-900">Registracija podjetja</h1>
           <p className="mt-1 text-sm text-slate-500">Ustvari račun in začni z evidenco v nekaj minutah.</p>
+          <p className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-brand-50 px-3 py-1 text-xs font-semibold text-brand-700 ring-1 ring-brand-100">
+            ✦ 14 dni brezplačno, brez kartice
+          </p>
 
           <form onSubmit={handleSubmit} className="mt-6 space-y-4">
             <L label="Ime podjetja">
