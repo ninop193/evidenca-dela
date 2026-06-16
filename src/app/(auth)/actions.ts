@@ -51,10 +51,16 @@ export async function registerCompany(formData: {
 
   const userId = created.user.id;
 
-  // 2) Ustvari podjetje
+  // 2) Ustvari podjetje (s 14-dnevnim preizkusom)
+  const trialEnds = new Date(Date.now() + 14 * 86_400_000).toISOString();
   const { data: company, error: companyErr } = await admin
     .from("companies")
-    .insert({ name: companyName.trim(), tax_id: taxId?.trim() || null })
+    .insert({
+      name: companyName.trim(),
+      tax_id: taxId?.trim() || null,
+      subscription_status: "trialing",
+      trial_ends_at: trialEnds,
+    })
     .select("id")
     .single();
   if (companyErr || !company) {

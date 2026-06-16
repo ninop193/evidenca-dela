@@ -2,6 +2,7 @@
 
 import { getProfile } from "@/lib/auth";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { PLAN } from "@/lib/billing";
 
 export type CreateEmployeeInput = {
   fullName: string;
@@ -36,6 +37,17 @@ export async function createEmployee(
   }
 
   const admin = createAdminClient();
+
+  // Omejitev paketa: do 10 zaposlenih.
+  const { count } = await admin
+    .from("employees")
+    .select("id", { count: "exact", head: true })
+    .eq("company_id", profile.company_id);
+  if ((count ?? 0) >= PLAN.maxEmployees) {
+    return {
+      error: `Paket Delovit dopušča do ${PLAN.maxEmployees} zaposlenih. Za več pošlji povpraševanje na info@nextera.si.`,
+    };
+  }
 
   // 1) Ustvari prijavo zaposlenega (takoj potrjeno)
   const { data: created, error: createErr } = await admin.auth.admin.createUser({

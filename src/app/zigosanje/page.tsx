@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { getProfile } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
+import { getAccess } from "@/lib/billing";
 import { Aurora } from "@/components/Aurora";
 import { Wordmark } from "@/components/ui";
 import { signOut } from "../(auth)/actions";
@@ -15,6 +16,13 @@ export default async function ZigosanjePage() {
   if (!profile) redirect("/login");
 
   const supabase = await createClient();
+  const { data: company } = await supabase
+    .from("companies")
+    .select("subscription_status, trial_ends_at")
+    .eq("id", profile.company_id)
+    .single();
+  const access = getAccess(company ?? {});
+
   const { data: employee } = await supabase
     .from("employees")
     .select("id")
@@ -65,7 +73,14 @@ export default async function ZigosanjePage() {
       </header>
 
       <div className="mx-auto flex w-full max-w-md flex-1 flex-col items-center px-4 py-10">
-        {!employee ? (
+        {!access.hasAccess ? (
+          <div className="glass iris-edge mt-10 rounded-2xl p-6 text-center">
+            <p className="font-semibold text-slate-900">Žigosanje trenutno ni na voljo</p>
+            <p className="mt-1.5 text-sm text-slate-600">
+              Naročnina podjetja je potekla. Obrni se na delodajalca, da uredi naročnino.
+            </p>
+          </div>
+        ) : !employee ? (
           <p className="mt-10 text-center text-sm text-slate-500">
             Tvoj račun še ni povezan z evidenco zaposlenih. Obrni se na delodajalca.
           </p>

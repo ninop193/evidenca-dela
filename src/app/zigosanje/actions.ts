@@ -2,6 +2,7 @@
 
 import { getProfile } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
+import { getAccess } from "@/lib/billing";
 
 const TZ = "Europe/Ljubljana";
 
@@ -20,22 +21,23 @@ function isSunday(d: Date): boolean {
 
 type ActionResult = { error?: string };
 
-// Poišče zapis zaposlenega za trenutno prijavljenega uporabnika.
+// Poišče zapis zaposlenega + preveri dostop (preizkus/naročnina) podjetja.
 async function getEmployee() {
   const supabase = await createClient();
   const profile = await getProfile();
-  if (!profile) return { supabase, profile: null, employee: null };
-  const { data: employee } = await supabase
-    .from("employees")
-    .select("id, company_id")
-    .eq("user_id", profile.id)
-    .single();
-  return { supabase, profile, employee };
+  if (!profile) return { supabase, profile: null, employee: null, hasAccess: false };
+  const [{ data: employee }, { data: company }] = await Promise.all([
+    supabase.from("employees").select("id, company_id").eq("user_id", profile.id).single(),
+    supabase.from("companies").select("subscription_status, trial_ends_at").eq("id", profile.company_id).single(),
+  ]);
+  const hasAccess = getAccess(company ?? {}).hasAccess;
+  return { supabase, profile, employee, hasAccess };
 }
 
 // PRIHOD — odpre nov vnos delovnega časa za danes.
 export async function clockIn(): Promise<ActionResult> {
-  const { supabase, employee } = await getEmployee();
+  const { supabase, employee, hasAccess } = await getEmployee();
+  if (!hasAccess) return { error: "Naročnina podjetja je potekla." };
   if (!employee) return { error: "Ni najdenega zaposlenega." };
 
   const today = todayLjubljana();
@@ -78,7 +80,8 @@ export async function clockIn(): Promise<ActionResult> {
 
 // ODHOD — zaključi odprt vnos in izračuna opravljene ure.
 export async function clockOut(): Promise<ActionResult> {
-  const { supabase, employee } = await getEmployee();
+  const { supabase, employee, hasAccess } = await getEmployee();
+  if (!hasAccess) return { error: "Naročnina podjetja je potekla." };
   if (!employee) return { error: "Ni najdenega zaposlenega." };
 
   const { data: open } = await supabase
