@@ -102,7 +102,7 @@ export default function Home() {
           </h1>
           <p className="reveal mt-6 max-w-md text-lg leading-relaxed text-slate-600" style={delay(0.16)}>
             Zaposleni žigosajo prihod in odhod z enim tapom. Ti vidiš vse ure in v sekundi
-            izvoziš evidenco za inšpekcijo. Fiksna cena, brez onboardinga.
+            izvoziš evidenco za inšpekcijo. Fiksna cena na podjetje, brez vezave.
           </p>
           <div className="reveal mt-9 flex flex-col gap-3 sm:flex-row" style={delay(0.24)}>
             <Link href="/register" className="glow-pulse group inline-flex items-center justify-center gap-2 rounded-full bg-brand-600 px-6 py-3.5 text-base font-semibold text-white transition hover:bg-brand-500">
