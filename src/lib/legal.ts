@@ -8,7 +8,7 @@ export const COMPANY = {
   davcna: "SI43277292",
   ddv: true,
   register: "Poslovni register Slovenije (AJPES)",
-  email: "podpora@delovit.si", // ustvari ta poštni predal na Neoserv
+  email: "info@delovit.si",
   product: "Delovit",
   court: "Maribor",
 };
