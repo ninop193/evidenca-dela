@@ -25,7 +25,7 @@ export function welcomeEmail(opts: {
       heading: "Dobrodošli v Delovit 🎉",
       intro: `${hi(opts.fullName)} Vaš račun je pripravljen${
         opts.companyName ? ` za <strong>${opts.companyName}</strong>` : ""
-      }. Od zdaj imate <strong>${days} dni popolnoma brezplačnega preizkusa</strong> — brez kartice in brez obveznosti.`,
+      }. Od zdaj imate <strong>${days} dni popolnoma brezplačnega preizkusa</strong>, brez kartice in brez obveznosti.`,
       bodyHtml:
         p("Kar lahko storite takoj:") +
         `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 20px;">
@@ -83,7 +83,7 @@ export function paymentSuccessEmail(opts: {
   if (opts.nextDate) rows.push(["Naslednje plačilo", opts.nextDate]);
 
   return {
-    subject: "Plačilo prejeto — naročnina je aktivna ✅",
+    subject: "Plačilo prejeto, naročnina je aktivna ✅",
     html: renderEmail({
       preview: "Hvala! Vaša naročnina Delovit je aktivna.",
       heading: "Plačilo je uspelo ✅",
@@ -101,7 +101,7 @@ export function paymentFailedEmail(opts: {
   fullName?: string | null;
 }): RenderedEmail {
   return {
-    subject: "Plačilo ni uspelo — preverite kartico",
+    subject: "Plačilo ni uspelo, preverite kartico",
     html: renderEmail({
       preview: "Posodobite plačilno sredstvo, da preprečite zaklep evidence.",
       heading: "Plačilo ni uspelo",
