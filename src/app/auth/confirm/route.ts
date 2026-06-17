@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { sendEmail } from "@/lib/email/send";
+import { welcomeEmail } from "@/lib/email/templates";
 
 // Po potrditvi emaila (klik v potrditveni povezavi): vzpostavi sejo,
 // ustvari podjetje iz podatkov ob registraciji in usmeri naprej.
@@ -47,6 +49,17 @@ export async function GET(req: NextRequest) {
       p_tax_id: meta.tax_id || null,
     });
     if (!error) {
+      // Dobrodošlica (ne sme podreti toka, če pošiljanje spodleti).
+      if (user.email) {
+        await sendEmail(
+          user.email,
+          welcomeEmail({
+            fullName: meta.full_name,
+            companyName: meta.company_name,
+            trialDaysLeft: 14,
+          }),
+        );
+      }
       return NextResponse.redirect(`${origin}/narocnina?welcome=1`);
     }
   }

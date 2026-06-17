@@ -2,6 +2,18 @@ import { NextRequest, NextResponse } from "next/server";
 import type Stripe from "stripe";
 import { stripe } from "@/lib/stripe";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { sendToCompany } from "@/lib/email/send";
+import { paymentSuccessEmail, paymentFailedEmail } from "@/lib/email/templates";
+
+const eurFromCents = (cents?: number | null, currency = "eur") =>
+  typeof cents === "number"
+    ? new Intl.NumberFormat("sl-SI", { style: "currency", currency: currency.toUpperCase() }).format(
+        cents / 100,
+      )
+    : null;
+
+const dateSl = (ts?: number | null) =>
+  ts ? new Intl.DateTimeFormat("sl-SI", { dateStyle: "long" }).format(new Date(ts * 1000)) : null;
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -76,6 +88,31 @@ export async function POST(req: NextRequest) {
       case "customer.subscription.updated":
       case "customer.subscription.deleted": {
         await syncSubscription(event.data.object as Stripe.Subscription);
+        break;
+      }
+      case "invoice.payment_succeeded": {
+        const inv = event.data.object as Stripe.Invoice;
+        const customerId = typeof inv.customer === "string" ? inv.customer : inv.customer?.id;
+        const line = inv.lines?.data?.[0] as
+          | { price?: { recurring?: { interval?: string } }; period?: { end?: number } }
+          | undefined;
+        const interval = line?.price?.recurring?.interval ?? null;
+        await sendToCompany({ stripeCustomerId: customerId ?? null }, ({ fullName }) =>
+          paymentSuccessEmail({
+            fullName,
+            amount: eurFromCents(inv.amount_paid, inv.currency),
+            interval,
+            nextDate: dateSl(line?.period?.end),
+          }),
+        );
+        break;
+      }
+      case "invoice.payment_failed": {
+        const inv = event.data.object as Stripe.Invoice;
+        const customerId = typeof inv.customer === "string" ? inv.customer : inv.customer?.id;
+        await sendToCompany({ stripeCustomerId: customerId ?? null }, ({ fullName }) =>
+          paymentFailedEmail({ fullName }),
+        );
         break;
       }
       default:
