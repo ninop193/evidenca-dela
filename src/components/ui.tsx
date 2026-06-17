@@ -137,9 +137,8 @@ export function Wordmark({ className, dark }: { className?: string; dark?: boole
         className,
       )}
     >
-      <span className="grid h-6 w-6 place-items-center rounded-lg bg-gradient-to-br from-brand-400 to-brand-600 shadow-[0_4px_14px_-2px_rgba(47,99,255,0.6)]">
-        <span className="block h-2.5 w-2.5 rounded-full border-2 border-white" />
-      </span>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src="/logo-mark.png" alt="Delovit" className="h-7 w-7 object-contain" />
       Delovit
     </span>
   );
