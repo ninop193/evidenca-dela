@@ -138,7 +138,7 @@ export function Wordmark({ className, dark }: { className?: string; dark?: boole
       )}
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src="/logo-mark.png" alt="Delovit" className="h-8 w-8 object-contain" />
+      <img src="/logo-mark.png?v=2" alt="Delovit" className="h-8 w-8 object-contain" />
       Delovit
     </span>
   );

@@ -90,7 +90,7 @@ export function renderEmail(o: LayoutOpts): string {
         <!-- Logo / glava -->
         <tr><td style="padding:4px 4px 22px;">
           <a href="${EMAIL_BASE}" style="text-decoration:none;display:inline-block;">
-            <img src="${EMAIL_BASE}/email-logo.png" width="44" height="44" alt="Delovit"
+            <img src="${EMAIL_BASE}/email-logo.png?v=2" width="44" height="44" alt="Delovit"
                  style="vertical-align:middle;border-radius:11px;display:inline-block;">
             <span style="vertical-align:middle;margin-left:10px;font-size:20px;font-weight:800;
                          letter-spacing:-0.02em;color:${COLORS.ink};">Delovit</span>
