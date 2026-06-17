@@ -107,7 +107,7 @@ export function paymentFailedEmail(opts: {
       heading: "Plačilo ni uspelo",
       intro: `${hi(opts.fullName)} Pri zadnjem obračunu vaše naročnine je bilo plačilo <strong>zavrnjeno</strong> (npr. potekla ali nezadostna sredstva na kartici).`,
       bodyHtml:
-        p("Da evidenca deluje naprej brez prekinitve, prosimo posodobite plačilno sredstvo. Imate <strong>3 dni</strong> dodatnega dostopa, nato se aplikacija zaklene."),
+        p("Da evidenca deluje naprej brez prekinitve, prosimo čim prej posodobite plačilno sredstvo. Če plačilo ne uspe, se dostop do aplikacije začasno zaklene."),
       button: { label: "Posodobi plačilo", href: `${EMAIL_BASE}/narocnina` },
       footnote: "Vaši podatki ostanejo shranjeni tudi v primeru zaklepa.",
     }),
