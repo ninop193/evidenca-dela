@@ -18,6 +18,7 @@ import { Footer } from "@/components/Footer";
 import { Pricing } from "@/components/Pricing";
 import { Wordmark } from "@/components/ui";
 import { SITE, orgJsonLd, websiteJsonLd } from "@/lib/seo";
+import { YandexMetrika } from "@/components/YandexMetrika";
 
 const delay = (s: number) => ({ animationDelay: `${s}s` });
 
@@ -88,6 +89,7 @@ export default function Home() {
   return (
     <div className="relative min-h-screen overflow-x-hidden text-slate-800">
       <Aurora />
+      <YandexMetrika />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
 
       {/* NAV */}
