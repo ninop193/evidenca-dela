@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
+import { CreditCard } from "lucide-react";
 import { signOut } from "../(auth)/actions";
 import { Wordmark, cn } from "@/components/ui";
 
@@ -47,7 +48,18 @@ export default function AppNav({ companyName }: { companyName: string }) {
         </div>
 
         <div className="flex items-center gap-3">
-          <span className="hidden max-w-[160px] truncate text-sm font-medium text-slate-500 sm:block">
+          <Link
+            href="/narocnina"
+            className={cn(
+              "hidden items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium transition sm:inline-flex",
+              isActive("/narocnina")
+                ? "bg-brand-600 text-white"
+                : "text-slate-600 hover:bg-white/60 hover:text-slate-900",
+            )}
+          >
+            <CreditCard className="h-4 w-4" /> Naročnina
+          </Link>
+          <span className="hidden max-w-[140px] truncate text-sm font-medium text-slate-500 lg:block">
             {companyName}
           </span>
           <form action={signOut}>
@@ -85,6 +97,19 @@ export default function AppNav({ companyName }: { companyName: string }) {
               {it.label}
             </Link>
           ))}
+          <div className="my-1 h-px bg-slate-300/50" />
+          <Link
+            href="/narocnina"
+            onClick={() => setOpen(false)}
+            className={cn(
+              "flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium",
+              isActive("/narocnina")
+                ? "bg-brand-600 text-white"
+                : "text-slate-700 hover:bg-white/60",
+            )}
+          >
+            <CreditCard className="h-4 w-4" /> Naročnina
+          </Link>
         </nav>
       )}
     </header>
