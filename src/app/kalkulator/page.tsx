@@ -7,9 +7,10 @@ import { Reveal } from "@/components/Reveal";
 import { Faq } from "@/components/Faq";
 import { Footer } from "@/components/Footer";
 import { Wordmark, buttonClasses } from "@/components/ui";
+import { SITE, orgJsonLd, websiteJsonLd } from "@/lib/seo";
 
 export const metadata: Metadata = {
-  title: `Bruto-neto kalkulator plače ${PLACA_CONFIG.leto} | Izračun neto plače`,
+  title: { absolute: `Bruto-neto kalkulator plače ${PLACA_CONFIG.leto} | Delovit` },
   description:
     "Brezplačen bruto-neto kalkulator plače za Slovenijo. Izračunaj neto plačo iz bruto zneska, prispevki, dohodnina in strošek delodajalca. Hitro in preprosto.",
   keywords: [
@@ -20,12 +21,17 @@ export const metadata: Metadata = {
     "neto plača Slovenija",
     "strošek delodajalca",
   ],
+  alternates: {
+    canonical: "/kalkulator",
+  },
   openGraph: {
     title: `Bruto-neto kalkulator plače ${PLACA_CONFIG.leto}`,
     description:
       "Izračunaj neto plačo iz bruto zneska, prispevki, dohodnina in strošek delodajalca.",
     type: "website",
     locale: "sl_SI",
+    url: "/kalkulator",
+    siteName: "Delovit",
   },
 };
 
@@ -60,13 +66,29 @@ export default function KalkulatorPage() {
   const jsonLd = {
     "@context": "https://schema.org",
     "@graph": [
+      orgJsonLd,
+      websiteJsonLd,
       {
         "@type": "WebApplication",
         name: "Bruto-neto kalkulator plače",
+        url: `${SITE.url}/kalkulator`,
         applicationCategory: "FinanceApplication",
         operatingSystem: "Web",
         offers: { "@type": "Offer", price: "0", priceCurrency: "EUR" },
         inLanguage: "sl",
+        publisher: { "@id": `${SITE.url}/#organization` },
+      },
+      {
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: "Domov", item: SITE.url },
+          {
+            "@type": "ListItem",
+            position: 2,
+            name: "Bruto-neto kalkulator",
+            item: `${SITE.url}/kalkulator`,
+          },
+        ],
       },
       {
         "@type": "FAQPage",

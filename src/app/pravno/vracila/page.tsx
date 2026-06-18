@@ -3,8 +3,9 @@ import { LegalPage, LSection } from "@/components/LegalPage";
 import { COMPANY } from "@/lib/legal";
 
 export const metadata: Metadata = {
-  title: "Vračila in odpoved naročnine | Delovit",
+  title: "Vračila in odpoved naročnine",
   description: "Politika odpovedi naročnine in vračil za storitev Delovit (NextEra d.o.o.).",
+  alternates: { canonical: "/pravno/vracila" },
 };
 
 export default function VracilaPage() {

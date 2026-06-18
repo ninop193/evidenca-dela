@@ -3,8 +3,9 @@ import { LegalPage, LSection } from "@/components/LegalPage";
 import { COMPANY } from "@/lib/legal";
 
 export const metadata: Metadata = {
-  title: "Pogoji uporabe | Delovit",
+  title: "Pogoji uporabe",
   description: "Pogoji uporabe storitve Delovit, ki jo zagotavlja NextEra d.o.o.",
+  alternates: { canonical: "/pravno/pogoji" },
 };
 
 export default function PogojiPage() {

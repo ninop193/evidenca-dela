@@ -35,7 +35,12 @@ export async function updateSession(request: NextRequest) {
 
   // Zaščitene poti: kdor ni prijavljen, gre na /login.
   // Javne poti (login, registracija, kalkulator, domača stran) so dovoljene vsem.
-  const publicPaths = ["/login", "/register", "/kalkulator", "/auth", "/pravno", "/api", "/pozabljeno-geslo", "/ponastavi-geslo"];
+  const publicPaths = [
+    "/login", "/register", "/kalkulator", "/auth", "/pravno", "/api",
+    "/pozabljeno-geslo", "/ponastavi-geslo",
+    // SEO / crawler poti — morajo biti dostopne brez prijave.
+    "/sitemap", "/opengraph-image", "/twitter-image", "/robots",
+  ];
   const isPublic =
     request.nextUrl.pathname === "/" ||
     publicPaths.some((p) => request.nextUrl.pathname.startsWith(p));

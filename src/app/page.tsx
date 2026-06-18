@@ -17,6 +17,7 @@ import { Faq, type FaqItem } from "@/components/Faq";
 import { Footer } from "@/components/Footer";
 import { Pricing } from "@/components/Pricing";
 import { Wordmark } from "@/components/ui";
+import { SITE, orgJsonLd, websiteJsonLd } from "@/lib/seo";
 
 const delay = (s: number) => ({ animationDelay: `${s}s` });
 
@@ -54,12 +55,34 @@ const FAQ: FaqItem[] = [
 export default function Home() {
   const faqJsonLd = {
     "@context": "https://schema.org",
-    "@type": "FAQPage",
-    mainEntity: FAQ.map((f) => ({
-      "@type": "Question",
-      name: f.q,
-      acceptedAnswer: { "@type": "Answer", text: f.a },
-    })),
+    "@graph": [
+      orgJsonLd,
+      websiteJsonLd,
+      {
+        "@type": "SoftwareApplication",
+        name: "Delovit",
+        url: SITE.url,
+        applicationCategory: "BusinessApplication",
+        operatingSystem: "Web, iOS, Android",
+        description: SITE.description,
+        inLanguage: "sl",
+        offers: {
+          "@type": "Offer",
+          price: String(SITE.monthlyNet),
+          priceCurrency: "EUR",
+          description: "Fiksna mesečna cena na podjetje, 14 dni brezplačno.",
+        },
+        publisher: { "@id": `${SITE.url}/#organization` },
+      },
+      {
+        "@type": "FAQPage",
+        mainEntity: FAQ.map((f) => ({
+          "@type": "Question",
+          name: f.q,
+          acceptedAnswer: { "@type": "Answer", text: f.a },
+        })),
+      },
+    ],
   };
 
   return (
@@ -95,10 +118,10 @@ export default function Home() {
             <ShieldCheck className="h-3.5 w-3.5 text-brand-600" />
             Skladno z ZEPDSV
           </div>
-          <h1 className="reveal mt-6 text-[2.7rem] font-extrabold leading-[1.05] tracking-tight text-slate-900 sm:text-6xl" style={delay(0.08)}>
-            Evidenca ur,
+          <h1 className="reveal mt-6 text-[2.5rem] font-extrabold leading-[1.05] tracking-tight text-slate-900 sm:text-[3.4rem]" style={delay(0.08)}>
+            Evidenca delovnega
             <br />
-            <span className="text-holo">brez panike.</span>
+            časa, <span className="text-holo">brez panike.</span>
           </h1>
           <p className="reveal mt-6 max-w-md text-lg leading-relaxed text-slate-600" style={delay(0.16)}>
             Zaposleni žigosajo prihod in odhod z enim tapom. Ti vidiš vse ure in v sekundi
