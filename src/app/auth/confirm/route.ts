@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { sendEmail } from "@/lib/email/send";
 import { welcomeEmail } from "@/lib/email/templates";
+import { isFreeAccessEmail, grantFreeAccess } from "@/lib/comp";
 
 // Po potrditvi emaila (klik v potrditveni povezavi): vzpostavi sejo,
 // ustvari podjetje iz podatkov ob registraciji in usmeri naprej.
@@ -43,12 +44,16 @@ export async function GET(req: NextRequest) {
     tax_id?: string | null;
   };
   if (meta.company_name) {
-    const { error } = await supabase.rpc("create_company_and_admin", {
+    const { data: newCompanyId, error } = await supabase.rpc("create_company_and_admin", {
       p_company_name: meta.company_name,
       p_full_name: meta.full_name || meta.company_name,
       p_tax_id: meta.tax_id || null,
     });
     if (!error) {
+      // Promo / prijatelji: vnaprej pooblaščeni emaili dobijo brezplačen dostop.
+      if (isFreeAccessEmail(user.email) && typeof newCompanyId === "string") {
+        await grantFreeAccess(newCompanyId);
+      }
       // Dobrodošlica (ne sme podreti toka, če pošiljanje spodleti).
       if (user.email) {
         await sendEmail(

@@ -6,6 +6,7 @@ import { ArrowRight } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { Aurora } from "@/components/Aurora";
 import { Wordmark } from "@/components/ui";
+import { claimFreeAccessIfEligible } from "./actions";
 
 const fieldCls =
   "w-full rounded-xl bg-white/70 px-3.5 py-2.5 text-[15px] text-slate-900 ring-1 ring-white/80 placeholder:text-slate-400 outline-none transition focus:ring-2 focus:ring-brand-500";
@@ -60,6 +61,8 @@ export default function DobrodosliPage() {
       setLoading(false);
       return;
     }
+    // Promo / prijatelji: vnaprej pooblaščeni emaili dobijo brezplačen dostop.
+    await claimFreeAccessIfEligible();
     router.push("/narocnina?welcome=1");
     router.refresh();
   }
