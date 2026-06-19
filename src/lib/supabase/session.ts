@@ -33,19 +33,14 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // Zaščitene poti: kdor ni prijavljen, gre na /login.
-  // Javne poti (login, registracija, kalkulator, domača stran) so dovoljene vsem.
-  const publicPaths = [
-    "/login", "/register", "/kalkulator", "/kontakt", "/studenti", "/auth", "/pravno", "/api",
-    "/pozabljeno-geslo", "/ponastavi-geslo",
-    // SEO / crawler poti — morajo biti dostopne brez prijave.
-    "/sitemap", "/opengraph-image", "/twitter-image", "/robots",
-  ];
-  const isPublic =
-    request.nextUrl.pathname === "/" ||
-    publicPaths.some((p) => request.nextUrl.pathname.startsWith(p));
+  // Zaščitimo SAMO dejansko zaščitene dele aplikacije. Vse ostalo (javne strani,
+  // SEO/crawler poti in neznane poti, ki pokažejo 404) je dostopno brez prijave.
+  // Vsaka od teh strani ima tudi lasten auth check (obramba v globino).
+  const protectedPrefixes = ["/dashboard", "/zigosanje", "/narocnina", "/dobrodosli"];
+  const path = request.nextUrl.pathname;
+  const isProtected = protectedPrefixes.some((p) => path === p || path.startsWith(p + "/"));
 
-  if (!user && !isPublic) {
+  if (!user && isProtected) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     return NextResponse.redirect(url);
