@@ -161,8 +161,8 @@ export default function Home() {
             { big: "€300–8.000", small: "globe za mikro podjetja brez ustrezne evidence" },
             { big: "< 5 min", small: "od registracije do prvega žiga prihoda" },
           ].map((s, i) => (
-            <Reveal key={s.big} delay={i * 90}>
-              <div className="glass iris-edge sheen rounded-2xl px-6 py-7 text-center">
+            <Reveal key={s.big} delay={i * 90} className="h-full">
+              <div className="glass iris-edge sheen flex h-full flex-col justify-center rounded-2xl px-6 py-7 text-center">
                 <p className="text-3xl font-extrabold tracking-tight text-brand-600 sm:text-4xl">{s.big}</p>
                 <p className="mt-2 text-sm leading-snug text-slate-600">{s.small}</p>
               </div>

@@ -32,7 +32,7 @@ export function SubscribeButtons() {
     <div>
       <div className="grid gap-5 sm:grid-cols-2">
         {/* Mesečno */}
-        <div className="glass iris-edge flex flex-col rounded-3xl p-7">
+        <div className="glass iris-edge flex flex-col rounded-3xl p-7 ring-1 ring-transparent transition hover:ring-2 hover:ring-brand-500/40">
           <p className="text-sm font-semibold uppercase tracking-wide text-slate-400">Mesečno</p>
           <div className="mt-2 flex items-end gap-1">
             <span className="text-4xl font-extrabold text-slate-900">{eur(PLAN.monthlyNet)}</span>
@@ -42,14 +42,14 @@ export function SubscribeButtons() {
           <button
             onClick={() => choose("month")}
             disabled={loading !== null}
-            className="mt-6 w-full rounded-full bg-white/70 py-3 text-base font-semibold text-slate-800 ring-1 ring-white/80 transition hover:bg-white disabled:opacity-50"
+            className="mt-auto w-full rounded-full bg-brand-600 py-3 text-base font-semibold text-white transition hover:bg-brand-500 disabled:opacity-50"
           >
             {loading === "month" ? "…" : "Izberi mesečno"}
           </button>
         </div>
 
         {/* Letno (poudarjeno) */}
-        <div className="glass-strong iris-edge flex flex-col rounded-3xl p-7 ring-2 ring-brand-500/40">
+        <div className="glass-strong iris-edge flex flex-col rounded-3xl p-7 ring-2 ring-brand-500/40 transition hover:ring-brand-500/70">
           <span className="mb-3 inline-flex w-fit items-center gap-1.5 rounded-full bg-brand-600 px-3 py-1 text-xs font-bold text-white shadow-soft">
             ★ 2 meseca gratis
           </span>
@@ -64,7 +64,7 @@ export function SubscribeButtons() {
           <button
             onClick={() => choose("year")}
             disabled={loading !== null}
-            className="glow-pulse mt-6 w-full rounded-full bg-brand-600 py-3 text-base font-semibold text-white transition hover:bg-brand-500 disabled:opacity-50"
+            className="glow-pulse mt-auto w-full rounded-full bg-brand-600 py-3 text-base font-semibold text-white transition hover:bg-brand-500 disabled:opacity-50"
           >
             {loading === "year" ? "…" : "Izberi letno"}
           </button>

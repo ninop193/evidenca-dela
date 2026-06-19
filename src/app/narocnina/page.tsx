@@ -147,7 +147,7 @@ export default async function NarocninaPage({
             <div className="mt-8 text-center text-sm text-slate-500">
               Imaš več kot 10 zaposlenih?{" "}
               <a
-                href="mailto:info@nextera.si?subject=Povprasevanje%20Delovit%20(vec%20kot%2010%20zaposlenih)"
+                href="mailto:info@delovit.si?subject=Povprasevanje%20Delovit%20(vec%20kot%2010%20zaposlenih)"
                 className="font-semibold text-brand-700 hover:text-brand-800"
               >
                 Pošlji povpraševanje

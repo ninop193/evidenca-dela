@@ -45,7 +45,7 @@ export async function createEmployee(
     .eq("company_id", profile.company_id);
   if ((count ?? 0) >= PLAN.maxEmployees) {
     return {
-      error: `Paket Delovit dopušča do ${PLAN.maxEmployees} zaposlenih. Za več pošlji povpraševanje na info@nextera.si.`,
+      error: `Paket Delovit dopušča do ${PLAN.maxEmployees} zaposlenih. Za več pošlji povpraševanje na info@delovit.si.`,
     };
   }
 
