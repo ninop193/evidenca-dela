@@ -32,6 +32,7 @@ export function Footer() {
               <li><Link href="/#kako" className="hover:text-brand-700">Kako deluje</Link></li>
               <li><Link href="/#vprasanja" className="hover:text-brand-700">Pogosta vprašanja</Link></li>
               <li><Link href="/#zakon" className="hover:text-brand-700">Kaj zahteva zakon</Link></li>
+              <li><Link href="/kontakt" className="hover:text-brand-700">Kontakt</Link></li>
             </ul>
           </div>
 

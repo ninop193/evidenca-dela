@@ -96,6 +96,35 @@ export function paymentSuccessEmail(opts: {
   };
 }
 
+// Kontaktni obrazec → sporočilo v info@delovit.si.
+export function contactEmail(opts: {
+  name: string;
+  email: string;
+  company?: string | null;
+  message: string;
+}): RenderedEmail {
+  const esc = (s: string) =>
+    s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  return {
+    subject: `Novo povpraševanje: ${opts.name}`,
+    html: renderEmail({
+      preview: `Sporočilo s kontaktnega obrazca od ${opts.name}.`,
+      heading: "Novo povpraševanje 📨",
+      intro: "Prek kontaktnega obrazca na delovit.si je prispelo novo sporočilo.",
+      bodyHtml:
+        infoBox(
+          [
+            ["Ime", esc(opts.name)],
+            ["E-pošta", esc(opts.email)],
+            ...(opts.company ? [["Podjetje", esc(opts.company)] as [string, string]] : []),
+          ],
+        ) +
+        p(`<strong>Sporočilo:</strong><br>${esc(opts.message).replace(/\n/g, "<br>")}`),
+      footnote: "Odgovoriš lahko neposredno na ta mail (Reply) — gre na pošiljateljev naslov.",
+    }),
+  };
+}
+
 // 4) Plačilo ni uspelo / kartica zavrnjena.
 export function paymentFailedEmail(opts: {
   fullName?: string | null;

@@ -12,7 +12,11 @@ function client() {
 }
 
 // Pošlji en mail. Nikoli ne vrže — napako le zabeleži (mail ne sme podreti webhooka/akcije).
-export async function sendEmail(to: string, email: RenderedEmail): Promise<boolean> {
+export async function sendEmail(
+  to: string,
+  email: RenderedEmail,
+  opts?: { replyTo?: string },
+): Promise<boolean> {
   const resend = client();
   if (!resend) {
     console.warn("RESEND_API_KEY manjka — mail ni poslan:", email.subject);
@@ -24,6 +28,7 @@ export async function sendEmail(to: string, email: RenderedEmail): Promise<boole
       to,
       subject: email.subject,
       html: email.html,
+      ...(opts?.replyTo ? { replyTo: opts.replyTo } : {}),
     });
     if (error) {
       console.error("Resend napaka:", error);
