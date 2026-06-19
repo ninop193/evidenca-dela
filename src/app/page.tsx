@@ -16,7 +16,7 @@ import { Reveal } from "@/components/Reveal";
 import { Faq, type FaqItem } from "@/components/Faq";
 import { Footer } from "@/components/Footer";
 import { Pricing } from "@/components/Pricing";
-import { Wordmark } from "@/components/ui";
+import { LandingNav } from "@/components/LandingNav";
 import { SITE, orgJsonLd, websiteJsonLd } from "@/lib/seo";
 import { YandexMetrika } from "@/components/YandexMetrika";
 
@@ -93,28 +93,7 @@ export default function Home() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
 
       {/* NAV */}
-      <header className="sticky top-0 z-30 px-4 pt-4">
-        <div className="glass-strong iris-edge mx-auto flex max-w-5xl items-center justify-between rounded-full px-5 py-2.5">
-          <Wordmark className="relative z-10" />
-          <nav className="flex items-center gap-1 text-sm">
-            <Link href="/studenti" className="hidden rounded-full px-3 py-1.5 font-medium text-slate-600 transition hover:bg-white/60 hover:text-slate-900 sm:block">
-              Za študente
-            </Link>
-            <Link href="/#cena" className="hidden rounded-full px-3 py-1.5 font-medium text-slate-600 transition hover:bg-white/60 hover:text-slate-900 sm:block">
-              Cena
-            </Link>
-            <Link href="/kalkulator" className="hidden rounded-full px-3 py-1.5 font-medium text-slate-600 transition hover:bg-white/60 hover:text-slate-900 sm:block">
-              Kalkulator
-            </Link>
-            <Link href="/login" className="rounded-full px-3 py-1.5 font-medium text-slate-600 transition hover:bg-white/60 hover:text-slate-900">
-              Prijava
-            </Link>
-            <Link href="/register" className="rounded-full bg-brand-600 px-4 py-1.5 font-semibold text-white shadow-[0_6px_20px_-6px_rgba(29,78,216,0.7)] transition hover:bg-brand-500">
-              Začni
-            </Link>
-          </nav>
-        </div>
-      </header>
+      <LandingNav />
 
       {/* HERO */}
       <section className="mx-auto grid max-w-6xl items-center gap-14 px-5 py-16 sm:py-24 lg:grid-cols-2">
