@@ -97,6 +97,9 @@ export default function Home() {
         <div className="glass-strong iris-edge mx-auto flex max-w-5xl items-center justify-between rounded-full px-5 py-2.5">
           <Wordmark className="relative z-10" />
           <nav className="flex items-center gap-1 text-sm">
+            <Link href="/studenti" className="hidden rounded-full px-3 py-1.5 font-medium text-slate-600 transition hover:bg-white/60 hover:text-slate-900 sm:block">
+              Za študente
+            </Link>
             <Link href="/#cena" className="hidden rounded-full px-3 py-1.5 font-medium text-slate-600 transition hover:bg-white/60 hover:text-slate-900 sm:block">
               Cena
             </Link>
