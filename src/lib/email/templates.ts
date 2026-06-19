@@ -96,6 +96,50 @@ export function paymentSuccessEmail(opts: {
   };
 }
 
+// ── Supabase Auth predlogi (za prilepiti v Supabase Dashboard) ──────────────
+// Uporabljajo Supabase spremenljivko {{ .ConfirmationURL }} (akcijska povezava).
+
+const ACTION_URL = "{{ .ConfirmationURL }}";
+
+export function authConfirmEmail(): RenderedEmail {
+  return {
+    subject: "Potrdite svoj email za Delovit",
+    html: renderEmail({
+      preview: "Še zadnji korak za aktivacijo računa Delovit.",
+      heading: "Potrdite svoj email",
+      intro:
+        "Še zadnji korak. Kliknite spodaj in potrdite svoj e-poštni naslov, da aktivirate račun Delovit in zaženete 14-dnevni brezplačni preizkus.",
+      bodyHtml: p(
+        "Če gumb ne deluje, kopirajte to povezavo v brskalnik:<br><span style=\"color:#1d4ed8;word-break:break-all;\">" +
+          ACTION_URL +
+          "</span>",
+      ),
+      button: { label: "Potrdi email", href: ACTION_URL },
+      footnote: "Če računa niste ustvarili vi, ta email mirno prezrite.",
+    }),
+  };
+}
+
+export function authResetEmail(): RenderedEmail {
+  return {
+    subject: "Ponastavitev gesla za Delovit",
+    html: renderEmail({
+      preview: "Nastavite novo geslo za svoj Delovit račun.",
+      heading: "Ponastavite geslo",
+      intro:
+        "Prejeli smo zahtevo za ponastavitev gesla za vaš račun Delovit. Kliknite spodaj in nastavite novo geslo.",
+      bodyHtml: p(
+        "Če gumb ne deluje, kopirajte to povezavo v brskalnik:<br><span style=\"color:#1d4ed8;word-break:break-all;\">" +
+          ACTION_URL +
+          "</span>",
+      ),
+      button: { label: "Ponastavi geslo", href: ACTION_URL },
+      footnote:
+        "Če ponastavitve niste zahtevali vi, ta email prezrite. Vaše geslo ostane nespremenjeno.",
+    }),
+  };
+}
+
 // Kontaktni obrazec → sporočilo v info@delovit.si.
 export function contactEmail(opts: {
   name: string;

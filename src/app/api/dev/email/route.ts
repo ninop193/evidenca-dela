@@ -4,6 +4,8 @@ import {
   trialEndingEmail,
   paymentSuccessEmail,
   paymentFailedEmail,
+  authConfirmEmail,
+  authResetEmail,
 } from "@/lib/email/templates";
 
 export const dynamic = "force-dynamic";
@@ -27,6 +29,8 @@ export async function GET(req: NextRequest) {
       nextDate: "13. julij 2026",
     }),
     failed: paymentFailedEmail({ fullName: sample.fullName }),
+    "confirm-signup": authConfirmEmail(),
+    "reset-password": authResetEmail(),
   } as const;
 
   const email = map[t as keyof typeof map] ?? map.welcome;
