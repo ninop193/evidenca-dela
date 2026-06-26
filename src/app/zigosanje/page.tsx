@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getAccess } from "@/lib/billing";
 import { Aurora } from "@/components/Aurora";
 import { Wordmark } from "@/components/ui";
+import { ChangePassword } from "@/components/ChangePassword";
 import { signOut } from "../(auth)/actions";
 import ClockWidget from "./ClockWidget";
 
@@ -63,6 +64,7 @@ export default async function ZigosanjePage() {
             <span className="hidden text-sm font-medium text-slate-500 xs:block">
               {profile.full_name?.split(" ")[0] ?? "Zaposleni"}
             </span>
+            <ChangePassword variant="icon" />
             <form action={signOut}>
               <button className="rounded-full bg-white/60 px-3 py-1.5 text-sm font-medium text-slate-700 ring-1 ring-white/70 hover:bg-white/80">
                 Odjava

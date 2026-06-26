@@ -6,6 +6,7 @@ import { useState } from "react";
 import { CreditCard } from "lucide-react";
 import { signOut } from "../(auth)/actions";
 import { Wordmark, cn } from "@/components/ui";
+import { ChangePassword } from "@/components/ChangePassword";
 
 const ITEMS = [
   { href: "/dashboard", label: "Domov", exact: true },
@@ -62,6 +63,7 @@ export default function AppNav({ companyName }: { companyName: string }) {
           <span className="hidden max-w-[140px] truncate text-sm font-medium text-slate-500 lg:block">
             {companyName}
           </span>
+          <ChangePassword variant="icon" />
           <form action={signOut}>
             <button className="rounded-full bg-white/60 px-3 py-1.5 text-sm font-medium text-slate-700 ring-1 ring-white/70 transition hover:bg-white/80">
               Odjava
@@ -110,6 +112,7 @@ export default function AppNav({ companyName }: { companyName: string }) {
           >
             <CreditCard className="h-4 w-4" /> Naročnina
           </Link>
+          <ChangePassword variant="text" />
         </nav>
       )}
     </header>
