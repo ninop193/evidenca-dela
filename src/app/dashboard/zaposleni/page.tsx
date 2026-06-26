@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Users, UserPlus } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { Badge, Card, buttonClasses } from "@/components/ui";
+import { EmployeeRowActions } from "./EmployeeRowActions";
 
 export default async function EmployeesPage() {
   const supabase = await createClient();
@@ -46,6 +47,7 @@ export default async function EmployeesPage() {
                     <Th>EMŠO</Th>
                     <Th>Davčna</Th>
                     <Th>Status</Th>
+                    <th className="px-4 py-3"></th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-50">
@@ -67,6 +69,9 @@ export default async function EmployeesPage() {
                           {e.active ? "Aktiven" : "Neaktiven"}
                         </Badge>
                       </td>
+                      <td className="px-4 py-3.5 text-right">
+                        <EmployeeRowActions employeeId={e.id} fullName={e.full_name} active={!!e.active} />
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -84,9 +89,12 @@ export default async function EmployeesPage() {
                         <Badge tone="amber" className="ml-2">poslovodna</Badge>
                       )}
                     </p>
-                    <Badge tone={e.active ? "green" : "slate"}>
-                      {e.active ? "Aktiven" : "Neaktiven"}
-                    </Badge>
+                    <div className="flex items-center gap-1">
+                      <Badge tone={e.active ? "green" : "slate"}>
+                        {e.active ? "Aktiven" : "Neaktiven"}
+                      </Badge>
+                      <EmployeeRowActions employeeId={e.id} fullName={e.full_name} active={!!e.active} />
+                    </div>
                   </div>
                   <dl className="mt-2 grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-sm">
                     <dt className="text-slate-400">Delovno mesto</dt>

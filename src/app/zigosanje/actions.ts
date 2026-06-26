@@ -27,7 +27,7 @@ async function getEmployee() {
   const profile = await getProfile();
   if (!profile) return { supabase, profile: null, employee: null, hasAccess: false };
   const [{ data: employee }, { data: company }] = await Promise.all([
-    supabase.from("employees").select("id, company_id").eq("user_id", profile.id).single(),
+    supabase.from("employees").select("id, company_id, active").eq("user_id", profile.id).single(),
     supabase.from("companies").select("subscription_status, trial_ends_at, current_period_end").eq("id", profile.company_id).single(),
   ]);
   const hasAccess = getAccess(company ?? {}).hasAccess;
@@ -39,6 +39,7 @@ export async function clockIn(): Promise<ActionResult> {
   const { supabase, employee, hasAccess } = await getEmployee();
   if (!hasAccess) return { error: "Naročnina podjetja je potekla." };
   if (!employee) return { error: "Ni najdenega zaposlenega." };
+  if (!employee.active) return { error: "Vaš račun je deaktiviran. Obrnite se na delodajalca." };
 
   const today = todayLjubljana();
 
@@ -83,6 +84,7 @@ export async function clockOut(): Promise<ActionResult> {
   const { supabase, employee, hasAccess } = await getEmployee();
   if (!hasAccess) return { error: "Naročnina podjetja je potekla." };
   if (!employee) return { error: "Ni najdenega zaposlenega." };
+  if (!employee.active) return { error: "Vaš račun je deaktiviran. Obrnite se na delodajalca." };
 
   const { data: open } = await supabase
     .from("time_entries")

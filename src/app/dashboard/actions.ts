@@ -1,8 +1,72 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { getProfile } from "@/lib/auth";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { PLAN } from "@/lib/billing";
+
+export type ActionResult = { error?: string; ok?: boolean };
+
+// Preveri, da je klicatelj admin in da zaposleni pripada njegovemu podjetju.
+async function ownedEmployee(employeeId: string) {
+  const profile = await getProfile();
+  if (!profile || profile.role !== "admin") {
+    return { error: "Samo delodajalec lahko upravlja zaposlene." as string };
+  }
+  const admin = createAdminClient();
+  const { data: emp } = await admin
+    .from("employees")
+    .select("id, company_id, user_id")
+    .eq("id", employeeId)
+    .maybeSingle();
+  if (!emp || emp.company_id !== profile.company_id) {
+    return { error: "Zaposleni ni najden." as string };
+  }
+  return { admin, emp };
+}
+
+// Deaktiviraj / ponovno aktiviraj zaposlenega (ohrani evidenco ur).
+export async function setEmployeeActive(
+  employeeId: string,
+  active: boolean,
+): Promise<ActionResult> {
+  const res = await ownedEmployee(employeeId);
+  if ("error" in res) return { error: res.error };
+  const { error } = await res.admin
+    .from("employees")
+    .update({ active })
+    .eq("id", employeeId);
+  if (error) return { error: "Sprememba ni uspela." };
+  revalidatePath("/dashboard/zaposleni");
+  return { ok: true };
+}
+
+// Dokončno izbriši zaposlenega — DOVOLJENO le, če nima zabeleženih ur ali odsotnosti
+// (zakon zahteva hrambo evidence; sicer naj se uporabi deaktivacija).
+export async function deleteEmployee(employeeId: string): Promise<ActionResult> {
+  const res = await ownedEmployee(employeeId);
+  if ("error" in res) return { error: res.error };
+  const { admin, emp } = res;
+
+  const [{ count: entries }, { count: absences }] = await Promise.all([
+    admin.from("time_entries").select("id", { count: "exact", head: true }).eq("employee_id", employeeId),
+    admin.from("absences").select("id", { count: "exact", head: true }).eq("employee_id", employeeId),
+  ]);
+  if ((entries ?? 0) > 0 || (absences ?? 0) > 0) {
+    return {
+      error:
+        "Ta zaposleni ima zabeleženo evidenco, ki jo morate po zakonu hraniti. Namesto brisanja ga deaktivirajte.",
+    };
+  }
+
+  // Izbriši zapis zaposlenega, nato še njegovo prijavo (auth → kaskadno pobriše users).
+  const { error: delErr } = await admin.from("employees").delete().eq("id", employeeId);
+  if (delErr) return { error: "Brisanje ni uspelo." };
+  if (emp.user_id) await admin.auth.admin.deleteUser(emp.user_id).catch(() => {});
+
+  revalidatePath("/dashboard/zaposleni");
+  return { ok: true };
+}
 
 export type CreateEmployeeInput = {
   fullName: string;
