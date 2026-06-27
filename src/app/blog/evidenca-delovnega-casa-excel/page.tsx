@@ -240,7 +240,7 @@ export default function Page() {
               Prenesi brezplačen Excel vzorec (.xlsx)
             </a>
             <p className="text-sm text-slate-500">
-              Brez registracije. Ali raje, da se ure beležijo samodejno?{" "}
+              Brez registracije. Ali bi raje, da se ure beležijo samodejno?{" "}
               <Link href="/register" className="font-semibold text-brand-700 hover:text-brand-800">
                 Preizkusi Delovit brezplačno →
               </Link>
