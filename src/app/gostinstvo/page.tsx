@@ -37,7 +37,7 @@ const config: NicheConfig = {
     </>
   ),
   roleWord: "Natakar",
-  keyTitle: "Špici, sezonci in študentje? Evidenca je vseeno obvezna",
+  keyTitle: "Sezonci in študentje? Evidenca je vseeno obvezna",
   keyBody:
     "V gostinstvu so urniki neenakomerni, osebje se menja, dela se ob nedeljah in praznikih. Prav zato je evidenca ur pogosto kaos, po ZEPDSV pa jo morate voditi za vsakega, ki dela pri vas, tudi za sezonce in študente.",
   faqIntro: {
