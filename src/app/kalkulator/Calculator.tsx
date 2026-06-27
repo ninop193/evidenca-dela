@@ -3,8 +3,7 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { izracunajPlaco, eur, PLACA_CONFIG } from "@/lib/placa";
-import { captureLead } from "./actions";
-import { Button, Card, Input, buttonClasses } from "@/components/ui";
+import { Card, buttonClasses } from "@/components/ui";
 
 export default function Calculator() {
   const [bruto, setBruto] = useState("1500");
@@ -50,8 +49,6 @@ export default function Calculator() {
         aktualne stopnje pri FURS ali svojem računovodji.
       </p>
 
-      <EmailCapture />
-
       <div className="relative overflow-hidden rounded-3xl bg-slate-900 p-7 text-center shadow-lift">
         <div className="bg-grid absolute inset-0 opacity-[0.15]" />
         <div className="relative">
@@ -89,57 +86,5 @@ function Cell({
         {value}
       </p>
     </div>
-  );
-}
-
-function EmailCapture() {
-  const [email, setEmail] = useState("");
-  const [state, setState] = useState<"idle" | "loading" | "done">("idle");
-  const [error, setError] = useState<string | null>(null);
-
-  async function submit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    setError(null);
-    setState("loading");
-    const res = await captureLead(email);
-    if (res.error) {
-      setError(res.error);
-      setState("idle");
-      return;
-    }
-    setState("done");
-  }
-
-  if (state === "done") {
-    return (
-      <div className="rounded-2xl bg-brand-50 p-5 text-center text-sm text-brand-800 ring-1 ring-brand-100">
-        ✅ Hvala! Poslali ti bomo dostop do brezplačnega meseca preizkusa.
-      </div>
-    );
-  }
-
-  return (
-    <Card className="p-5">
-      <p className="text-sm font-semibold text-slate-900">
-        Dobi brezplačen mesec preizkusa evidence ur
-      </p>
-      <p className="mt-1 text-xs text-slate-500">
-        Pusti email in pošljemo ti dostop, brez obveznosti.
-      </p>
-      <form onSubmit={submit} className="mt-3 flex flex-col gap-2 sm:flex-row">
-        <Input
-          type="email"
-          required
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="ti@podjetje.si"
-          className="flex-1"
-        />
-        <Button type="submit" disabled={state === "loading"}>
-          {state === "loading" ? "Pošiljam…" : "Pošlji"}
-        </Button>
-      </form>
-      {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
-    </Card>
   );
 }
