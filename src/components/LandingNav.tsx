@@ -6,9 +6,9 @@ import { Menu, X } from "lucide-react";
 import { Wordmark } from "@/components/ui";
 
 const LINKS = [
-  { href: "/studenti", label: "Za študente" },
   { href: "/#cena", label: "Cena" },
   { href: "/kalkulator", label: "Kalkulator" },
+  { href: "/blog", label: "Blog" },
 ];
 
 const linkClass =
