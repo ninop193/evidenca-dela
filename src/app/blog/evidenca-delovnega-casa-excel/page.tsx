@@ -275,7 +275,14 @@ export default function Page() {
             </li>
             <li>
               <strong>Globe</strong> od 300 do 8.000 € za delodajalca posameznika, ki evidenc nima
-              urejenih, in od 3.000 do 20.000 € za pravno osebo.
+              urejenih, in od 3.000 do 20.000 € za pravno osebo. Več o tem:{" "}
+              <Link
+                href="/blog/globe-zepdsv-evidenca-delovnega-casa"
+                className="font-semibold text-brand-700 hover:text-brand-800"
+              >
+                kazni ZEPDSV in kako se jim izogniti
+              </Link>
+              .
             </li>
           </ul>
           <p>

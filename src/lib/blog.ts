@@ -10,6 +10,16 @@ export type BlogPost = {
 
 export const BLOG_POSTS: BlogPost[] = [
   {
+    slug: "globe-zepdsv-evidenca-delovnega-casa",
+    title: "Kazni ZEPDSV: kdo mora voditi evidenco in kako se izogniti globi",
+    description:
+      "IRSD je v 2024 izrekel več kot 1.000 kršitev evidenc. Globe za s.p. do 8.000 €, za d.o.o. do 20.000 €. Lestvica, escalation logika, rešitev.",
+    date: "2026-06-28",
+    excerpt:
+      "Poleti IRSD poostri nadzor. Kolikšne so globe, zakaj naraščajo, kako poteka inšpekcija in kako se globi izognete v štirih korakih.",
+    readMins: 5,
+  },
+  {
     slug: "evidenca-delovnega-casa-excel",
     title: "Evidenca delovnega časa v Excelu: zakaj pogosto ni dovolj",
     description:
