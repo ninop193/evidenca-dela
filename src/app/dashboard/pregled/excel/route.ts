@@ -282,6 +282,9 @@ export async function GET(req: NextRequest) {
     r += 2;
     ws.getCell(`A${r}`).value = "Kraj in datum: ____________________";
     ws.getCell(`A${r}`).font = { size: 10, color: { argb: DARK } };
+    r += 2;
+    ws.getCell(`A${r}`).value = "Podpis delavca: ____________________";
+    ws.getCell(`A${r}`).font = { size: 10, color: { argb: DARK } };
     ws.getCell(`H${r}`).value = "Podpis odgovorne osebe: ____________________";
     ws.getCell(`H${r}`).font = { size: 10, color: { argb: DARK } };
 

@@ -235,17 +235,21 @@ export default async function PrintPage({
             </section>
 
             {/* PODPISNI BLOK */}
-            <footer className="mt-10 flex items-end justify-between">
-              <div className="text-[10px] text-slate-500">
-                <p>Kraj in datum: ____________________</p>
-                <p className="mt-4 text-slate-400">
-                  Dokument ustvarjen elektronsko dne {generated}.
-                </p>
+            <footer className="mt-10">
+              <p className="text-[10px] text-slate-500">Kraj in datum: ____________________</p>
+              <div className="mt-8 flex items-end justify-between gap-8">
+                <div className="text-center text-[10px] text-slate-600">
+                  <div className="mb-1 h-8 w-52 border-b border-slate-400" />
+                  Podpis delavca
+                </div>
+                <div className="text-center text-[10px] text-slate-600">
+                  <div className="mb-1 h-8 w-52 border-b border-slate-400" />
+                  Podpis odgovorne osebe
+                </div>
               </div>
-              <div className="text-center text-[10px] text-slate-600">
-                <div className="mb-1 h-8 w-52 border-b border-slate-400" />
-                Podpis odgovorne osebe
-              </div>
+              <p className="mt-4 text-[10px] text-slate-400">
+                Dokument ustvarjen elektronsko dne {generated}.
+              </p>
             </footer>
           </article>
         ))}
