@@ -167,3 +167,35 @@ body {
     opacity: 1 !important;
   }
 }
+
+/* ─────────── Zmogljivost na dotik napravah (telefoni/tablice) ───────────
+   Android Chrome se duši ob animiranih blur slojih in močnem backdrop-filter
+   (na iOS Safari to teče gladko). Na dotik napravah izklopimo težke animacije
+   ozadja in zmanjšamo blur — videz ostane skoraj enak, drsenje pa je gladko.
+   Animirana različica ostane na namizju (pointer: fine, večji zaslon). */
+@media (pointer: coarse), (max-width: 820px) {
+  .float-a, .float-b, .float-y, .hue-spin, .glow-pulse, .text-holo,
+  .animate-ping, .animate-pulse {
+    animation: none !important;
+  }
+  .holo-orb {
+    will-change: auto;
+    filter: blur(48px);
+    opacity: 0.78;
+  }
+  .holo-sheen {
+    mix-blend-mode: normal;
+    opacity: 0.38 !important;
+  }
+  .grain { display: none; }
+  .glass {
+    background: rgba(255, 255, 255, 0.86);
+    backdrop-filter: blur(6px) saturate(135%);
+    -webkit-backdrop-filter: blur(6px) saturate(135%);
+  }
+  .glass-strong {
+    background: rgba(255, 255, 255, 0.93);
+    backdrop-filter: blur(6px) saturate(135%);
+    -webkit-backdrop-filter: blur(6px) saturate(135%);
+  }
+}
