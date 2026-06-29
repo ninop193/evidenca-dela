@@ -160,3 +160,45 @@ export async function createEmployee(
 
   return { email };
 }
+
+export type UpdateEmployeeInput = {
+  id: string;
+  fullName: string;
+  jobTitle?: string;
+  emso?: string;
+  taxId?: string;
+  weeklyHours?: string;
+  employmentStartDate?: string;
+  isManagement?: boolean;
+};
+
+// Uredi podatke obstoječega zaposlenega (vključno z oznako "poslovodna oseba").
+// Ne spreminja emaila/gesla (prijavni podatki).
+export async function updateEmployee(input: UpdateEmployeeInput): Promise<ActionResult> {
+  const res = await ownedEmployee(input.id);
+  if ("error" in res) return { error: res.error };
+  const { admin, emp } = res;
+
+  const fullName = input.fullName?.trim();
+  if (!fullName) return { error: "Ime in priimek sta obvezna." };
+
+  const { error } = await admin
+    .from("employees")
+    .update({
+      full_name: fullName,
+      job_title: input.jobTitle?.trim() || null,
+      emso: input.emso?.trim() || null,
+      tax_id: input.taxId?.trim() || null,
+      weekly_hours: input.weeklyHours ? Number(input.weeklyHours) : null,
+      employment_start_date: input.employmentStartDate || null,
+      is_management: !!input.isManagement,
+    })
+    .eq("id", input.id);
+  if (error) return { error: "Shranjevanje ni uspelo." };
+
+  // Uskladi ime tudi v prijavnem profilu (za dosleden prikaz).
+  if (emp.user_id) await admin.from("users").update({ full_name: fullName }).eq("id", emp.user_id);
+
+  revalidatePath("/dashboard/zaposleni");
+  return { ok: true };
+}

@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { MoreVertical, UserX, UserCheck, Trash2, Loader2, X } from "lucide-react";
+import { MoreVertical, UserX, UserCheck, Trash2, Loader2, X, Pencil } from "lucide-react";
 import { setEmployeeActive, deleteEmployee } from "../actions";
 
 export function EmployeeRowActions({
@@ -66,6 +67,13 @@ export function EmployeeRowActions({
 
       {open && (
         <div className="glass-strong iris-edge absolute right-0 z-20 mt-1 w-56 overflow-hidden rounded-2xl p-1.5 text-sm shadow-lg">
+          <Link
+            href={`/dashboard/zaposleni/${employeeId}`}
+            className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-left font-medium text-slate-700 transition hover:bg-white/70"
+          >
+            <Pencil className="h-4 w-4 text-slate-500" />
+            Uredi
+          </Link>
           <button
             onClick={toggleActive}
             disabled={loading}
