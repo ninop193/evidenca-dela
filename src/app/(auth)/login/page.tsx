@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
@@ -13,7 +12,6 @@ const fieldCls =
   "w-full rounded-xl bg-white/70 px-3.5 py-2.5 text-[15px] text-slate-900 ring-1 ring-white/80 shadow-[inset_0_1px_2px_rgba(120,130,200,0.08)] placeholder:text-slate-400 outline-none transition focus:ring-2 focus:ring-brand-500";
 
 export default function LoginPage() {
-  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -33,9 +31,20 @@ export default function LoginPage() {
       setLoading(false);
       return;
     }
-    const { data: profile } = await supabase.from("users").select("role").eq("id", data.user.id).single();
-    router.push(profile?.role === "admin" ? "/dashboard" : "/zigosanje");
-    router.refresh();
+    const { data: profile } = await supabase
+      .from("users")
+      .select("role")
+      .eq("id", data.user.id)
+      .maybeSingle();
+    // Trda navigacija (polno nalaganje) zanesljivo prevzame sveže prijavljeno sejo;
+    // mehka (router.push) lahko tu obtiči.
+    const dest =
+      profile?.role === "admin"
+        ? "/dashboard"
+        : profile?.role === "employee"
+          ? "/zigosanje"
+          : "/dobrodosli"; // brez podjetja → dokončaj registracijo
+    window.location.assign(dest);
   }
 
   return (

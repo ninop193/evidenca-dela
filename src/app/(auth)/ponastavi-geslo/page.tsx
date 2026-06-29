@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { Aurora } from "@/components/Aurora";
@@ -11,7 +10,6 @@ const fieldCls =
   "w-full rounded-xl bg-white/70 px-3.5 py-2.5 text-[15px] text-slate-900 ring-1 ring-white/80 placeholder:text-slate-400 outline-none transition focus:ring-2 focus:ring-brand-500";
 
 export default function PonastaviGesloPage() {
-  const router = useRouter();
   const [ready, setReady] = useState<"checking" | "ok" | "invalid">("checking");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -46,8 +44,8 @@ export default function PonastaviGesloPage() {
       setError("Napaka pri shranjevanju gesla. Poskusi znova.");
       return;
     }
-    router.push("/dashboard");
-    router.refresh();
+    // Trda navigacija; strežniški role-guard zaposlene preusmeri na /zigosanje.
+    window.location.assign("/dashboard");
   }
 
   return (
