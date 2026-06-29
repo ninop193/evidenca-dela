@@ -6,6 +6,7 @@ import {
   paymentFailedEmail,
   authConfirmEmail,
   authResetEmail,
+  employeeWelcomeEmail,
 } from "@/lib/email/templates";
 
 export const dynamic = "force-dynamic";
@@ -31,6 +32,12 @@ export async function GET(req: NextRequest) {
     failed: paymentFailedEmail({ fullName: sample.fullName }),
     "confirm-signup": authConfirmEmail(),
     "reset-password": authResetEmail(),
+    "employee-welcome": employeeWelcomeEmail({
+      fullName: "Marko Horvat",
+      email: "marko@gostilna.si",
+      password: "geslo12345",
+      companyName: "Gostilna Pri Lipi",
+    }),
   } as const;
 
   const email = map[t as keyof typeof map] ?? map.welcome;

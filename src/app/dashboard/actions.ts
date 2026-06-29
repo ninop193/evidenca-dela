@@ -4,6 +4,8 @@ import { revalidatePath } from "next/cache";
 import { getProfile } from "@/lib/auth";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { PLAN } from "@/lib/billing";
+import { sendEmail } from "@/lib/email/send";
+import { employeeWelcomeEmail } from "@/lib/email/templates";
 
 export type ActionResult = { error?: string; ok?: boolean };
 
@@ -159,6 +161,22 @@ export async function createEmployee(
     await admin.auth.admin.deleteUser(userId);
     return { error: "Napaka pri zapisu v evidenco zaposlenih." };
   }
+
+  // Pozdravni email s podatki za prijavo (ne sme podreti dodajanja, če spodleti).
+  const { data: company } = await admin
+    .from("companies")
+    .select("name")
+    .eq("id", profile.company_id)
+    .maybeSingle();
+  await sendEmail(
+    email,
+    employeeWelcomeEmail({
+      fullName,
+      email,
+      password: input.password,
+      companyName: company?.name ?? null,
+    }),
+  );
 
   return { email };
 }
