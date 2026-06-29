@@ -8,7 +8,7 @@ export default async function EmployeesPage() {
   const supabase = await createClient();
   const { data: employees } = await supabase
     .from("employees")
-    .select("id, full_name, job_title, emso, tax_id, is_management, active")
+    .select("id, full_name, job_title, emso, tax_id, is_management, worker_type, active")
     .order("created_at", { ascending: true });
 
   return (
@@ -55,6 +55,11 @@ export default async function EmployeesPage() {
                     <tr key={e.id} className="transition hover:bg-white/45">
                       <td className="px-4 py-3.5 font-medium text-slate-900">
                         {e.full_name}
+                        {e.worker_type === "student" && (
+                          <Badge tone="brand" className="ml-2">
+                            Študent
+                          </Badge>
+                        )}
                         {e.is_management && (
                           <Badge tone="amber" className="ml-2">
                             poslovodna
@@ -85,6 +90,9 @@ export default async function EmployeesPage() {
                   <div className="flex items-start justify-between gap-3">
                     <p className="font-semibold text-slate-900">
                       {e.full_name}
+                      {e.worker_type === "student" && (
+                        <Badge tone="brand" className="ml-2">Študent</Badge>
+                      )}
                       {e.is_management && (
                         <Badge tone="amber" className="ml-2">poslovodna</Badge>
                       )}

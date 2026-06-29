@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { createEmployee } from "../../actions";
-import { Button, Card, Field, Input, buttonClasses } from "@/components/ui";
+import { Button, Card, Field, Input, buttonClasses, selectClasses } from "@/components/ui";
 
 export default function NewEmployeePage() {
   const [loading, setLoading] = useState(false);
@@ -29,6 +29,7 @@ export default function NewEmployeePage() {
       weeklyHours: String(form.get("weeklyHours") ?? ""),
       employmentStartDate: String(form.get("employmentStartDate") ?? ""),
       isManagement: form.get("isManagement") === "on",
+      workerType: String(form.get("workerType") ?? "zaposlen"),
     });
 
     if (res.error) {
@@ -97,6 +98,12 @@ export default function NewEmployeePage() {
               Podatki za evidenco (13. člen)
             </p>
             <div className="space-y-4">
+              <Field label="Vrsta dela">
+                <select name="workerType" defaultValue="zaposlen" className={selectClasses}>
+                  <option value="zaposlen">Zaposleni</option>
+                  <option value="student">Študent / dijak (napotnica)</option>
+                </select>
+              </Field>
               <Field label="Delovno mesto">
                 <Input name="jobTitle" placeholder="Mizar" />
               </Field>

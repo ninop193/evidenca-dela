@@ -78,6 +78,7 @@ export type CreateEmployeeInput = {
   weeklyHours?: string;
   employmentStartDate?: string;
   isManagement?: boolean;
+  workerType?: string;
 };
 
 export type CreateEmployeeResult = { error?: string; email?: string };
@@ -151,6 +152,7 @@ export async function createEmployee(
     weekly_hours: input.weeklyHours ? Number(input.weeklyHours) : null,
     employment_start_date: input.employmentStartDate || null,
     is_management: !!input.isManagement,
+    worker_type: input.workerType === "student" ? "student" : "zaposlen",
   });
   if (empErr) {
     await admin.from("users").delete().eq("id", userId);
@@ -170,6 +172,7 @@ export type UpdateEmployeeInput = {
   weeklyHours?: string;
   employmentStartDate?: string;
   isManagement?: boolean;
+  workerType?: string;
 };
 
 // Uredi podatke obstoječega zaposlenega (vključno z oznako "poslovodna oseba").
@@ -192,6 +195,7 @@ export async function updateEmployee(input: UpdateEmployeeInput): Promise<Action
       weekly_hours: input.weeklyHours ? Number(input.weeklyHours) : null,
       employment_start_date: input.employmentStartDate || null,
       is_management: !!input.isManagement,
+      worker_type: input.workerType === "student" ? "student" : "zaposlen",
     })
     .eq("id", input.id);
   if (error) return { error: "Shranjevanje ni uspelo." };

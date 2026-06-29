@@ -36,6 +36,7 @@ export type ReportEmployee = {
   employment_start_date: string | null;
   employment_end_date: string | null;
   is_management: boolean;
+  worker_type: string | null;
   entries: ReportEntry[];
   absences: ReportAbsence[];
   totals: Record<string, number>;
@@ -77,7 +78,7 @@ export async function getMonthlyReport(
       supabase
         .from("employees")
         .select(
-          "id, full_name, emso, tax_id, job_title, weekly_hours, employment_start_date, employment_end_date, is_management",
+          "id, full_name, emso, tax_id, job_title, weekly_hours, employment_start_date, employment_end_date, is_management, worker_type",
         )
         .order("full_name"),
       supabase

@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { updateEmployee } from "../../actions";
-import { Button, Card, Field, Input } from "@/components/ui";
+import { Button, Card, Field, Input, selectClasses } from "@/components/ui";
 
 type Employee = {
   id: string;
@@ -15,6 +15,7 @@ type Employee = {
   weekly_hours: number | null;
   employment_start_date: string | null;
   is_management: boolean | null;
+  worker_type: string | null;
   email?: string | null;
 };
 
@@ -38,6 +39,7 @@ export function EditEmployeeForm({ employee }: { employee: Employee }) {
       weeklyHours: String(form.get("weeklyHours") ?? ""),
       employmentStartDate: String(form.get("employmentStartDate") ?? ""),
       isManagement: form.get("isManagement") === "on",
+      workerType: String(form.get("workerType") ?? "zaposlen"),
     });
 
     if (res.error) {
@@ -76,6 +78,16 @@ export function EditEmployeeForm({ employee }: { employee: Employee }) {
               Podatki za evidenco (13. člen)
             </p>
             <div className="space-y-4">
+              <Field label="Vrsta dela">
+                <select
+                  name="workerType"
+                  defaultValue={employee.worker_type === "student" ? "student" : "zaposlen"}
+                  className={selectClasses}
+                >
+                  <option value="zaposlen">Zaposleni</option>
+                  <option value="student">Študent / dijak (napotnica)</option>
+                </select>
+              </Field>
               <Field label="Delovno mesto">
                 <Input name="jobTitle" defaultValue={employee.job_title ?? ""} placeholder="Mizar" />
               </Field>

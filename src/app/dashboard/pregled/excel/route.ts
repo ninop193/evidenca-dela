@@ -122,6 +122,7 @@ export async function GET(req: NextRequest) {
       richText: [
         { text: "Zaposleni:  ", font: { color: { argb: MUTED }, size: 10 } },
         { text: emp.full_name, font: { bold: true, size: 11, color: { argb: DARK } } },
+        { text: `      Vrsta dela:  ${emp.worker_type === "student" ? "Študent / dijak" : "Zaposleni"}`, font: { size: 10, color: { argb: DARK } } },
         { text: `      Delovno mesto:  ${emp.job_title ?? "—"}`, font: { size: 10, color: { argb: DARK } } },
         { text: `      Tedenski delovni čas:  ${emp.weekly_hours != null ? `${emp.weekly_hours} h` : "—"}`, font: { size: 10, color: { argb: DARK } } },
       ],

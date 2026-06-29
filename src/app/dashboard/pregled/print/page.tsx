@@ -119,6 +119,7 @@ export default async function PrintPage({
             {/* PODATKI ZAPOSLENEGA */}
             <section className="mt-5 grid grid-cols-4 gap-x-4 gap-y-2 rounded-lg bg-slate-50 px-4 py-3 text-xs ring-1 ring-slate-100">
               <Info label="Zaposleni" value={emp.full_name} wide />
+              <Info label="Vrsta dela" value={emp.worker_type === "student" ? "Študent / dijak" : "Zaposleni"} />
               <Info label="Delovno mesto" value={emp.job_title ?? "—"} />
               <Info label="Tedenski delovni čas" value={emp.weekly_hours != null ? `${emp.weekly_hours} h` : "—"} />
               <Info label="EMŠO" value={emp.emso ?? "—"} />
