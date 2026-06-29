@@ -62,9 +62,15 @@ export default function DobrodosliPage() {
       return;
     }
     // Promo / prijatelji: vnaprej pooblaščeni emaili dobijo brezplačen dostop.
-    await claimFreeAccessIfEligible();
-    router.push("/narocnina?welcome=1");
-    router.refresh();
+    // Ne sme blokirati preusmeritve, če slučajno spodleti.
+    try {
+      await claimFreeAccessIfEligible();
+    } catch {
+      // namenoma tiho — podjetje je že ustvarjeno
+    }
+    // Trda preusmeritev (polno nalaganje), da se zanesljivo prevzame sveža
+    // seja po prijavi. Mehka navigacija (router.push) lahko tu obtiči.
+    window.location.assign("/narocnina?welcome=1");
   }
 
   return (
