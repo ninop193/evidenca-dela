@@ -5,6 +5,9 @@ import { createAdminClient } from "@/lib/supabase/admin";
 // Doda se ime v malih črkah. Dostop velja takoj ob ustvarjenju podjetja.
 const FREE_ACCESS_EMAILS = new Set<string>([
   "jolandate@gmail.com",
+  "nino.pavalec01@gmail.com",
+  "marytsy.work@gmail.com",
+  "billing@futuristica.com",
 ]);
 
 export function isFreeAccessEmail(email?: string | null): boolean {
