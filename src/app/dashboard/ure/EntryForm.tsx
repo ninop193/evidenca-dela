@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createManualEntry, updateEntry, deleteEntry, type EntryInput } from "./actions";
+import { SloDateInput } from "@/components/SloDateInput";
 
 export type EntryInitial = Partial<EntryInput> & { employeeId?: string; date?: string };
 
@@ -98,7 +99,10 @@ export default function EntryForm({
         </select>
       </label>
 
-      <Field label="Datum *" name="date" type="date" required defaultValue={initial?.date} />
+      <label className="block">
+        <span className="mb-1 block text-sm font-medium text-slate-700">Datum *</span>
+        <SloDateInput name="date" required defaultValue={initial?.date} />
+      </label>
 
       <div className="grid grid-cols-2 gap-3">
         <Field label="Prihod (ura)" name="clockInTime" type="time" defaultValue={initial?.clockInTime} />

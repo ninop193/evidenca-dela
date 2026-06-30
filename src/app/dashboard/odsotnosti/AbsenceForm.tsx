@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createAbsence } from "./actions";
 import { TYPE_LABELS, CATEGORY_LABELS } from "./labels";
+import { SloDateInput } from "@/components/SloDateInput";
 
 // Predlagana kategorija glede na vrsto odsotnosti (admin lahko spremeni).
 const DEFAULT_CATEGORY: Record<string, string> = {
@@ -74,11 +75,11 @@ export default function AbsenceForm({
       <div className="grid grid-cols-2 gap-3">
         <label className="block">
           <span className="mb-1 block text-sm font-medium text-slate-700">Od *</span>
-          <input name="dateFrom" type="date" required className="w-full rounded-xl bg-white/70 px-3.5 py-2.5 text-[15px] text-slate-900 ring-1 ring-white/80 outline-none transition focus:ring-2 focus:ring-brand-500" />
+          <SloDateInput name="dateFrom" required />
         </label>
         <label className="block">
           <span className="mb-1 block text-sm font-medium text-slate-700">Do *</span>
-          <input name="dateTo" type="date" required className="w-full rounded-xl bg-white/70 px-3.5 py-2.5 text-[15px] text-slate-900 ring-1 ring-white/80 outline-none transition focus:ring-2 focus:ring-brand-500" />
+          <SloDateInput name="dateTo" required />
         </label>
       </div>
 

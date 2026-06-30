@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { updateEmployee } from "../../actions";
 import { Button, Card, Field, Input, selectClasses } from "@/components/ui";
+import { SloDateInput } from "@/components/SloDateInput";
 
 type Employee = {
   id: string;
@@ -109,9 +110,8 @@ export function EditEmployeeForm({ employee }: { employee: Employee }) {
                   />
                 </Field>
                 <Field label="Datum nastopa dela">
-                  <Input
+                  <SloDateInput
                     name="employmentStartDate"
-                    type="date"
                     defaultValue={employee.employment_start_date ?? ""}
                   />
                 </Field>

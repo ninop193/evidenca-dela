@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { createEmployee } from "../../actions";
 import { Button, Card, Field, Input, buttonClasses, selectClasses } from "@/components/ui";
+import { SloDateInput } from "@/components/SloDateInput";
 
 export default function NewEmployeePage() {
   const [loading, setLoading] = useState(false);
@@ -120,7 +121,7 @@ export default function NewEmployeePage() {
                   <Input name="weeklyHours" type="number" placeholder="40" />
                 </Field>
                 <Field label="Datum nastopa dela">
-                  <Input name="employmentStartDate" type="date" />
+                  <SloDateInput name="employmentStartDate" />
                 </Field>
               </div>
               <label className="flex items-center gap-2 text-sm text-slate-700">
