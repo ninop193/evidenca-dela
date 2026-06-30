@@ -69,18 +69,22 @@ export async function getMonthlyReport(
   supabase: SupabaseClient,
   companyId: string,
   month: string,
+  employeeId?: string,
 ): Promise<MonthlyReport> {
   const { first, last } = monthBounds(month);
+
+  let empQuery = supabase
+    .from("employees")
+    .select(
+      "id, full_name, emso, tax_id, job_title, weekly_hours, employment_start_date, employment_end_date, is_management, worker_type",
+    )
+    .order("full_name");
+  if (employeeId) empQuery = empQuery.eq("id", employeeId);
 
   const [{ data: company }, { data: employees }, { data: entries }, { data: absences }] =
     await Promise.all([
       supabase.from("companies").select("name, tax_id").eq("id", companyId).single(),
-      supabase
-        .from("employees")
-        .select(
-          "id, full_name, emso, tax_id, job_title, weekly_hours, employment_start_date, employment_end_date, is_management, worker_type",
-        )
-        .order("full_name"),
+      empQuery,
       supabase
         .from("time_entries")
         .select(

@@ -88,6 +88,7 @@ export default async function MonthlyOverviewPage({
           <p className="mt-1 text-sm text-slate-500">Seštevki, potrjevanje in izvoz evidence.</p>
         </div>
         <div className="flex items-center gap-2">
+          <span className="hidden text-sm font-medium text-slate-500 sm:inline">Izvozi vse:</span>
           <a href={`/dashboard/pregled/excel?month=${month}`} className={buttonClasses("secondary", "sm")}>
             <Download className="h-4 w-4" /> Excel
           </a>
@@ -119,9 +120,29 @@ export default async function MonthlyOverviewPage({
             const allConfirmed = list.length > 0 && list.every((e) => e.confirmed);
             return (
               <Card key={emp.id} className="overflow-hidden">
-                <div className="flex items-center justify-between border-b border-slate-100 px-5 py-3.5">
+                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 px-5 py-3.5">
                   <h2 className="font-semibold text-slate-900">{emp.full_name}</h2>
-                  <MonthActions employeeId={emp.id} month={month} confirmed={allConfirmed} hasEntries={list.length > 0} />
+                  <div className="flex items-center gap-1.5">
+                    {list.length > 0 && (
+                      <>
+                        <a
+                          href={`/dashboard/pregled/excel?month=${month}&employee=${emp.id}`}
+                          className="inline-flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-xs font-medium text-slate-600 ring-1 ring-slate-200 transition hover:bg-slate-50 hover:text-slate-900"
+                          title="Izvozi Excel samo za tega zaposlenega"
+                        >
+                          <Download className="h-3.5 w-3.5" /> Excel
+                        </a>
+                        <Link
+                          href={`/dashboard/pregled/print?month=${month}&employee=${emp.id}`}
+                          className="inline-flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-xs font-medium text-slate-600 ring-1 ring-slate-200 transition hover:bg-slate-50 hover:text-slate-900"
+                          title="Izvozi PDF samo za tega zaposlenega"
+                        >
+                          <Printer className="h-3.5 w-3.5" /> PDF
+                        </Link>
+                      </>
+                    )}
+                    <MonthActions employeeId={emp.id} month={month} confirmed={allConfirmed} hasEntries={list.length > 0} />
+                  </div>
                 </div>
 
                 {list.length === 0 ? (

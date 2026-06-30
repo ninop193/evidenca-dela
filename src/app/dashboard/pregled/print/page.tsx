@@ -35,7 +35,7 @@ function monthLabel(month: string) {
 export default async function PrintPage({
   searchParams,
 }: {
-  searchParams: Promise<{ month?: string }>;
+  searchParams: Promise<{ month?: string; employee?: string }>;
 }) {
   const profile = await getProfile();
   if (!profile) redirect("/login");
@@ -43,9 +43,10 @@ export default async function PrintPage({
 
   const sp = await searchParams;
   const month = /^\d{4}-\d{2}$/.test(sp.month ?? "") ? sp.month! : currentMonth();
+  const employeeId = sp.employee || undefined;
 
   const supabase = await createClient();
-  const report = await getMonthlyReport(supabase, profile.company_id, month);
+  const report = await getMonthlyReport(supabase, profile.company_id, month, employeeId);
   const generated = new Intl.DateTimeFormat("sl-SI", { timeZone: TZ, dateStyle: "long" }).format(
     new Date(),
   );

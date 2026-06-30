@@ -64,9 +64,10 @@ export async function GET(req: NextRequest) {
   if (!/^\d{4}-\d{2}$/.test(month)) {
     return new Response("Neveljaven mesec", { status: 400 });
   }
+  const employeeId = req.nextUrl.searchParams.get("employee") || undefined;
 
   const supabase = await createClient();
-  const report = await getMonthlyReport(supabase, profile.company_id, month);
+  const report = await getMonthlyReport(supabase, profile.company_id, month, employeeId);
   const generated = new Intl.DateTimeFormat("sl-SI", { timeZone: TZ, dateStyle: "long" }).format(
     new Date(),
   );
