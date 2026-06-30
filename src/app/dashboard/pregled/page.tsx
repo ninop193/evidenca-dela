@@ -92,7 +92,7 @@ export default async function MonthlyOverviewPage({
           <a href={`/dashboard/pregled/excel?month=${month}`} className={buttonClasses("secondary", "sm")}>
             <Download className="h-4 w-4" /> Excel
           </a>
-          <Link href={`/dashboard/pregled/print?month=${month}`} className={buttonClasses("primary", "sm")}>
+          <Link href={`/izpis/evidenca?month=${month}`} className={buttonClasses("primary", "sm")}>
             <Printer className="h-4 w-4" /> PDF
           </Link>
         </div>
@@ -133,7 +133,7 @@ export default async function MonthlyOverviewPage({
                           <Download className="h-3.5 w-3.5" /> Excel
                         </a>
                         <Link
-                          href={`/dashboard/pregled/print?month=${month}&employee=${emp.id}`}
+                          href={`/izpis/evidenca?month=${month}&employee=${emp.id}`}
                           className="inline-flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-xs font-medium text-slate-600 ring-1 ring-slate-200 transition hover:bg-slate-50 hover:text-slate-900"
                           title="Izvozi PDF samo za tega zaposlenega"
                         >

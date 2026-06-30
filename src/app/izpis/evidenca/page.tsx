@@ -1,9 +1,11 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 import { getProfile } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { getMonthlyReport } from "@/lib/report";
 import { TYPE_LABELS, CATEGORY_LABELS } from "@/app/dashboard/odsotnosti/labels";
+import { Wordmark } from "@/components/ui";
 import PrintButton from "./PrintButton";
 
 const TZ = "Europe/Ljubljana";
@@ -66,14 +68,26 @@ export default async function PrintPage({
       `}</style>
 
       {/* Orodna vrstica — se ne natisne */}
-      <div className="no-print sticky top-0 z-10 flex items-center justify-between border-b border-slate-200 bg-white/90 px-4 py-3 backdrop-blur">
-        <Link href={`/dashboard/pregled?month=${month}`} className="text-sm text-slate-500 hover:text-slate-900">
-          ← Nazaj
-        </Link>
-        <span className="hidden text-xs text-slate-500 sm:block">
-          Klikni gumb → v oknu za tiskanje izberi <strong>„Shrani kot PDF"</strong>.
-        </span>
-        <PrintButton />
+      <div className="no-print sticky top-0 z-10 border-b border-slate-200 bg-white/95 backdrop-blur">
+        <div className="mx-auto flex max-w-[820px] items-center justify-between gap-3 px-4 py-3">
+          <div className="flex items-center gap-4">
+            <Link
+              href={`/dashboard/pregled?month=${month}`}
+              className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-500 transition hover:text-slate-900"
+            >
+              <ArrowLeft className="h-4 w-4" /> Nazaj
+            </Link>
+            <span className="hidden sm:block">
+              <Wordmark className="text-sm" />
+            </span>
+          </div>
+          <div className="flex items-center gap-3">
+            <span className="hidden text-xs text-slate-400 md:inline">
+              Klikni gumb, nato izberi <strong className="font-semibold text-slate-500">„Shrani kot PDF"</strong>.
+            </span>
+            <PrintButton />
+          </div>
+        </div>
       </div>
 
       <div className="mx-auto max-w-[820px] px-4 py-8 print:p-0">
