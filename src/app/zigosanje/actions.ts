@@ -71,7 +71,7 @@ export async function clockIn(): Promise<ActionResult> {
           hours_count: capH,
           total_worked_hours: capH,
           needs_review: true,
-          notes: autoCapNote(capH),
+          notes: autoCapNote(),
         })
         .eq("id", s.id);
     }
@@ -125,7 +125,7 @@ export async function clockOut(): Promise<ActionResult> {
       hours_count: hours,
       total_worked_hours: hours,
       sunday_hours: isSunday(start) ? hours : 0,
-      ...(overCap ? { needs_review: true, notes: autoCapNote(capH) } : {}),
+      ...(overCap ? { needs_review: true, notes: autoCapNote() } : {}),
     })
     .eq("id", open.id);
   if (error) return { error: "Napaka pri beleženju odhoda." };

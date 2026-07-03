@@ -62,6 +62,6 @@ export function autostopHoursFor(cat: WorkerCategory): number {
 }
 
 // Opomba, ki se zapiše ob samodejni omejitvi (za pregled).
-export function autoCapNote(capHours: number): string {
-  return `Samodejno omejeno na ${capHours} h – verjetno pozabljen odhod. Preverite in vpišite dejanski čas odhoda.`;
+export function autoCapNote(): string {
+  return "Odhod ni bil zabeležen, zato je vnos označen za pregled. Vpišite dejanski čas odhoda.";
 }

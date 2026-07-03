@@ -12,6 +12,12 @@ const todayLjubljana = () =>
   new Intl.DateTimeFormat("en-CA", { timeZone: TZ }).format(new Date());
 const fmtDate = (d: string) =>
   new Intl.DateTimeFormat("sl-SI", { timeZone: TZ }).format(new Date(d + "T00:00:00"));
+const fmtTime = (iso: string) =>
+  new Intl.DateTimeFormat("sl-SI", {
+    timeZone: TZ,
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(new Date(iso));
 
 // Dnevni cron: vnosi, ki so ostali ODPRTI iz prejšnjih dni (pozabljen odhod,
 // delavec se ni več vrnil). Predlagamo odhod ob dnevni meji (auto-stop),
@@ -54,7 +60,7 @@ export async function GET(req: NextRequest) {
   const empById = new Map((emps ?? []).map((e) => [e.id, e]));
 
   // Zapri vsak vnos ob meji + zberi po podjetju za obvestilo.
-  const perCompany = new Map<string, { name: string; date: string; capHours: number }[]>();
+  const perCompany = new Map<string, { name: string; date: string; clockIn: string }[]>();
   let closed = 0;
 
   for (const e of entries) {
@@ -73,14 +79,18 @@ export async function GET(req: NextRequest) {
         hours_count: capH,
         total_worked_hours: capH,
         needs_review: true,
-        notes: autoCapNote(capH),
+        notes: autoCapNote(),
       })
       .eq("id", e.id);
     if (upErr) continue;
     closed++;
 
     const list = perCompany.get(e.company_id) ?? [];
-    list.push({ name: emp?.full_name ?? "Zaposleni", date: fmtDate(e.date), capHours: capH });
+    list.push({
+      name: emp?.full_name ?? "Zaposleni",
+      date: fmtDate(e.date),
+      clockIn: fmtTime(e.clock_in as string),
+    });
     perCompany.set(e.company_id, list);
   }
 
