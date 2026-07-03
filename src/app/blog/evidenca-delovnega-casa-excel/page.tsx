@@ -253,6 +253,16 @@ export default function Page() {
             v PDF). V tem primeru je evidenca delovnega časa obrazec v Excelu povsem zakonita
             rešitev.
           </p>
+          <p>
+            Če raje uporabljate obrazec za tiskanje, si oglejte{" "}
+            <Link
+              href="/blog/evidenca-delovnega-casa-obrazec"
+              className="font-semibold text-brand-700 hover:text-brand-800"
+            >
+              brezplačen obrazec za evidenco delovnega časa
+            </Link>{" "}
+            v Wordu in PDF.
+          </p>
 
           <h2 className="!mt-12 text-2xl font-bold tracking-tight text-slate-900">
             Kdaj Excel ni dovolj - in kaj storiti namesto tega

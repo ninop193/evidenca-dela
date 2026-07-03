@@ -247,6 +247,16 @@ export default function Page() {
             </li>
           </ul>
           <p>
+            Kako praznik pravilno vpisati v obrazec, si oglejte v{" "}
+            <Link
+              href="/blog/evidenca-delovnega-casa-obrazec"
+              className="font-semibold text-brand-700 hover:text-brand-800"
+            >
+              obrazcu za evidenco delovnega časa
+            </Link>
+            .
+          </p>
+          <p>
             V Excelu ali na papirju to pomeni ročno označevanje 15 datumov in ločeno računanje ur za
             dodatke.{" "}
             <Link

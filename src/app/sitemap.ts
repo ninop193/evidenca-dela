@@ -15,6 +15,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${base}/blog/evidenca-delovnega-casa-excel`, lastModified: now, changeFrequency: "monthly", priority: 0.8 },
     { url: `${base}/blog/globe-zepdsv-evidenca-delovnega-casa`, lastModified: now, changeFrequency: "monthly", priority: 0.8 },
     { url: `${base}/blog/prazniki-dela-prosti-dnevi-2026`, lastModified: now, changeFrequency: "monthly", priority: 0.8 },
+    { url: `${base}/blog/evidenca-delovnega-casa-obrazec`, lastModified: now, changeFrequency: "monthly", priority: 0.8 },
     { url: `${base}/kontakt`, lastModified: now, changeFrequency: "yearly", priority: 0.5 },
     { url: `${base}/pravno/pogoji`, lastModified: now, changeFrequency: "yearly", priority: 0.3 },
     { url: `${base}/pravno/zasebnost`, lastModified: now, changeFrequency: "yearly", priority: 0.3 },

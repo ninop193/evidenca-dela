@@ -230,6 +230,16 @@ export default function Page() {
               Velja.
             </li>
           </ul>
+          <p>
+            Katera polja obrazec sploh mora vsebovati, da se izognete nepopolnim vnosom, najdete v{" "}
+            <Link
+              href="/blog/evidenca-delovnega-casa-obrazec"
+              className="font-semibold text-brand-700 hover:text-brand-800"
+            >
+              obrazcu za evidenco delovnega časa
+            </Link>{" "}
+            za brezplačen prenos.
+          </p>
 
           <h2 className="!mt-12 text-2xl font-bold tracking-tight text-slate-900">
             Kako se izognete globi

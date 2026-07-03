@@ -10,6 +10,16 @@ export type BlogPost = {
 
 export const BLOG_POSTS: BlogPost[] = [
   {
+    slug: "evidenca-delovnega-casa-obrazec",
+    title: "Evidenca delovnega časa: obrazec in vzorec za brezplačen prenos",
+    description:
+      "Brezplačen Word/PDF obrazec za evidenco delovnega časa in tabela obveznih polj po ZEPDSV. Prenesite takoj, brez prijave.",
+    date: "2026-07-03",
+    excerpt:
+      "Pripravljen obrazec za neposreden prenos (Word in PDF), brez prijave, in tabela obveznih sestavin po 18. členu ZEPDSV.",
+    readMins: 4,
+  },
+  {
     slug: "prazniki-dela-prosti-dnevi-2026",
     title: "Prazniki in dela prosti dnevi 2026: koledar in evidentiranje",
     description:
