@@ -15,6 +15,7 @@ type Employee = {
   tax_id: string | null;
   weekly_hours: number | null;
   employment_start_date: string | null;
+  birth_date: string | null;
   is_management: boolean | null;
   worker_type: string | null;
   email?: string | null;
@@ -39,6 +40,7 @@ export function EditEmployeeForm({ employee }: { employee: Employee }) {
       taxId: String(form.get("taxId") ?? ""),
       weeklyHours: String(form.get("weeklyHours") ?? ""),
       employmentStartDate: String(form.get("employmentStartDate") ?? ""),
+      birthDate: String(form.get("birthDate") ?? ""),
       isManagement: form.get("isManagement") === "on",
       workerType: String(form.get("workerType") ?? "zaposlen"),
     });
@@ -116,6 +118,12 @@ export function EditEmployeeForm({ employee }: { employee: Employee }) {
                   />
                 </Field>
               </div>
+              <Field
+                label="Datum rojstva"
+                hint="Za mladoletne dijake (<18): dnevna meja 8 ur (146. in 193. člen ZDR-1). Pusti prazno za polnoletne."
+              >
+                <SloDateInput name="birthDate" defaultValue={employee.birth_date ?? ""} />
+              </Field>
               <label className="flex items-center gap-2 text-sm text-slate-700">
                 <input
                   type="checkbox"

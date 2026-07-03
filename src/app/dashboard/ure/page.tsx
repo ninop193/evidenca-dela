@@ -22,6 +22,7 @@ type Row = {
   total_worked_hours: number | null;
   overtime_hours: number | null;
   confirmed: boolean;
+  needs_review: boolean | null;
   employees: { full_name: string } | null;
 };
 
@@ -30,7 +31,7 @@ export default async function HoursPage() {
   const { data } = await supabase
     .from("time_entries")
     .select(
-      "id, date, clock_in, clock_out, total_worked_hours, overtime_hours, confirmed, employees(full_name)",
+      "id, date, clock_in, clock_out, total_worked_hours, overtime_hours, confirmed, needs_review, employees(full_name)",
     )
     .order("date", { ascending: false })
     .order("clock_in", { ascending: false })
@@ -95,9 +96,13 @@ export default async function HoursPage() {
                         {(r.overtime_hours ?? 0).toFixed(2)}
                       </td>
                       <td className="px-4 py-3.5">
-                        <Badge tone={r.confirmed ? "green" : "slate"}>
-                          {r.confirmed ? "potrjeno" : "v obdelavi"}
-                        </Badge>
+                        {r.needs_review ? (
+                          <Badge tone="amber">za pregled</Badge>
+                        ) : (
+                          <Badge tone={r.confirmed ? "green" : "slate"}>
+                            {r.confirmed ? "potrjeno" : "v obdelavi"}
+                          </Badge>
+                        )}
                       </td>
                       <td className="px-4 py-3.5 text-right">
                         <Link
@@ -143,6 +148,8 @@ export default async function HoursPage() {
                     )}
                     {r.clock_out == null ? (
                       <Badge tone="brand">v teku</Badge>
+                    ) : r.needs_review ? (
+                      <Badge tone="amber">za pregled</Badge>
                     ) : (
                       <Badge tone={r.confirmed ? "green" : "slate"}>
                         {r.confirmed ? "potrjeno" : "v obdelavi"}

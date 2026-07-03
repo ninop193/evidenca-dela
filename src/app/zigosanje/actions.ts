@@ -3,6 +3,7 @@
 import { getProfile } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { getAccess } from "@/lib/billing";
+import { workerCategory, autostopHoursFor, autoCapNote } from "@/lib/workLimits";
 
 const TZ = "Europe/Ljubljana";
 
@@ -19,7 +20,7 @@ function isSunday(d: Date): boolean {
   );
 }
 
-type ActionResult = { error?: string };
+type ActionResult = { error?: string; capped?: boolean };
 
 // Poišče zapis zaposlenega + preveri dostop (preizkus/naročnina) podjetja.
 async function getEmployee() {
@@ -27,7 +28,7 @@ async function getEmployee() {
   const profile = await getProfile();
   if (!profile) return { supabase, profile: null, employee: null, hasAccess: false };
   const [{ data: employee }, { data: company }] = await Promise.all([
-    supabase.from("employees").select("id, company_id, active").eq("user_id", profile.id).single(),
+    supabase.from("employees").select("id, company_id, active, worker_type, birth_date").eq("user_id", profile.id).single(),
     supabase.from("companies").select("subscription_status, trial_ends_at, current_period_end").eq("id", profile.company_id).single(),
   ]);
   const hasAccess = getAccess(company ?? {}).hasAccess;
@@ -55,18 +56,25 @@ export async function clockIn(): Promise<ActionResult> {
     return { error: "Prihod je že zabeležen." };
   }
 
-  // Pozabljen odhod iz prejšnjega dne → samodejno zaključi in označi za pregled.
+  // Pozabljen odhod iz prejšnjega dne → predlagaj odhod ob dnevni meji (auto-stop)
+  // in OZNAČI za pregled. Ure se ne odrežejo tiho; delodajalec/delavec popravi.
   const stale = (openEntries ?? []).filter((e) => e.date !== today);
-  for (const s of stale) {
-    await supabase
-      .from("time_entries")
-      .update({
-        clock_out: s.clock_in,
-        hours_count: 0,
-        total_worked_hours: 0,
-        notes: "Samodejno zaprto – manjka odhod. Prosimo, popravite ure.",
-      })
-      .eq("id", s.id);
+  if (stale.length) {
+    const capH = autostopHoursFor(workerCategory(employee.worker_type, employee.birth_date));
+    for (const s of stale) {
+      const start = new Date(s.clock_in as string);
+      const capOut = new Date(start.getTime() + capH * 3_600_000);
+      await supabase
+        .from("time_entries")
+        .update({
+          clock_out: capOut.toISOString(),
+          hours_count: capH,
+          total_worked_hours: capH,
+          needs_review: true,
+          notes: autoCapNote(capH),
+        })
+        .eq("id", s.id);
+    }
   }
 
   const { error } = await supabase.from("time_entries").insert({
@@ -98,20 +106,28 @@ export async function clockOut(): Promise<ActionResult> {
 
   const now = new Date();
   const start = new Date(open.clock_in as string);
-  const hours = Math.max(
-    0,
-    Math.round(((now.getTime() - start.getTime()) / 3_600_000) * 100) / 100,
-  );
+
+  // Če razpon presega dnevno mejo (auto-stop), gre skoraj zagotovo za pozabljen
+  // odhod (npr. klik naslednje jutro). Predlagamo odhod ob meji in OZNAČIMO za
+  // pregled — ura se ne odreže tiho, delodajalec/delavec vpiše dejanski čas.
+  const capH = autostopHoursFor(workerCategory(employee.worker_type, employee.birth_date));
+  const rawMs = Math.max(0, now.getTime() - start.getTime());
+  const overCap = rawMs > capH * 3_600_000;
+  const clockOutAt = overCap ? new Date(start.getTime() + capH * 3_600_000) : now;
+  const hours = overCap
+    ? capH
+    : Math.round((rawMs / 3_600_000) * 100) / 100;
 
   const { error } = await supabase
     .from("time_entries")
     .update({
-      clock_out: now.toISOString(),
+      clock_out: clockOutAt.toISOString(),
       hours_count: hours,
       total_worked_hours: hours,
       sunday_hours: isSunday(start) ? hours : 0,
+      ...(overCap ? { needs_review: true, notes: autoCapNote(capH) } : {}),
     })
     .eq("id", open.id);
   if (error) return { error: "Napaka pri beleženju odhoda." };
-  return {};
+  return { capped: overCap };
 }

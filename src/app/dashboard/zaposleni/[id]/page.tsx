@@ -13,7 +13,7 @@ export default async function EditEmployeePage({
   // RLS poskrbi, da admin vidi le zaposlene svojega podjetja.
   const { data: emp } = await supabase
     .from("employees")
-    .select("id, full_name, job_title, emso, tax_id, weekly_hours, employment_start_date, is_management, worker_type, user_id")
+    .select("id, full_name, job_title, emso, tax_id, weekly_hours, employment_start_date, birth_date, is_management, worker_type, user_id")
     .eq("id", id)
     .maybeSingle();
 

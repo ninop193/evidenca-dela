@@ -79,6 +79,7 @@ export type CreateEmployeeInput = {
   taxId?: string;
   weeklyHours?: string;
   employmentStartDate?: string;
+  birthDate?: string;
   isManagement?: boolean;
   workerType?: string;
 };
@@ -153,6 +154,7 @@ export async function createEmployee(
     tax_id: input.taxId?.trim() || null,
     weekly_hours: input.weeklyHours ? Number(input.weeklyHours) : null,
     employment_start_date: input.employmentStartDate || null,
+    birth_date: input.birthDate || null,
     is_management: !!input.isManagement,
     worker_type: input.workerType === "student" ? "student" : "zaposlen",
   });
@@ -189,6 +191,7 @@ export type UpdateEmployeeInput = {
   taxId?: string;
   weeklyHours?: string;
   employmentStartDate?: string;
+  birthDate?: string;
   isManagement?: boolean;
   workerType?: string;
 };
@@ -212,6 +215,7 @@ export async function updateEmployee(input: UpdateEmployeeInput): Promise<Action
       tax_id: input.taxId?.trim() || null,
       weekly_hours: input.weeklyHours ? Number(input.weeklyHours) : null,
       employment_start_date: input.employmentStartDate || null,
+      birth_date: input.birthDate || null,
       is_management: !!input.isManagement,
       worker_type: input.workerType === "student" ? "student" : "zaposlen",
     })

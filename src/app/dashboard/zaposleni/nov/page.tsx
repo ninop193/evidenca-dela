@@ -29,6 +29,7 @@ export default function NewEmployeePage() {
       taxId: String(form.get("taxId") ?? ""),
       weeklyHours: String(form.get("weeklyHours") ?? ""),
       employmentStartDate: String(form.get("employmentStartDate") ?? ""),
+      birthDate: String(form.get("birthDate") ?? ""),
       isManagement: form.get("isManagement") === "on",
       workerType: String(form.get("workerType") ?? "zaposlen"),
     });
@@ -124,6 +125,12 @@ export default function NewEmployeePage() {
                   <SloDateInput name="employmentStartDate" />
                 </Field>
               </div>
+              <Field
+                label="Datum rojstva"
+                hint="Za mladoletne dijake (<18): dnevna meja 8 ur (146. in 193. člen ZDR-1). Pusti prazno za polnoletne."
+              >
+                <SloDateInput name="birthDate" />
+              </Field>
               <label className="flex items-center gap-2 text-sm text-slate-700">
                 <input type="checkbox" name="isManagement" className="h-4 w-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500" />
                 Poslovodna oseba (evidenca izrabe se ne vodi)

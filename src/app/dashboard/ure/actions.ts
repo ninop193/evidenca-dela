@@ -69,6 +69,8 @@ function buildPayload(input: EntryInput, companyId: string) {
     running_total_hours: num(input.runningTotalHours),
     reference_period: input.referencePeriod?.trim() || null,
     notes: input.notes?.trim() || null,
+    // Ko delodajalec ročno shrani vnos, je pregledan → počisti oznako "za pregled".
+    needs_review: false,
   };
 }
 

@@ -6,6 +6,7 @@ import { Aurora } from "@/components/Aurora";
 import { Wordmark } from "@/components/ui";
 import { ChangePassword } from "@/components/ChangePassword";
 import { signOut } from "../(auth)/actions";
+import { workerCategory, reminderHoursFor } from "@/lib/workLimits";
 import ClockWidget from "./ClockWidget";
 
 const TZ = "Europe/Ljubljana";
@@ -26,9 +27,14 @@ export default async function ZigosanjePage() {
 
   const { data: employee } = await supabase
     .from("employees")
-    .select("id")
+    .select("id, worker_type, birth_date")
     .eq("user_id", profile.id)
     .single();
+
+  // Zakonska dnevna meja za opomnik ("Ne pozabi žigosati odhoda").
+  const reminderHours = employee
+    ? reminderHoursFor(workerCategory(employee.worker_type, employee.birth_date))
+    : 10;
 
   let isOpen = false;
   let openSince: string | null = null;
@@ -91,6 +97,7 @@ export default async function ZigosanjePage() {
             isOpen={isOpen}
             openSince={openSince}
             todayEntries={todayEntries}
+            reminderHours={reminderHours}
           />
         )}
       </div>

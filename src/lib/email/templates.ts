@@ -219,3 +219,35 @@ export function paymentFailedEmail(opts: {
     }),
   };
 }
+
+// 5) Opozorilo delodajalcu: vnos(i) so ostali odprti (pozabljen odhod) → za pregled.
+export function openEntriesAlertEmail(opts: {
+  fullName?: string | null;
+  items: { name: string; date: string; capHours: number }[];
+}): RenderedEmail {
+  const n = opts.items.length;
+  const beseda = n === 1 ? "vnos" : n < 5 ? "vnosi" : "vnosov";
+  const rows = opts.items
+    .map(
+      (it) =>
+        `<tr><td style="padding:5px 0;font-size:15px;color:#475569;">• &nbsp;<strong>${it.name}</strong> — ${it.date} (predlagano ${it.capHours} h)</td></tr>`,
+    )
+    .join("");
+  return {
+    subject:
+      n === 1
+        ? "1 vnos delovnega časa čaka na pregled"
+        : `${n} vnosov delovnega časa čaka na pregled`,
+    html: renderEmail({
+      preview: "Pozabljen odhod — predlagali smo čas in vnos označili za pregled.",
+      heading: "Vnosi za pregled",
+      intro: `${hi(opts.fullName)} Pri spodnjih ${beseda} zaposleni verjetno niso žigosali odhoda. Vnose smo <strong>označili za pregled</strong> in predlagali čas odhoda ob dnevni meji — ura ni bila tiho odrezana.`,
+      bodyHtml:
+        `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 20px;">${rows}</table>` +
+        p("Odprite pregled ur, preverite dejanski čas odhoda in po potrebi popravite. Ko vnos shranite, oznaka izgine."),
+      button: { label: "Odpri pregled ur", href: `${EMAIL_BASE}/dashboard/ure` },
+      footnote:
+        "Pravilna evidenca izrabe delovnega časa je zahteva 18. člena ZEPDSV. Delovit vas opozori, preden to opazi inšpektor.",
+    }),
+  };
+}

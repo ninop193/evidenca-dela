@@ -35,10 +35,12 @@ export default function ClockWidget({
   isOpen,
   openSince,
   todayEntries,
+  reminderHours,
 }: {
   isOpen: boolean;
   openSince: string | null;
   todayEntries: Entry[];
+  reminderHours: number;
 }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -70,6 +72,12 @@ export default function ClockWidget({
   }
 
   const totalToday = todayEntries.reduce((a, e) => a + (Number(e.total_worked_hours) || 0), 0);
+
+  // Opomnik: če je odprta izmena presegla zakonsko dnevno mejo, spomni na odhod.
+  const overLimit =
+    isOpen &&
+    openSince != null &&
+    now - new Date(openSince).getTime() >= reminderHours * 3_600_000;
 
   return (
     <div className="flex w-full flex-col items-center">
@@ -151,6 +159,15 @@ export default function ClockWidget({
         <p className="glass mt-6 rounded-xl px-3.5 py-2 text-sm font-medium text-rose-600">
           {error}
         </p>
+      )}
+
+      {overLimit && !error && (
+        <div className="mt-6 flex items-start gap-2.5 rounded-xl bg-amber-50/90 px-3.5 py-2.5 text-sm text-amber-800 ring-1 ring-amber-200">
+          <span aria-hidden className="mt-0.5">⏰</span>
+          <span>
+            Presegli ste {reminderHours} ur dela. Ste še na delu? Ne pozabite žigosati odhoda.
+          </span>
+        </div>
       )}
 
       {/* Danes */}
