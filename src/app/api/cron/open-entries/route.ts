@@ -63,6 +63,7 @@ export async function GET(req: NextRequest) {
   const perCompany = new Map<string, { name: string; date: string; clockIn: string }[]>();
   let closed = 0;
 
+  const nowMs = Date.now();
   for (const e of entries) {
     if (!e.clock_in) continue;
     const emp = empById.get(e.employee_id);
@@ -70,6 +71,12 @@ export async function GET(req: NextRequest) {
       workerCategory(emp?.worker_type, emp?.birth_date),
     );
     const start = new Date(e.clock_in as string);
+
+    // Nočna izmena (npr. začetek ob 20:00) ob 4:00 še NI pozabljen odhod.
+    // Zapri šele, ko je dejansko pretekla dnevna meja (sicer bi vpisali
+    // odhod v prihodnosti in označili še trajajočo izmeno).
+    if (nowMs - start.getTime() < capH * 3_600_000) continue;
+
     const capOut = new Date(start.getTime() + capH * 3_600_000);
 
     const { error: upErr } = await admin

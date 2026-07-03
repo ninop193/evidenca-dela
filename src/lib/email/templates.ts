@@ -217,6 +217,59 @@ export function paymentFailedEmail(opts: {
   };
 }
 
+// Ure v slovenskem zapisu (decimalna vejica), npr. 10,5 h.
+const hOut = (h: number) => String(Math.round(h * 10) / 10).replace(".", ",");
+
+// 5a) Opomnik ZAPOSLENEMU: odprta izmena je presegla zakonsko dnevno mejo.
+export function shiftLimitEmployeeEmail(opts: {
+  fullName?: string | null;
+  clockIn: string; // "07:32"
+  hours: number;
+  second?: boolean; // drugi opomnik (+30 min)
+}): RenderedEmail {
+  const ur = hOut(opts.hours);
+  return {
+    subject: opts.second ? "Opomnik: odhod še ni zabeležen" : "Ste še na delu?",
+    html: renderEmail({
+      preview: "Ne pozabite žigosati odhoda.",
+      heading: opts.second ? "Odhod še ni zabeležen" : "Ste še na delu?",
+      intro: `${hi(opts.fullName)} Prihod ste žigosali ob <strong>${opts.clockIn}</strong>, od takrat je minilo že <strong>${ur} h</strong>.`,
+      bodyHtml: p(
+        opts.second
+          ? "Če ste delo že končali, čim prej žigosajte odhod, da bo evidenca točna. Če ste še na delu, to sporočilo prezrite."
+          : "Če ste delo že končali, žigosajte odhod. Če ste še na delu, to sporočilo prezrite.",
+      ),
+      button: { label: "Odpri žigosanje", href: `${EMAIL_BASE}/zigosanje` },
+      footnote:
+        "Opomnik pošljemo, ko odprta izmena preseže dnevno mejo delovnega časa. Tako evidenca ostane točna brez popravkov za nazaj.",
+    }),
+  };
+}
+
+// 5b) Obvestilo DELODAJALCU: zaposleni je še vedno prijavljen po preseženi meji.
+export function shiftLimitEmployerEmail(opts: {
+  fullName?: string | null;
+  employeeName: string;
+  clockIn: string;
+  hours: number;
+}): RenderedEmail {
+  const ur = hOut(opts.hours);
+  return {
+    subject: `${opts.employeeName} je še vedno prijavljen`,
+    html: renderEmail({
+      preview: "Odprta izmena je presegla dnevno mejo delovnega časa.",
+      heading: "Zaposleni je še vedno prijavljen",
+      intro: `${hi(opts.fullName)} <strong>${opts.employeeName}</strong> je žigosal prihod ob <strong>${opts.clockIn}</strong> in po <strong>${ur} h</strong> še ni zabeležil odhoda. Opomnik smo mu že poslali.`,
+      bodyHtml: p(
+        "Če je delo končano in je odhod pozabljen, lahko vnos uredite v pregledu ur. Če izmena res še traja, tega sporočila ni treba upoštevati; ob dnevni meji bo vnos označen za pregled.",
+      ),
+      button: { label: "Odpri pregled ur", href: `${EMAIL_BASE}/dashboard/ure` },
+      footnote:
+        "Pravilna evidenca izrabe delovnega časa je zahteva 18. člena ZEPDSV. Delovit vas opozori, preden to opazi inšpektor.",
+    }),
+  };
+}
+
 // 5) Opozorilo delodajalcu: vnos(i) so ostali odprti (zabeležen prihod brez odhoda) → za pregled.
 export function openEntriesAlertEmail(opts: {
   fullName?: string | null;
