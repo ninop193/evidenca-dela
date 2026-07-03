@@ -61,7 +61,8 @@ export function EditEmployeeForm({ employee }: { employee: Employee }) {
       </Link>
       <h1 className="mt-3 text-2xl font-bold tracking-tight text-slate-900">Uredi zaposlenega</h1>
       <p className="mt-1 text-sm text-slate-500">
-        Popravi podatke v evidenci. Email in geslo za prijavo se tu ne spreminjata.
+        Popravi podatke v evidenci. Email za prijavo tu ni mogoče spremeniti; geslo si
+        zaposleni nastavi sam prek povabila.
       </p>
 
       <Card className="mt-6 p-6">

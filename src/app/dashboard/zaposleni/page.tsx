@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Users, UserPlus } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { Badge, Card, buttonClasses } from "@/components/ui";
 import { EmployeeRowActions } from "./EmployeeRowActions";
 
@@ -8,8 +9,24 @@ export default async function EmployeesPage() {
   const supabase = await createClient();
   const { data: employees } = await supabase
     .from("employees")
-    .select("id, full_name, job_title, emso, tax_id, is_management, worker_type, active")
+    .select("id, user_id, full_name, job_title, emso, tax_id, is_management, worker_type, active")
     .order("created_at", { ascending: true });
+
+  // Kdo se še ni nikoli prijavil (ni sprejel povabila / nastavil gesla) →
+  // delodajalec vidi "čaka na prijavo" in ve, da naj pošlje povabilo znova.
+  const neverSignedIn = new Set<string>();
+  const withUser = (employees ?? []).filter((e) => e.user_id);
+  if (withUser.length) {
+    const admin = createAdminClient();
+    const results = await Promise.all(
+      withUser.map((e) => admin.auth.admin.getUserById(e.user_id as string).catch(() => null)),
+    );
+    results.forEach((r, i) => {
+      if (r?.data?.user && !r.data.user.last_sign_in_at) {
+        neverSignedIn.add(withUser[i].id);
+      }
+    });
+  }
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-8">
@@ -73,6 +90,11 @@ export default async function EmployeesPage() {
                         <Badge tone={e.active ? "green" : "slate"}>
                           {e.active ? "Aktiven" : "Neaktiven"}
                         </Badge>
+                        {neverSignedIn.has(e.id) && (
+                          <Badge tone="amber" className="ml-1.5">
+                            čaka na prijavo
+                          </Badge>
+                        )}
                       </td>
                       <td className="px-4 py-3.5 text-right">
                         <EmployeeRowActions employeeId={e.id} fullName={e.full_name} active={!!e.active} />
@@ -98,6 +120,9 @@ export default async function EmployeesPage() {
                       )}
                     </p>
                     <div className="flex items-center gap-1">
+                      {neverSignedIn.has(e.id) && (
+                        <Badge tone="amber">čaka na prijavo</Badge>
+                      )}
                       <Badge tone={e.active ? "green" : "slate"}>
                         {e.active ? "Aktiven" : "Neaktiven"}
                       </Badge>
