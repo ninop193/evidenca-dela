@@ -9,7 +9,7 @@ import { SloDateInput } from "@/components/SloDateInput";
 export default function NewEmployeePage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [done, setDone] = useState<{ email: string; password: string } | null>(null);
+  const [done, setDone] = useState<{ email: string; inviteSent: boolean } | null>(null);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -17,13 +17,11 @@ export default function NewEmployeePage() {
     setLoading(true);
 
     const form = new FormData(e.currentTarget);
-    const password = String(form.get("password") ?? "");
     const email = String(form.get("email") ?? "").trim().toLowerCase();
 
     const res = await createEmployee({
       fullName: String(form.get("fullName") ?? ""),
       email,
-      password,
       jobTitle: String(form.get("jobTitle") ?? ""),
       emso: String(form.get("emso") ?? ""),
       taxId: String(form.get("taxId") ?? ""),
@@ -39,7 +37,7 @@ export default function NewEmployeePage() {
       setLoading(false);
       return;
     }
-    setDone({ email, password });
+    setDone({ email, inviteSent: !!res.inviteSent });
     setLoading(false);
   }
 
@@ -49,19 +47,17 @@ export default function NewEmployeePage() {
         <Card className="p-7 text-center">
           <div className="mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-brand-50 text-2xl">✅</div>
           <h1 className="mt-3 text-xl font-bold text-slate-900">Zaposleni dodan</h1>
-          <p className="mt-1.5 text-sm text-slate-500">
-            Posreduj te podatke zaposlenemu za prijavo na telefonu:
-          </p>
-          <div className="mt-4 space-y-2 rounded-xl bg-slate-50 p-4 text-left text-sm ring-1 ring-slate-100">
-            <p>
-              <span className="text-slate-500">Email:</span>{" "}
-              <strong className="text-slate-900">{done.email}</strong>
+          {done.inviteSent ? (
+            <p className="mt-1.5 text-sm text-slate-500">
+              Povabilo je poslano na <strong className="text-slate-900">{done.email}</strong>.
+              Zaposleni si prek povezave v mailu sam nastavi geslo in se prijavi na telefonu.
             </p>
-            <p>
-              <span className="text-slate-500">Geslo:</span>{" "}
-              <strong className="text-slate-900">{done.password}</strong>
+          ) : (
+            <p className="mt-1.5 text-sm text-amber-700">
+              Zaposleni je dodan, a povabila na <strong>{done.email}</strong> ni bilo mogoče
+              poslati. Na seznamu zaposlenih izberi »Pošlji povabilo znova«.
             </p>
-          </div>
+          )}
           <div className="mt-6 flex flex-col gap-2">
             <Link href="/dashboard/zaposleni" className={buttonClasses("primary", "lg")}>
               Nazaj na seznam
@@ -81,18 +77,17 @@ export default function NewEmployeePage() {
         ← Nazaj na seznam
       </Link>
       <h1 className="mt-3 text-2xl font-bold tracking-tight text-slate-900">Dodaj zaposlenega</h1>
-      <p className="mt-1 text-sm text-slate-500">Email in geslo bo zaposleni uporabil za prijavo na telefonu.</p>
+      <p className="mt-1 text-sm text-slate-500">
+        Na ta email bo zaposleni prejel povabilo, prek katerega si sam nastavi geslo.
+      </p>
 
       <Card className="mt-6 p-6">
         <form onSubmit={handleSubmit} className="space-y-4">
           <Field label="Ime in priimek *">
             <Input name="fullName" required placeholder="Marko Horvat" />
           </Field>
-          <Field label="Email za prijavo *">
+          <Field label="Email za prijavo *" hint="Sem pošljemo povabilo za nastavitev gesla">
             <Input name="email" type="email" required placeholder="marko@podjetje.si" />
-          </Field>
-          <Field label="Geslo za prijavo *" hint="Vsaj 8 znakov">
-            <Input name="password" type="text" required placeholder="npr. geslo123" />
           </Field>
 
           <div className="border-t border-slate-100 pt-4">

@@ -3,8 +3,8 @@
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { MoreVertical, UserX, UserCheck, Trash2, Loader2, X, Pencil } from "lucide-react";
-import { setEmployeeActive, deleteEmployee } from "../actions";
+import { MoreVertical, UserX, UserCheck, Trash2, Loader2, X, Pencil, Mail } from "lucide-react";
+import { setEmployeeActive, deleteEmployee, resendEmployeeInvite } from "../actions";
 
 export function EmployeeRowActions({
   employeeId,
@@ -20,6 +20,7 @@ export function EmployeeRowActions({
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [inviteOk, setInviteOk] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -42,6 +43,16 @@ export function EmployeeRowActions({
     }
   }
 
+  async function doResendInvite() {
+    setLoading(true);
+    setError(null);
+    setInviteOk(false);
+    const res = await resendEmployeeInvite(employeeId);
+    setLoading(false);
+    if (res.error) setError(res.error);
+    else setInviteOk(true);
+  }
+
   async function doDelete() {
     setLoading(true);
     setError(null);
@@ -58,7 +69,7 @@ export function EmployeeRowActions({
   return (
     <div className="relative inline-block text-left" ref={ref}>
       <button
-        onClick={() => { setOpen((v) => !v); setError(null); }}
+        onClick={() => { setOpen((v) => !v); setError(null); setInviteOk(false); }}
         className="grid h-8 w-8 place-items-center rounded-full text-slate-500 transition hover:bg-white/70 hover:text-slate-900"
         aria-label="Možnosti"
       >
@@ -74,6 +85,14 @@ export function EmployeeRowActions({
             <Pencil className="h-4 w-4 text-slate-500" />
             Uredi
           </Link>
+          <button
+            onClick={doResendInvite}
+            disabled={loading}
+            className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-left font-medium text-slate-700 transition hover:bg-white/70 disabled:opacity-50"
+          >
+            {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Mail className="h-4 w-4 text-brand-600" />}
+            {inviteOk ? "Povabilo poslano ✓" : "Pošlji povabilo znova"}
+          </button>
           <button
             onClick={toggleActive}
             disabled={loading}

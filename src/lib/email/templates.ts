@@ -140,35 +140,32 @@ export function authResetEmail(): RenderedEmail {
   };
 }
 
-// Zaposleni dodan: pozdravni email s podatki za prijavo.
-export function employeeWelcomeEmail(opts: {
+// Zaposleni dodan: povabilo s povezavo, prek katere si sam nastavi geslo.
+export function employeeInviteEmail(opts: {
   fullName?: string | null;
   email: string;
-  password: string;
   companyName?: string | null;
+  actionUrl: string;
 }): RenderedEmail {
   const esc = (s: string) =>
     s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
   const n = firstName(opts.fullName);
   return {
-    subject: "Vaš dostop do Delovit 👋",
+    subject: "Vaše povabilo v Delovit 👋",
     html: renderEmail({
-      preview: "Podatki za prijavo in žigosanje delovnega časa.",
+      preview: "Nastavite si geslo in začnite žigosati delovni čas.",
       heading: "Dobrodošli v Delovit 👋",
       intro: `${n ? `Pozdravljeni, ${n}.` : "Pozdravljeni."} ${
         opts.companyName ? `<strong>${esc(opts.companyName)}</strong> vas je` : "Vaš delodajalec vas je"
-      } dodal v Delovit za beleženje delovnega časa. Spodaj so vaši podatki za prijavo.`,
+      } dodal v Delovit za beleženje delovnega časa. Kliknite spodnji gumb in si nastavite geslo za prijavo.`,
       bodyHtml:
-        infoBox([
-          ["E-pošta", esc(opts.email)],
-          ["Geslo", esc(opts.password)],
-        ]) +
+        infoBox([["Vaš email za prijavo", esc(opts.email)]]) +
         p(
-          "Prijavite se na telefonu in žigosajte prihod ter odhod z enim tapom. Aplikacijo si lahko dodate na domači zaslon telefona.",
+          "Po nastavitvi gesla se prijavite na telefonu in žigosajte prihod ter odhod z enim tapom. Aplikacijo si lahko dodate na domači zaslon telefona.",
         ),
-      button: { label: "Prijava", href: `${EMAIL_BASE}/login` },
+      button: { label: "Nastavite si geslo", href: opts.actionUrl },
       footnote:
-        "Priporočamo, da po prvi prijavi geslo spremenite (ikona ključka v aplikaciji). Če prijave niste pričakovali, ta email prezrite.",
+        "Povezava je veljavna omejen čas. Če poteče, prosite delodajalca, da vam pošlje novo povabilo. Če povabila niste pričakovali, ta email prezrite.",
     }),
   };
 }

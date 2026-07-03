@@ -5,7 +5,39 @@ import { getProfile } from "@/lib/auth";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { PLAN } from "@/lib/billing";
 import { sendEmail } from "@/lib/email/send";
-import { employeeWelcomeEmail } from "@/lib/email/templates";
+import { employeeInviteEmail } from "@/lib/email/templates";
+import { EMAIL_BASE } from "@/lib/email/render";
+
+// Baza za povezave v mailih (lokalno: localhost, produkcija: delovit.si).
+const APP_BASE = (process.env.NEXT_PUBLIC_APP_URL || EMAIL_BASE).replace(/\/$/, "");
+
+// Ustvari enkratno povezavo, prek katere si zaposleni sam nastavi geslo,
+// in mu pošlje povabilo. Geslo pozna samo zaposleni (ne delodajalec, ne mail).
+async function sendInvite(opts: {
+  admin: ReturnType<typeof createAdminClient>;
+  email: string;
+  fullName: string | null;
+  companyName: string | null;
+}): Promise<boolean> {
+  const { data, error } = await opts.admin.auth.admin.generateLink({
+    type: "recovery",
+    email: opts.email,
+  });
+  const tokenHash = data?.properties?.hashed_token;
+  if (error || !tokenHash) {
+    console.error("Povabilo: generiranje povezave spodletelo:", error);
+    return false;
+  }
+  return sendEmail(
+    opts.email,
+    employeeInviteEmail({
+      fullName: opts.fullName,
+      email: opts.email,
+      companyName: opts.companyName,
+      actionUrl: `${APP_BASE}/auth/povabilo?token_hash=${encodeURIComponent(tokenHash)}`,
+    }),
+  );
+}
 
 export type ActionResult = { error?: string; ok?: boolean };
 
@@ -73,7 +105,6 @@ export async function deleteEmployee(employeeId: string): Promise<ActionResult> 
 export type CreateEmployeeInput = {
   fullName: string;
   email: string;
-  password: string;
   jobTitle?: string;
   emso?: string;
   taxId?: string;
@@ -84,9 +115,10 @@ export type CreateEmployeeInput = {
   workerType?: string;
 };
 
-export type CreateEmployeeResult = { error?: string; email?: string };
+export type CreateEmployeeResult = { error?: string; email?: string; inviteSent?: boolean };
 
 // Admin doda zaposlenega: ustvari mu prijavo + zapis v evidenco o zaposlenih (13. člen).
+// Gesla NE nastavlja delodajalec — zaposleni ga nastavi sam prek povabila v mailu.
 export async function createEmployee(
   input: CreateEmployeeInput,
 ): Promise<CreateEmployeeResult> {
@@ -97,11 +129,8 @@ export async function createEmployee(
 
   const email = input.email?.trim().toLowerCase();
   const fullName = input.fullName?.trim();
-  if (!fullName || !email || !input.password) {
-    return { error: "Ime, email in geslo so obvezni." };
-  }
-  if (input.password.length < 8) {
-    return { error: "Geslo mora imeti vsaj 8 znakov." };
+  if (!fullName || !email) {
+    return { error: "Ime in email sta obvezna." };
   }
 
   const admin = createAdminClient();
@@ -117,10 +146,10 @@ export async function createEmployee(
     };
   }
 
-  // 1) Ustvari prijavo zaposlenega (takoj potrjeno)
+  // 1) Ustvari prijavo zaposlenega (takoj potrjeno, BREZ gesla —
+  //    zaposleni si ga nastavi sam prek povabila)
   const { data: created, error: createErr } = await admin.auth.admin.createUser({
     email,
-    password: input.password,
     email_confirm: true,
   });
   if (createErr || !created.user) {
@@ -164,23 +193,45 @@ export async function createEmployee(
     return { error: "Napaka pri zapisu v evidenco zaposlenih." };
   }
 
-  // Pozdravni email s podatki za prijavo (ne sme podreti dodajanja, če spodleti).
+  // Povabilo s povezavo za nastavitev gesla (ne sme podreti dodajanja, če spodleti;
+  // delodajalec ga lahko pošlje znova iz seznama zaposlenih).
   const { data: company } = await admin
     .from("companies")
     .select("name")
     .eq("id", profile.company_id)
     .maybeSingle();
-  await sendEmail(
+  const inviteSent = await sendInvite({
+    admin,
     email,
-    employeeWelcomeEmail({
-      fullName,
-      email,
-      password: input.password,
-      companyName: company?.name ?? null,
-    }),
-  );
+    fullName,
+    companyName: company?.name ?? null,
+  });
 
-  return { email };
+  return { email, inviteSent };
+}
+
+// Ponovno pošlji povabilo (npr. povezava potekla ali email ni prispel).
+export async function resendEmployeeInvite(employeeId: string): Promise<ActionResult> {
+  const res = await ownedEmployee(employeeId);
+  if ("error" in res) return { error: res.error };
+  const { admin, emp } = res;
+  if (!emp.user_id) return { error: "Ta zaposleni nima prijavnega računa." };
+
+  const [{ data: u }, { data: company }, { data: empRow }] = await Promise.all([
+    admin.from("users").select("email").eq("id", emp.user_id).maybeSingle(),
+    admin.from("companies").select("name").eq("id", emp.company_id).maybeSingle(),
+    admin.from("employees").select("full_name").eq("id", employeeId).maybeSingle(),
+  ]);
+  if (!u?.email) return { error: "Email zaposlenega ni najden." };
+
+  const ok = await sendInvite({
+    admin,
+    email: u.email,
+    fullName: empRow?.full_name ?? null,
+    companyName: company?.name ?? null,
+  });
+  if (!ok) return { error: "Pošiljanje povabila ni uspelo. Poskusite znova." };
+  return { ok: true };
 }
 
 export type UpdateEmployeeInput = {

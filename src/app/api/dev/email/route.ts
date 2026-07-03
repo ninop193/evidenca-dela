@@ -6,7 +6,7 @@ import {
   paymentFailedEmail,
   authConfirmEmail,
   authResetEmail,
-  employeeWelcomeEmail,
+  employeeInviteEmail,
 } from "@/lib/email/templates";
 
 export const dynamic = "force-dynamic";
@@ -32,11 +32,11 @@ export async function GET(req: NextRequest) {
     failed: paymentFailedEmail({ fullName: sample.fullName }),
     "confirm-signup": authConfirmEmail(),
     "reset-password": authResetEmail(),
-    "employee-welcome": employeeWelcomeEmail({
+    "employee-invite": employeeInviteEmail({
       fullName: "Marko Horvat",
       email: "marko@gostilna.si",
-      password: "geslo12345",
       companyName: "Gostilna Pri Lipi",
+      actionUrl: "http://localhost:3000/auth/povabilo?token_hash=primer",
     }),
   } as const;
 
