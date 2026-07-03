@@ -12,7 +12,7 @@ const SLUG = "prazniki-dela-prosti-dnevi-2026";
 const PUBLISHED = "2026-07-02";
 const URL = `${SITE.url}/blog/${SLUG}`;
 const DESC =
-  "Koledar dela prostih dni 2026 (15 praznikov, 8 na vikend), dolgi vikendi za dopust in kako praznik pravilno vpišete v evidenco delovnega časa po ZEPDSV.";
+  "Koledar dela prostih dni 2026 (15 praznikov, 8 na vikend), podaljšani vikendi za dopust in kako praznik pravilno vpišete v evidenco delovnega časa po ZEPDSV.";
 
 export const metadata: Metadata = {
   title: { absolute: "Prazniki in dela prosti dnevi 2026: koledar in evidenca" },
@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     "prazniki 2026",
     "dela prosti dnevi 2026",
     "koledar praznikov 2026",
-    "dolgi vikendi 2026",
+    "podaljšani vikendi 2026",
     "praznik evidenca delovnega časa",
   ],
   alternates: { canonical: `/blog/${SLUG}` },
@@ -199,7 +199,7 @@ export default function Page() {
           </p>
 
           <h2 className="!mt-12 text-2xl font-bold tracking-tight text-slate-900">
-            Dolgi vikendi 2026: kje se dopust najbolj splača
+            Podaljšani vikendi 2026: kje se dopust najbolj splača
           </h2>
           <ul className="ml-5 list-disc space-y-2 marker:text-brand-500">
             <li>

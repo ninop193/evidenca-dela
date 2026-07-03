@@ -10,7 +10,7 @@ export default function Image() {
     badge: "Blog · 2026",
     line1: "Prazniki 2026:",
     line2: "koledar in evidenca.",
-    sub: "15 dela prostih dni, dolgi vikendi in kako jih vpisati.",
+    sub: "15 dela prostih dni, podaljšani vikendi in kako jih vpisati.",
     url: "www.delovit.si/blog",
   });
 }

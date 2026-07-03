@@ -23,7 +23,7 @@ export const BLOG_POSTS: BlogPost[] = [
     slug: "prazniki-dela-prosti-dnevi-2026",
     title: "Prazniki in dela prosti dnevi 2026: koledar in evidentiranje",
     description:
-      "Koledar dela prostih dni 2026 (15 praznikov, 8 na vikend), dolgi vikendi za dopust in kako praznik pravilno vpišete v evidenco delovnega časa po ZEPDSV.",
+      "Koledar dela prostih dni 2026 (15 praznikov, 8 na vikend), podaljšani vikendi za dopust in kako praznik pravilno vpišete v evidenco delovnega časa po ZEPDSV.",
     date: "2026-07-02",
     excerpt:
       "Leto 2026 ima 15 dela prostih dni, a 8 jih pade na vikend. Celoten koledar, kje se dopust najbolj splača in kako praznik pravilno vpišete v evidenco.",
