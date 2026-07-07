@@ -1,4 +1,6 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
+import { ChevronRight } from "lucide-react";
 import { getProfile } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { getAccess } from "@/lib/billing";
@@ -7,11 +9,8 @@ import { Wordmark } from "@/components/ui";
 import { ChangePassword } from "@/components/ChangePassword";
 import { signOut } from "../(auth)/actions";
 import { workerCategory, reminderHoursFor } from "@/lib/workLimits";
+import { todayLjubljana, weekStart } from "@/lib/tzdate";
 import ClockWidget from "./ClockWidget";
-
-const TZ = "Europe/Ljubljana";
-const todayLjubljana = () =>
-  new Intl.DateTimeFormat("en-CA", { timeZone: TZ }).format(new Date());
 
 export default async function ZigosanjePage() {
   const profile = await getProfile();
@@ -44,18 +43,38 @@ export default async function ZigosanjePage() {
     clock_out: string | null;
     total_worked_hours: number | null;
   }[] = [];
+  let weekTotal = 0;
+  let monthTotal = 0;
 
   if (employee) {
-    const { data: entries } = await supabase
-      .from("time_entries")
-      .select("id, clock_in, clock_out, total_worked_hours")
-      .eq("employee_id", employee.id)
-      .eq("date", todayLjubljana())
-      .order("clock_in", { ascending: true });
+    const today = todayLjubljana();
+    const [{ data: entries }, { data: monthRows }] = await Promise.all([
+      supabase
+        .from("time_entries")
+        .select("id, clock_in, clock_out, total_worked_hours")
+        .eq("employee_id", employee.id)
+        .eq("date", today)
+        .order("clock_in", { ascending: true }),
+      // Tekoči mesec + morebitni rep tedna iz prejšnjega meseca (en zajem za oba seštevka).
+      supabase
+        .from("time_entries")
+        .select("date, total_worked_hours")
+        .eq("employee_id", employee.id)
+        .gte("date", [`${today.slice(0, 7)}-01`, weekStart(today)].sort()[0])
+        .lte("date", today),
+    ]);
     todayEntries = entries ?? [];
     const open = todayEntries.find((e) => e.clock_out == null);
     isOpen = !!open;
     openSince = open?.clock_in ?? null;
+
+    const wStart = weekStart(today);
+    const mStart = `${today.slice(0, 7)}-01`;
+    for (const r of monthRows ?? []) {
+      const h = Number(r.total_worked_hours) || 0;
+      if (r.date >= mStart) monthTotal += h;
+      if (r.date >= wStart) weekTotal += h;
+    }
   }
 
   return (
@@ -93,12 +112,45 @@ export default async function ZigosanjePage() {
             Tvoj račun še ni povezan z evidenco zaposlenih. Obrni se na delodajalca.
           </p>
         ) : (
-          <ClockWidget
-            isOpen={isOpen}
-            openSince={openSince}
-            todayEntries={todayEntries}
-            reminderHours={reminderHours}
-          />
+          <>
+            <ClockWidget
+              isOpen={isOpen}
+              openSince={openSince}
+              todayEntries={todayEntries}
+              reminderHours={reminderHours}
+            />
+
+            {/* Moje ure — seštevki na dotik + vhod v osebni pregled */}
+            <Link
+              href="/moje-ure"
+              className="glass-strong iris-edge mt-4 flex w-full items-center justify-between rounded-2xl px-5 py-4 transition active:scale-[0.99]"
+            >
+              <div className="flex items-center gap-6">
+                <div>
+                  <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-400">
+                    Ta teden
+                  </p>
+                  <p className="mt-0.5 text-lg font-bold tabular-nums text-slate-900">
+                    {weekTotal.toFixed(2)}
+                    <span className="ml-0.5 text-xs font-semibold text-slate-400">h</span>
+                  </p>
+                </div>
+                <div>
+                  <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-400">
+                    Ta mesec
+                  </p>
+                  <p className="mt-0.5 text-lg font-bold tabular-nums text-slate-900">
+                    {monthTotal.toFixed(2)}
+                    <span className="ml-0.5 text-xs font-semibold text-slate-400">h</span>
+                  </p>
+                </div>
+              </div>
+              <span className="flex items-center gap-1 text-sm font-semibold text-brand-600">
+                Moje ure
+                <ChevronRight className="h-4 w-4" />
+              </span>
+            </Link>
+          </>
         )}
       </div>
     </main>

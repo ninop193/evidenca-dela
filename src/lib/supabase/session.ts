@@ -36,7 +36,7 @@ export async function updateSession(request: NextRequest) {
   // Zaščitimo SAMO dejansko zaščitene dele aplikacije. Vse ostalo (javne strani,
   // SEO/crawler poti in neznane poti, ki pokažejo 404) je dostopno brez prijave.
   // Vsaka od teh strani ima tudi lasten auth check (obramba v globino).
-  const protectedPrefixes = ["/dashboard", "/zigosanje", "/narocnina", "/dobrodosli", "/izpis"];
+  const protectedPrefixes = ["/dashboard", "/zigosanje", "/moje-ure", "/narocnina", "/dobrodosli", "/izpis"];
   const path = request.nextUrl.pathname;
   const isProtected = protectedPrefixes.some((p) => path === p || path.startsWith(p + "/"));
 
