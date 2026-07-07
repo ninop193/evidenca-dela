@@ -36,16 +36,24 @@ export default function ClockWidget({
   openSince,
   todayEntries,
   reminderHours,
+  serverNow,
 }: {
   isOpen: boolean;
   openSince: string | null;
   todayEntries: Entry[];
   reminderHours: number;
+  serverNow: number;
 }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [confirmOut, setConfirmOut] = useState(false);
   const [now, setNow] = useState(() => Date.now());
+  // Sidro na STREŽNIŠKI čas: če ima telefon napačno nastavljeno uro, bi
+  // Date.now() pokvaril živi števec (npr. takoj pokazal 1:00:00). Odmik
+  // izračunamo enkrat ob nalaganju in ga prištevamo ob vsakem ticku.
+  const [clockOffset] = useState(() => serverNow - Date.now());
+  const correctedNow = now + clockOffset;
 
   // Živi števec časa, ko je zaposleni na delu.
   useEffect(() => {
@@ -54,7 +62,7 @@ export default function ClockWidget({
     return () => clearInterval(t);
   }, [isOpen]);
 
-  async function handleClick() {
+  async function submit(action: "in" | "out") {
     if (loading) return;
     setError(null);
     setLoading(true);
@@ -62,13 +70,25 @@ export default function ClockWidget({
     try {
       navigator.vibrate?.(18);
     } catch {}
-    const res = isOpen ? await clockOut() : await clockIn();
+    const res = action === "out" ? await clockOut() : await clockIn();
     setLoading(false);
+    setConfirmOut(false);
     if (res.error) {
       setError(res.error);
       return;
     }
     router.refresh();
+  }
+
+  function handleClick() {
+    if (loading) return;
+    if (isOpen) {
+      // Odhod je "dokončen" (popravke ureja delodajalec) → najprej potrditev.
+      setError(null);
+      setConfirmOut(true);
+      return;
+    }
+    void submit("in");
   }
 
   const totalToday = todayEntries.reduce((a, e) => a + (Number(e.total_worked_hours) || 0), 0);
@@ -77,7 +97,7 @@ export default function ClockWidget({
   const overLimit =
     isOpen &&
     openSince != null &&
-    now - new Date(openSince).getTime() >= reminderHours * 3_600_000;
+    correctedNow - new Date(openSince).getTime() >= reminderHours * 3_600_000;
 
   return (
     <div className="flex w-full flex-col items-center">
@@ -149,11 +169,50 @@ export default function ClockWidget({
           {/* živ števec pod sredino */}
           {isOpen && (
             <span className="pointer-events-none absolute left-1/2 top-[73%] -translate-x-1/2 -translate-y-1/2 font-mono text-base tabular-nums text-white/90">
-              {elapsedStr(openSince, now)}
+              {elapsedStr(openSince, correctedNow)}
             </span>
           )}
         </span>
       </button>
+
+      {/* Potrditev odhoda — odhod je dokončen (popravke ureja delodajalec) */}
+      {confirmOut && (
+        <div
+          className="fixed inset-0 z-50 grid place-items-center bg-slate-900/40 p-4"
+          onClick={() => !loading && setConfirmOut(false)}
+        >
+          <div
+            className="glass-strong iris-edge w-full max-w-sm rounded-3xl p-6"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-rose-50">
+              <Square className="h-5 w-5 fill-rose-600 text-rose-600" strokeWidth={0} />
+            </div>
+            <h3 className="mt-4 text-center text-lg font-bold text-slate-900">Žigosaš odhod?</h3>
+            <p className="mt-1.5 text-center text-sm leading-relaxed text-slate-600">
+              Na delu si od {fmtTime(openSince)} ({elapsedStr(openSince, correctedNow)}).
+              Odhoda kasneje ne moreš popraviti sam; popravke lahko uredi delodajalec.
+            </p>
+            <div className="mt-6 grid grid-cols-2 gap-2">
+              <button
+                onClick={() => setConfirmOut(false)}
+                disabled={loading}
+                className="rounded-full bg-white/70 py-3 text-sm font-semibold text-slate-700 ring-1 ring-white/80 transition hover:bg-white disabled:opacity-50"
+              >
+                Prekliči
+              </button>
+              <button
+                onClick={() => void submit("out")}
+                disabled={loading}
+                className="inline-flex items-center justify-center gap-2 rounded-full bg-rose-600 py-3 text-sm font-semibold text-white transition hover:bg-rose-500 disabled:opacity-50"
+              >
+                {loading && <Loader2 className="h-4 w-4 animate-spin" />}
+                Potrdi odhod
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {error && (
         <p className="glass mt-6 rounded-xl px-3.5 py-2 text-sm font-medium text-rose-600">

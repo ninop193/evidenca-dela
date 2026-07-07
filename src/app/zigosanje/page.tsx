@@ -118,6 +118,7 @@ export default async function ZigosanjePage() {
               openSince={openSince}
               todayEntries={todayEntries}
               reminderHours={reminderHours}
+              serverNow={Date.now()}
             />
 
             {/* Moje ure — seštevki na dotik + vhod v osebni pregled */}
