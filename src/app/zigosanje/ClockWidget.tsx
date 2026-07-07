@@ -182,7 +182,7 @@ export default function ClockWidget({
           onClick={() => !loading && setConfirmOut(false)}
         >
           <div
-            className="glass-strong iris-edge w-full max-w-sm rounded-3xl p-6"
+            className="w-full max-w-sm rounded-3xl bg-white p-6 shadow-[0_24px_60px_-20px_rgba(15,23,42,0.45)] ring-1 ring-slate-200/70"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-rose-50">
@@ -197,7 +197,7 @@ export default function ClockWidget({
               <button
                 onClick={() => setConfirmOut(false)}
                 disabled={loading}
-                className="rounded-full bg-white/70 py-3 text-sm font-semibold text-slate-700 ring-1 ring-white/80 transition hover:bg-white disabled:opacity-50"
+                className="rounded-full bg-slate-100 py-3 text-sm font-semibold text-slate-700 ring-1 ring-slate-200 transition hover:bg-slate-200 disabled:opacity-50"
               >
                 Prekliči
               </button>
