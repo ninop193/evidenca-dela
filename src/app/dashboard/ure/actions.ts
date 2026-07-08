@@ -30,6 +30,7 @@ export type EntryInput = {
   date: string;
   clockInTime?: string; // HH:MM
   clockOutTime?: string; // HH:MM
+  breakMinutes?: string; // odmor v minutah (18. člen — izraba odmora)
   totalWorkedHours?: string;
   workTimeType?: string; // 'polni' | 'krajsi'
   overtimeHours?: string;
@@ -55,6 +56,7 @@ function buildPayload(input: EntryInput, companyId: string) {
     date: input.date,
     clock_in: combineLjubljana(input.date, input.clockInTime),
     clock_out: combineLjubljana(input.date, input.clockOutTime),
+    break_minutes: Math.min(480, Math.max(0, Math.round(num(input.breakMinutes) ?? 0))),
     hours_count: total,
     total_worked_hours: total,
     work_time_type: input.workTimeType === "krajsi" ? "krajsi" : "polni",

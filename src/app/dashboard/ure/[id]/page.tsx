@@ -54,6 +54,7 @@ export default async function EditEntryPage({
               date: entry.date,
               clockInTime: toTime(entry.clock_in),
               clockOutTime: toTime(entry.clock_out),
+              breakMinutes: numStr(entry.break_minutes),
               totalWorkedHours: numStr(entry.total_worked_hours),
               workTimeType: entry.work_time_type ?? "polni",
               overtimeHours: numStr(entry.overtime_hours),

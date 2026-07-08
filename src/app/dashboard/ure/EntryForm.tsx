@@ -35,6 +35,7 @@ export default function EntryForm({
       date: String(f.get("date") ?? ""),
       clockInTime: String(f.get("clockInTime") ?? ""),
       clockOutTime: String(f.get("clockOutTime") ?? ""),
+      breakMinutes: String(f.get("breakMinutes") ?? ""),
       totalWorkedHours: String(f.get("totalWorkedHours") ?? ""),
       workTimeType: String(f.get("workTimeType") ?? "polni"),
       overtimeHours: String(f.get("overtimeHours") ?? ""),
@@ -131,14 +132,24 @@ export default function EntryForm({
         </label>
       </div>
 
-      <Field
-        label="Nadure"
-        name="overtimeHours"
-        type="number"
-        step="0.25"
-        defaultValue={initial?.overtimeHours}
-        placeholder="0"
-      />
+      <div className="grid grid-cols-2 gap-3">
+        <Field
+          label="Nadure"
+          name="overtimeHours"
+          type="number"
+          step="0.25"
+          defaultValue={initial?.overtimeHours}
+          placeholder="0"
+        />
+        <Field
+          label="Odmor (min)"
+          name="breakMinutes"
+          type="number"
+          step="5"
+          defaultValue={initial?.breakMinutes}
+          placeholder="30"
+        />
+      </div>
 
       <button
         type="button"

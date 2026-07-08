@@ -88,7 +88,9 @@ export async function clockIn(): Promise<ActionResult> {
 }
 
 // ODHOD — zaključi odprt vnos in izračuna opravljene ure.
-export async function clockOut(): Promise<ActionResult> {
+// breakMinutes: neobvezna zabeležka odmora (18. člen ZEPDSV). Odmor se po
+// ZDR-1 všteva v delovni čas, zato UR NE odšteva — je samo evidenčni podatek.
+export async function clockOut(breakMinutes?: number): Promise<ActionResult> {
   const { supabase, employee, hasAccess } = await getEmployee();
   if (!hasAccess) return { error: "Naročnina podjetja je potekla." };
   if (!employee) return { error: "Ni najdenega zaposlenega." };
@@ -118,6 +120,10 @@ export async function clockOut(): Promise<ActionResult> {
     ? capH
     : Math.round((rawMs / 3_600_000) * 100) / 100;
 
+  const brk = Number.isFinite(breakMinutes)
+    ? Math.min(480, Math.max(0, Math.round(breakMinutes as number)))
+    : 0;
+
   const { error } = await supabase
     .from("time_entries")
     .update({
@@ -125,6 +131,7 @@ export async function clockOut(): Promise<ActionResult> {
       hours_count: hours,
       total_worked_hours: hours,
       sunday_hours: isSunday(start) ? hours : 0,
+      break_minutes: brk,
       ...(overCap ? { needs_review: true, notes: autoCapNote() } : {}),
     })
     .eq("id", open.id);

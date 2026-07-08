@@ -48,6 +48,7 @@ export default function ClockWidget({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [confirmOut, setConfirmOut] = useState(false);
+  const [breakMin, setBreakMin] = useState(0);
   const [now, setNow] = useState(() => Date.now());
   // Sidro na STREŽNIŠKI čas: če ima telefon napačno nastavljeno uro, bi
   // Date.now() pokvaril živi števec (npr. takoj pokazal 1:00:00). Odmik
@@ -70,7 +71,7 @@ export default function ClockWidget({
     try {
       navigator.vibrate?.(18);
     } catch {}
-    const res = action === "out" ? await clockOut() : await clockIn();
+    const res = action === "out" ? await clockOut(breakMin) : await clockIn();
     setLoading(false);
     setConfirmOut(false);
     if (res.error) {
@@ -85,6 +86,7 @@ export default function ClockWidget({
     if (isOpen) {
       // Odhod je "dokončen" (popravke ureja delodajalec) → najprej potrditev.
       setError(null);
+      setBreakMin(0);
       setConfirmOut(true);
       return;
     }
@@ -193,6 +195,34 @@ export default function ClockWidget({
               Na delu si od {fmtTime(openSince)} ({elapsedStr(openSince, correctedNow)}).
               Odhoda kasneje ne moreš popraviti sam; popravke lahko uredi delodajalec.
             </p>
+
+            {/* Neobvezna zabeležka odmora (se všteva v delovni čas, ur ne odšteva) */}
+            <p className="mt-5 text-center text-xs font-semibold uppercase tracking-wide text-slate-400">
+              Odmor danes (neobvezno)
+            </p>
+            <div className="mt-2 grid grid-cols-4 gap-1.5">
+              {[
+                [0, "Brez"],
+                [15, "15 min"],
+                [30, "30 min"],
+                [45, "45 min"],
+              ].map(([min, label]) => (
+                <button
+                  key={min}
+                  type="button"
+                  onClick={() => setBreakMin(min as number)}
+                  className={
+                    "rounded-full py-2 text-[13px] font-semibold transition " +
+                    (breakMin === min
+                      ? "bg-brand-600 text-white"
+                      : "bg-slate-100 text-slate-600 ring-1 ring-slate-200 hover:bg-slate-200")
+                  }
+                >
+                  {label as string}
+                </button>
+              ))}
+            </div>
+
             <div className="mt-6 grid grid-cols-2 gap-2">
               <button
                 onClick={() => setConfirmOut(false)}

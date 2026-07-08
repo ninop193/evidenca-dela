@@ -5,6 +5,7 @@ export type ReportEntry = {
   date: string;
   clock_in: string | null;
   clock_out: string | null;
+  break_minutes: number | null;
   total_worked_hours: number | null;
   overtime_hours: number | null;
   night_hours: number | null;
@@ -88,7 +89,7 @@ export async function getMonthlyReport(
       supabase
         .from("time_entries")
         .select(
-          "id, employee_id, date, clock_in, clock_out, total_worked_hours, overtime_hours, night_hours, sunday_hours, holiday_hours, shift_split_hours, unevenly_distributed_hours, pension_benefit_hours, pension_benefit_status, confirmed, notes",
+          "id, employee_id, date, clock_in, clock_out, break_minutes, total_worked_hours, overtime_hours, night_hours, sunday_hours, holiday_hours, shift_split_hours, unevenly_distributed_hours, pension_benefit_hours, pension_benefit_status, confirmed, notes",
         )
         .gte("date", first)
         .lte("date", last)
@@ -123,6 +124,8 @@ export async function getMonthlyReport(
     }
     const absList = absByEmp.get(emp.id) ?? [];
     totals.unworked_hours = absList.reduce((acc, a) => acc + (Number(a.unworked_hours) || 0), 0);
+    // Odmor (v minutah) — ločeno od urnih seštevkov.
+    totals.break_minutes = list.reduce((acc, e) => acc + (Number(e.break_minutes) || 0), 0);
     return { ...emp, entries: list, absences: absList, totals } as ReportEmployee;
   });
 

@@ -41,6 +41,7 @@ const HEAD = [
   "Datum",
   "Prihod",
   "Odhod",
+  "Odmor (min)",
   "Redne ure",
   "Nadure",
   "Nočne",
@@ -52,7 +53,7 @@ const HEAD = [
   "Status",
   "Opomba",
 ];
-const WIDTHS = [12, 9, 9, 11, 9, 9, 10, 10, 16, 14, 12, 12, 22];
+const WIDTHS = [12, 9, 9, 11, 11, 9, 9, 10, 10, 16, 14, 12, 12, 22];
 const NCOLS = HEAD.length;
 
 export async function GET(req: NextRequest) {
@@ -158,7 +159,7 @@ export async function GET(req: NextRequest) {
       c.value = label;
       c.font = { bold: true, size: 9.5, color: { argb: "FFFFFFFF" } };
       c.fill = { type: "pattern", pattern: "solid", fgColor: { argb: DARK } };
-      c.alignment = { vertical: "middle", horizontal: i >= 3 && i <= 10 ? "center" : "left", wrapText: true };
+      c.alignment = { vertical: "middle", horizontal: i >= 3 && i <= 11 ? "center" : "left", wrapText: true };
       c.border = allBorders;
     });
     head.height = 26;
@@ -171,6 +172,7 @@ export async function GET(req: NextRequest) {
         fmtDate(e.date),
         fmtTime(e.clock_in),
         fmtTime(e.clock_out),
+        Math.round(Number(e.break_minutes) || 0),
         num(e.total_worked_hours),
         num(e.overtime_hours),
         num(e.night_hours),
@@ -187,8 +189,8 @@ export async function GET(req: NextRequest) {
         c.value = v;
         c.border = allBorders;
         c.font = { size: 9.5, color: { argb: DARK } };
-        if (ci >= 3 && ci <= 10) {
-          c.numFmt = "0.00";
+        if (ci >= 3 && ci <= 11) {
+          c.numFmt = ci === 3 ? "0" : "0.00";
           c.alignment = { horizontal: "right" };
         }
         if (i % 2 === 1) c.fill = { type: "pattern", pattern: "solid", fgColor: { argb: BAND } };
@@ -211,6 +213,7 @@ export async function GET(req: NextRequest) {
     const t = emp.totals;
     const totalVals = [
       "SKUPAJ", "", "",
+      t.break_minutes,
       t.total_worked_hours, t.overtime_hours, t.night_hours, t.sunday_hours,
       t.holiday_hours, t.shift_split_hours, t.unevenly_distributed_hours, t.pension_benefit_hours,
       "", "",
@@ -221,8 +224,8 @@ export async function GET(req: NextRequest) {
       c.font = { bold: true, size: 9.5, color: { argb: DARK } };
       c.border = { ...allBorders, top: { style: "medium", color: { argb: DARK } } };
       c.fill = { type: "pattern", pattern: "solid", fgColor: { argb: BAND } };
-      if (ci >= 3 && ci <= 10) {
-        c.numFmt = "0.00";
+      if (ci >= 3 && ci <= 11) {
+        c.numFmt = ci === 3 ? "0" : "0.00";
         c.alignment = { horizontal: "right" };
       }
     });

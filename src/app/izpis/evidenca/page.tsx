@@ -27,6 +27,11 @@ const h = (n: number | null | undefined) => {
   const v = Number(n) || 0;
   return v === 0 ? "·" : v.toFixed(2);
 };
+// Odmor v minutah (celo število).
+const mins = (n: number | null | undefined) => {
+  const v = Math.round(Number(n) || 0);
+  return v === 0 ? "·" : String(v);
+};
 function monthLabel(month: string) {
   const [y, m] = month.split("-").map(Number);
   return new Intl.DateTimeFormat("sl-SI", { month: "long", year: "numeric" }).format(
@@ -53,7 +58,7 @@ export default async function PrintPage({
     new Date(),
   );
 
-  const cols = ["Datum", "Dan", "Prihod", "Odhod", "Redne", "Nad.", "Noč.", "Ned.", "Prazn.", "Izm.", "Neen.", "Zav.+"];
+  const cols = ["Datum", "Dan", "Prihod", "Odhod", "Odm.", "Redne", "Nad.", "Noč.", "Ned.", "Prazn.", "Izm.", "Neen.", "Zav.+"];
 
   return (
     <main className="report-root min-h-screen bg-slate-100 text-slate-900">
@@ -178,6 +183,7 @@ export default async function PrintPage({
                       <Td className="capitalize text-slate-500">{fmtDow(e.date)}</Td>
                       <Td>{fmtTime(e.clock_in)}</Td>
                       <Td>{fmtTime(e.clock_out)}</Td>
+                      <Td num>{mins(e.break_minutes)}</Td>
                       <Td num strong>{h(e.total_worked_hours)}</Td>
                       <Td num>{h(e.overtime_hours)}</Td>
                       <Td num>{h(e.night_hours)}</Td>
@@ -195,6 +201,7 @@ export default async function PrintPage({
                   <td className="px-1.5 py-1.5 text-left uppercase tracking-wide" colSpan={4}>
                     Skupaj
                   </td>
+                  <Td num strong>{mins(emp.totals.break_minutes)}</Td>
                   <Td num strong>{h(emp.totals.total_worked_hours)}</Td>
                   <Td num strong>{h(emp.totals.overtime_hours)}</Td>
                   <Td num strong>{h(emp.totals.night_hours)}</Td>
@@ -207,7 +214,7 @@ export default async function PrintPage({
               </tfoot>
             </table>
             <p className="mt-1 text-[8px] text-slate-400">
-              Legenda: Nad.=nadure · Noč.=nočne · Ned.=nedeljske · Prazn.=praznične · Izm.=izmensko/deljeno · Neen.=neenakomerno razporejeno · Zav.+=zavarovalna doba s povečanjem · „·" = 0
+              Legenda: Odm.=odmor v minutah (se všteva v delovni čas) · Nad.=nadure · Noč.=nočne · Ned.=nedeljske · Prazn.=praznične · Izm.=izmensko/deljeno · Neen.=neenakomerno razporejeno · Zav.+=zavarovalna doba s povečanjem · „·" = 0
             </p>
 
             {/* ODSOTNOSTI */}

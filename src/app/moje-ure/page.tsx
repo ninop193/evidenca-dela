@@ -38,6 +38,7 @@ type Entry = {
   date: string;
   clock_in: string | null;
   clock_out: string | null;
+  break_minutes: number | null;
   total_worked_hours: number | null;
   overtime_hours: number | null;
   night_hours: number | null;
@@ -78,7 +79,7 @@ export default async function MojeUrePage({
     supabase
       .from("time_entries")
       .select(
-        "id, date, clock_in, clock_out, total_worked_hours, overtime_hours, night_hours, sunday_hours, holiday_hours, needs_review",
+        "id, date, clock_in, clock_out, break_minutes, total_worked_hours, overtime_hours, night_hours, sunday_hours, holiday_hours, needs_review",
       )
       .eq("employee_id", employee.id)
       .gte("date", mStart)
@@ -228,9 +229,16 @@ export default async function MojeUrePage({
                       )}
                     </div>
                   </div>
-                  {(Number(e.overtime_hours) || 0) > 0 && (
+                  {((Number(e.overtime_hours) || 0) > 0 || (Number(e.break_minutes) || 0) > 0) && (
                     <p className="mt-1 text-xs text-slate-400">
-                      od tega nadure: {fmtH(Number(e.overtime_hours))} h
+                      {[
+                        (Number(e.break_minutes) || 0) > 0 ? `odmor ${e.break_minutes} min` : null,
+                        (Number(e.overtime_hours) || 0) > 0
+                          ? `od tega nadure: ${fmtH(Number(e.overtime_hours))} h`
+                          : null,
+                      ]
+                        .filter(Boolean)
+                        .join(" · ")}
                     </p>
                   )}
                 </li>
