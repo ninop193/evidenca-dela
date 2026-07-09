@@ -149,6 +149,17 @@ export default function Page() {
             bilo zabeleženih več kot 1.000 kršitev na področju evidenc delovnega časa.
           </p>
 
+          <p>
+            Preden preveriš višino glob, je vredno razumeti, kaj{" "}
+            <Link
+              href="/blog/evidenca-o-izrabi-delovnega-casa"
+              className="font-semibold text-brand-700 hover:text-brand-800"
+            >
+              evidenca o izrabi delovnega časa
+            </Link>{" "}
+            sploh mora vsebovati po 18. členu ZEPDSV.
+          </p>
+
           <h2 className="!mt-12 text-2xl font-bold tracking-tight text-slate-900">
             Lestvica glob po ZEPDSV
           </h2>

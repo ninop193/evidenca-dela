@@ -234,7 +234,15 @@ export default function Page() {
             </li>
             <li>
               <strong>Delo na praznik</strong> mora biti iz evidence razvidno do ure natančno, ker
-              je podlaga za obračun dodatka po kolektivni pogodbi.
+              je podlaga za obračun dodatka po kolektivni pogodbi. Praznično delo je ena od
+              kategorij, ki jo moraš v{" "}
+              <Link
+                href="/blog/evidenca-o-izrabi-delovnega-casa"
+                className="font-semibold text-brand-700 hover:text-brand-800"
+              >
+                evidenci o izrabi delovnega časa
+              </Link>{" "}
+              evidentirati ločeno od rednih ur.
             </li>
             <li>
               <strong>Praznik na vikend</strong> ne prinese nadomestnega prostega dne. V evidenci za

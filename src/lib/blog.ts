@@ -10,6 +10,16 @@ export type BlogPost = {
 
 export const BLOG_POSTS: BlogPost[] = [
   {
+    slug: "evidenca-o-izrabi-delovnega-casa",
+    title: "Kaj je evidenca o izrabi delovnega časa (in zakaj se ime ne ujema z evidenco zaposlenih)",
+    description:
+      "Evidenca o izrabi delovnega časa ni isto kot evidenca zaposlenih delavcev. Kaj mora vsebovati po 18. členu ZEPDSV in kdo jo mora voditi.",
+    date: "2026-07-09",
+    excerpt:
+      "Izraz iz 18. člena ZEPDSV pomeni dnevni zapis o dejansko porabljenih urah, ne administrativni karton zaposlenega. Kaj mora vsebovati in kdo jo vodi.",
+    readMins: 5,
+  },
+  {
     slug: "evidenca-delovnega-casa-obrazec",
     title: "Evidenca delovnega časa: obrazec in vzorec za brezplačen prenos",
     description:

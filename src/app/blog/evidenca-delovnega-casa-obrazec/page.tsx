@@ -212,6 +212,16 @@ export default function Page() {
             podatkov se v praksi pogosto pomešata, kar potem obrazec po nepotrebnem podaljša.
           </p>
           <p>
+            Za ozadje, zakaj so ta polja obvezna in od kod izraz sploh izhaja, si oglej{" "}
+            <Link
+              href="/blog/evidenca-o-izrabi-delovnega-casa"
+              className="font-semibold text-brand-700 hover:text-brand-800"
+            >
+              razlago pojma evidenca o izrabi delovnega časa
+            </Link>
+            .
+          </p>
+          <p>
             Pred objavo oziroma uporabo obrazca vam priporočamo, da polja preverite še sami v
             čistopisu 18. člena ZEPDSV na{" "}
             <a

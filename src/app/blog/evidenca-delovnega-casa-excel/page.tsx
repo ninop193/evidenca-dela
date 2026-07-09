@@ -160,6 +160,17 @@ export default function Page() {
             <strong>Najpogostejša zmota:</strong> „Mislil sem, da to dela servis." Servis ureja
             napotnico in obračun, evidenco delovnega časa pa zakon nalaga vam, delodajalcu.
           </p>
+          <p>
+            Če te zanima, od kod izraz „evidenca o izrabi delovnega časa" sploh izhaja in kaj
+            natančno mora vsebovati po 18. členu, si oglej{" "}
+            <Link
+              href="/blog/evidenca-o-izrabi-delovnega-casa"
+              className="font-semibold text-brand-700 hover:text-brand-800"
+            >
+              razlago pojma in obveznih polj
+            </Link>
+            .
+          </p>
 
           <h2 className="!mt-12 text-2xl font-bold tracking-tight text-slate-900">
             Zakaj evidenca delovnega časa v Excelu pogosto ne prestane inšpekcije
