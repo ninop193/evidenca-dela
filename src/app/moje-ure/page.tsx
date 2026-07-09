@@ -88,7 +88,7 @@ export default async function MojeUrePage({
       .order("clock_in", { ascending: false }),
     supabase
       .from("time_entries")
-      .select("date, total_worked_hours")
+      .select("date, total_worked_hours, clock_out")
       .eq("employee_id", employee.id)
       .gte("date", wStart)
       .lte("date", today),
@@ -108,6 +108,8 @@ export default async function MojeUrePage({
   const todayTotal = (weekRows ?? [])
     .filter((e) => e.date === today)
     .reduce((a, e) => a + (Number(e.total_worked_hours) || 0), 0);
+  // Izmena v teku danes → na kartici "Danes" pokažemo utrip namesto zavajajoče ničle.
+  const openToday = (weekRows ?? []).some((e) => e.date === today && e.clock_out == null);
   const { data: curMonthRows } = isCurrentMonth
     ? { data: monthEntries }
     : await supabase
@@ -161,19 +163,31 @@ export default async function MojeUrePage({
 
         {/* Kartice: Danes / Ta teden / Ta mesec (vedno tekoče stanje) */}
         <div className="mt-4 grid grid-cols-3 gap-2">
-          {[
-            ["Danes", todayTotal],
-            ["Ta teden", weekTotal],
-            ["Ta mesec", curMonthTotal],
-          ].map(([label, val]) => (
-            <div key={label as string} className="glass iris-edge rounded-2xl px-3 py-3 text-center">
+          {(
+            [
+              ["Danes", todayTotal, openToday],
+              ["Ta teden", weekTotal, false],
+              ["Ta mesec", curMonthTotal, false],
+            ] as [string, number, boolean][]
+          ).map(([label, val, running]) => (
+            <div key={label} className="glass iris-edge rounded-2xl px-3 py-3 text-center">
               <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-400">
-                {label as string}
+                {label}
               </p>
-              <p className="mt-1 text-lg font-bold tabular-nums text-slate-900">
-                {fmtH(val as number)}
-                <span className="ml-0.5 text-xs font-semibold text-slate-400">h</span>
-              </p>
+              {running ? (
+                <p className="mt-1 inline-flex items-center gap-1.5 text-sm font-bold text-brand-600">
+                  <span className="relative flex h-2 w-2">
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand-400 opacity-75" />
+                    <span className="relative inline-flex h-2 w-2 rounded-full bg-brand-500" />
+                  </span>
+                  v teku
+                </p>
+              ) : (
+                <p className="mt-1 text-lg font-bold tabular-nums text-slate-900">
+                  {fmtH(val)}
+                  <span className="ml-0.5 text-xs font-semibold text-slate-400">h</span>
+                </p>
+              )}
             </div>
           ))}
         </div>
