@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
@@ -14,6 +14,14 @@ const fieldCls =
 export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [savedEmail, setSavedEmail] = useState("");
+
+  // Zapomni si zadnji email — če uporabnika kadar koli odjavi, vpiše samo še geslo.
+  useEffect(() => {
+    try {
+      setSavedEmail(localStorage.getItem("delovit-login-email") ?? "");
+    } catch {}
+  }, []);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -31,6 +39,9 @@ export default function LoginPage() {
       setLoading(false);
       return;
     }
+    try {
+      localStorage.setItem("delovit-login-email", email);
+    } catch {}
     const { data: profile } = await supabase
       .from("users")
       .select("role")
@@ -58,10 +69,20 @@ export default function LoginPage() {
           <h1 className="text-xl font-bold text-slate-900">Prijava</h1>
           <p className="mt-1 text-sm text-slate-500">Dobrodošel nazaj.</p>
 
-          <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+          {/* method="post": če bi se obrazec oddal pred nalaganjem JS, geslo ne sme v URL */}
+          <form onSubmit={handleSubmit} method="post" className="mt-6 space-y-4">
             <label className="block">
               <span className="mb-1.5 block text-sm font-medium text-slate-700">Email</span>
-              <input name="email" type="email" required placeholder="ti@podjetje.si" className={fieldCls} />
+              <input
+                name="email"
+                type="email"
+                required
+                placeholder="ti@podjetje.si"
+                autoComplete="email"
+                defaultValue={savedEmail}
+                key={savedEmail || "empty"}
+                className={fieldCls}
+              />
             </label>
             <label className="block">
               <div className="mb-1.5 flex items-center justify-between">
@@ -70,7 +91,7 @@ export default function LoginPage() {
                   Pozabljeno geslo?
                 </Link>
               </div>
-              <input name="password" type="password" required placeholder="••••••••" className={fieldCls} />
+              <input name="password" type="password" required placeholder="••••••••" autoComplete="current-password" className={fieldCls} />
             </label>
 
             {error && (
