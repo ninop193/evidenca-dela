@@ -324,7 +324,10 @@ export default function Page() {
             </Link>{" "}
             dober vmesni korak, dokler ekipa ostaja majhna. Ko pa obrazcev, popravkov in izjem
             postane preveč za en sam list, potrebujete{" "}
-            <Link href="/" className="font-semibold text-brand-700 hover:text-brand-800">
+            <Link
+              href="/evidenca-delovnega-casa"
+              className="font-semibold text-brand-700 hover:text-brand-800"
+            >
               digitalno evidenco delovnega časa, ki se izpolnjuje sama
             </Link>
             , namesto da jo vsak mesec znova sestavljate ročno.

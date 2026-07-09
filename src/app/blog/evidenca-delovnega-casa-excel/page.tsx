@@ -296,8 +296,15 @@ export default function Page() {
             </li>
           </ul>
           <p>
-            Rešitev, ki jo vse pogosteje izberejo mikro delodajalci: orodje, ki beleži čas
-            samodejno, hrani podatke varno in jih v sekundi izvozi v PDF ali Excel za inšpekcijo.
+            Rešitev, ki jo vse pogosteje izberejo mikro delodajalci:{" "}
+            <Link
+              href="/evidenca-delovnega-casa"
+              className="font-semibold text-brand-700 hover:text-brand-800"
+            >
+              aplikacija za evidenco delovnega časa
+            </Link>
+            , ki beleži čas samodejno, hrani podatke varno in jih v sekundi izvozi v PDF ali Excel
+            za inšpekcijo.
           </p>
           <p>
             <Link href="/" className="font-semibold text-brand-700 hover:text-brand-800">

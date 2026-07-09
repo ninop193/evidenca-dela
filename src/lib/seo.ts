@@ -5,9 +5,9 @@ export const SITE = {
   name: "Delovit",
   url: "https://www.delovit.si",
   // Privzeti (domača stran) naslov in opis — ciljajo glavne iskane besede.
-  title: "Delovit | Evidenca delovnega časa za mikro podjetja (ZEPDSV)",
+  title: "Delovit | Aplikacija za evidenco delovnega časa (ZEPDSV)",
   description:
-    "Preprosta evidenca delovnega časa za mikro podjetja in s.p. Skladno z ZEPDSV, žigosanje z mobitelom, izvoz za inšpekcijo v PDF in Excel. Fiksna cena na podjetje, brez vezave.",
+    "Preprosta aplikacija za evidenco delovnega časa za mikro podjetja in s.p. Skladno z ZEPDSV, žigosanje z mobitelom, izvoz za inšpekcijo v PDF in Excel. Fiksna cena na podjetje, brez vezave.",
   locale: "sl_SI",
   lang: "sl",
   keywords: [

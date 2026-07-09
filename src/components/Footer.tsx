@@ -19,6 +19,7 @@ export function Footer() {
           <div>
             <h3 className="text-sm font-semibold text-slate-900">Orodja</h3>
             <ul className="mt-3 space-y-2 text-sm text-slate-600">
+              <li><Link href="/evidenca-delovnega-casa" className="hover:text-brand-700">Aplikacija za evidenco delovnega časa</Link></li>
               <li><Link href="/kalkulator" className="hover:text-brand-700">Bruto-neto kalkulator</Link></li>
               <li><Link href="/blog" className="hover:text-brand-700">Blog</Link></li>
               <li><Link href="/register" className="hover:text-brand-700">Registracija podjetja</Link></li>

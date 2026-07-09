@@ -266,7 +266,14 @@ export default function Page() {
               Delovit
             </Link>{" "}
             je zasnovan točno za te zahteve: evidenca je vedno ažurna, vsak vnos dobi žig časa,
-            pokrita je celotna ekipa.
+            pokrita je celotna ekipa. Poglejte, kako deluje{" "}
+            <Link
+              href="/evidenca-delovnega-casa"
+              className="font-semibold text-brand-700 hover:text-brand-800"
+            >
+              program za evidenco delovnega časa
+            </Link>
+            .
           </p>
           <TrialButton />
 

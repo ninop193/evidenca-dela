@@ -260,7 +260,7 @@ export default function Page() {
             V Excelu ali na papirju to pomeni ročno označevanje 15 datumov in ločeno računanje ur za
             dodatke.{" "}
             <Link
-              href="/blog/evidenca-delovnega-casa-excel"
+              href="/evidenca-delovnega-casa"
               className="font-semibold text-brand-700 hover:text-brand-800"
             >
               Digitalna evidenca delovnega časa
