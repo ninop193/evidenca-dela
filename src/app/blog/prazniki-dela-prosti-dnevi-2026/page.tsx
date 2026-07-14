@@ -262,7 +262,14 @@ export default function Page() {
             >
               obrazcu za evidenco delovnega časa
             </Link>
-            .
+            . Praznično delo je le ena od kategorij v širši obveznosti, celoten pregled, kaj{" "}
+            <Link
+              href="/blog/evidenca-delovnega-casa-vodnik"
+              className="font-semibold text-brand-700 hover:text-brand-800"
+            >
+              evidenca delovnega časa
+            </Link>{" "}
+            zahteva, najdeš v tem vodniku.
           </p>
           <p>
             V Excelu ali na papirju to pomeni ročno označevanje 15 datumov in ločeno računanje ur za

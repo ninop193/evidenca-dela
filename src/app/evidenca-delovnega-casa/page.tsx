@@ -70,6 +70,10 @@ const FAQ: FaqItem[] = [
     a: "Da. Po 2. členu ZEPDSV se evidenca vodi za vsakogar, ki je vključen v delovni proces — tudi za dijake in študente na napotnici. Delovit loči redno zaposlene in študente ter pri mladoletnih upošteva strožje dnevne meje.",
   },
   {
+    q: "Kako poteka registracija delovnega časa v Delovitu?",
+    a: "Zaposleni odpre Delovit na telefonu in z enim tapom žigosa prihod, ob koncu dela pa odhod, z možnostjo zabeležke odmora. Registracija delovnega časa je s tem opravljena sproti, brez terminala, kartic ali dodatne opreme, evidenca pa se izpolnjuje sama.",
+  },
+  {
     q: "Kaj se zgodi, če zaposleni pozabi žigosati odhod?",
     a: "Aplikacija ga na to sama opomni po e-pošti, delodajalec pa dobi obvestilo in vnos, označen za pregled — ure nikoli ne izginejo in se nikoli ne popravijo na skrivaj.",
   },

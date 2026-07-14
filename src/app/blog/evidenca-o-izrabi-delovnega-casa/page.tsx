@@ -161,6 +161,16 @@ export default function Page() {
             delavcih in eno o izrabi delovnega časa. Zamenjujeta se pogosto, ker zvenita podobno,
             obveznosti pa so precej različne.
           </p>
+          <p>
+            Če iščeš širši okvir, preden se poglobiš v to terminološko razliko, si oglej{" "}
+            <Link
+              href="/blog/evidenca-delovnega-casa-vodnik"
+              className="font-semibold text-brand-700 hover:text-brand-800"
+            >
+              evidenca delovnega časa: kaj zahteva zakon in kako jo voditi
+            </Link>
+            .
+          </p>
 
           <h2 className="!mt-12 text-2xl font-bold tracking-tight text-slate-900">
             Zakaj se evidenca imenuje ravno tako in od kod izhaja

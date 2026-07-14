@@ -62,6 +62,11 @@ export default function BlogIndex() {
                   <span className="inline-flex items-center gap-1">
                     <Clock className="h-3.5 w-3.5" /> {p.readMins} min branja
                   </span>
+                  {p.badge && (
+                    <span className="rounded-full bg-brand-50 px-2 py-0.5 font-semibold text-brand-700 ring-1 ring-brand-100">
+                      {p.badge}
+                    </span>
+                  )}
                 </div>
                 <h2 className="mt-2 text-xl font-bold text-slate-900 group-hover:text-brand-700">
                   {p.title}

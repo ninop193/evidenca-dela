@@ -6,9 +6,21 @@ export type BlogPost = {
   date: string; // ISO, datum objave
   excerpt: string;
   readMins: number;
+  badge?: string; // npr. "Vodnik" — vizualno loči pillar od ozkih postov
 };
 
 export const BLOG_POSTS: BlogPost[] = [
+  {
+    slug: "evidenca-delovnega-casa-vodnik",
+    title: "Evidenca delovnega časa: kaj zahteva zakon in kako jo voditi",
+    description:
+      "Kaj je evidenca delovnega časa po ZEPDSV, kdo jo mora voditi, kaj mora vsebovati po 18. členu in kakšne so sankcije, če ni v redu. Vodnik na enem mestu.",
+    date: "2026-07-13",
+    excerpt:
+      "Celoten okvir na enem mestu: pravna podlaga, kdo mora voditi evidenco, obvezna polja, sankcije in razlika med ročnim in digitalnim vodenjem.",
+    readMins: 6,
+    badge: "Vodnik",
+  },
   {
     slug: "evidenca-o-izrabi-delovnega-casa",
     title: "Kaj je evidenca o izrabi delovnega časa (in zakaj se ime ne ujema z evidenco zaposlenih)",

@@ -159,6 +159,17 @@ export default function Page() {
             </Link>{" "}
             sploh mora vsebovati po 18. členu ZEPDSV.
           </p>
+          <p>
+            Za širši pregled, kaj evidenca delovnega časa sploh mora vsebovati in kdo jo mora
+            voditi, si oglej{" "}
+            <Link
+              href="/blog/evidenca-delovnega-casa-vodnik"
+              className="font-semibold text-brand-700 hover:text-brand-800"
+            >
+              celoten vodnik po ZEPDSV
+            </Link>
+            .
+          </p>
 
           <h2 className="!mt-12 text-2xl font-bold tracking-tight text-slate-900">
             Lestvica glob po ZEPDSV

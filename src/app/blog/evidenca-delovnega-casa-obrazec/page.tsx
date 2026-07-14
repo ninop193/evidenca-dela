@@ -219,6 +219,13 @@ export default function Page() {
             >
               razlago pojma evidenca o izrabi delovnega časa
             </Link>
+            . Za celoten pravni okvir, ne le obrazec, si oglej{" "}
+            <Link
+              href="/blog/evidenca-delovnega-casa-vodnik"
+              className="font-semibold text-brand-700 hover:text-brand-800"
+            >
+              evidenca delovnega časa: kaj zahteva zakon in kako jo voditi
+            </Link>
             .
           </p>
           <p>

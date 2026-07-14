@@ -139,6 +139,17 @@ export default function Page() {
             res deluje, a le, če ga uporabljate prav. Zakon ima namreč posebnost, ki marsikaterega
             delodajalca preseneti šele, ko potrka inšpektor.
           </p>
+          <p>
+            Če te zanima celoten pregled obveznosti, kdo mora evidenco voditi in kaj natančno mora
+            vsebovati, si najprej oglej{" "}
+            <Link
+              href="/blog/evidenca-delovnega-casa-vodnik"
+              className="font-semibold text-brand-700 hover:text-brand-800"
+            >
+              evidenco delovnega časa: kaj zahteva zakon in kako jo voditi
+            </Link>
+            .
+          </p>
 
           <h2 className="!mt-12 text-2xl font-bold tracking-tight text-slate-900">
             Kaj zakon zahteva - evidenca delovnega časa po novem
