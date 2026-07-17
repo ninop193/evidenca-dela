@@ -200,6 +200,16 @@ export default function Page() {
             posegajo po minimumu. Delodajalec, ki je bil že sankcioniran in evidence ni uredil, ob
             naslednjem nadzoru prejme globo bliže maksimumu.
           </p>
+          <p>
+            Koliko dejansko tvegaš glede na svojo ekipo in kršitve, preveri v{" "}
+            <Link
+              href="/kalkulator-glob"
+              className="font-semibold text-brand-700 hover:text-brand-800"
+            >
+              kalkulatorju glob po ZEPDSV
+            </Link>
+            .
+          </p>
 
           <h2 className="!mt-12 text-2xl font-bold tracking-tight text-slate-900">
             Zakaj globe naraščajo?

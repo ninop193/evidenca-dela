@@ -248,7 +248,14 @@ export default function Page() {
               pregledu kazni po ZEPDSV
             </Link>
             , ker se spreminjajo z novelami in jih ni smiselno ponavljati na vsakem mestu, kjer se
-            evidenca omenja.
+            evidenca omenja. Za hitro oceno svojega tveganja lahko uporabiš tudi{" "}
+            <Link
+              href="/kalkulator-glob"
+              className="font-semibold text-brand-700 hover:text-brand-800"
+            >
+              kalkulator glob po ZEPDSV
+            </Link>
+            .
           </p>
           <p>
             Vredno je poudariti, da inšpekcija ne kaznuje samo odsotnosti evidence. Enako
