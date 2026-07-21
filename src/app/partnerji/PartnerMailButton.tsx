@@ -8,7 +8,7 @@ const MAILTO =
   encodeURIComponent("Zanima me partnerski program Delovit") +
   "&body=" +
   encodeURIComponent(
-    "Pozdravljeni,\n\nzanima me partnerski program Delovit za računovodje (50 % provizija).\n\nIme / računovodstvo:\nTelefon:\nŠtevilo strank, ki bi jim priporočil/a:\n\nLep pozdrav,",
+    "Pozdravljeni,\n\nzanima me partnerski program Delovit (50 % provizija).\n\nIme:\nČime se ukvarjam (računovodstvo, svetovanje, prodaja, drugo):\nTelefon:\nKako bi pripeljal/a stranke:\n\nLep pozdrav,",
   );
 
 export function PartnerMailButton({

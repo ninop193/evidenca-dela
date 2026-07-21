@@ -3,12 +3,12 @@ import Link from "next/link";
 import {
   Percent,
   Repeat,
-  HandCoins,
-  Sparkles,
+  Users,
+  TrendingUp,
   FileText,
   UserPlus,
   ShieldCheck,
-  Calculator,
+  HandCoins,
 } from "lucide-react";
 import { Aurora } from "@/components/Aurora";
 import { Reveal } from "@/components/Reveal";
@@ -20,21 +20,21 @@ import { SITE, orgJsonLd, websiteJsonLd } from "@/lib/seo";
 import { PartnerMailButton } from "./PartnerMailButton";
 
 export const metadata: Metadata = {
-  title: { absolute: "Partnerski program za računovodje – 50 % provizije | Delovit" },
+  title: { absolute: "Partnerski program Delovit: 50 % provizije za partnerje" },
   description:
-    "Priporočite Delovit svojim strankam in prejmite 50 % naročnine za vsako pridobljeno podjetje, vsak mesec. Partnerski program za računovodje. Brez dodatnega dela.",
+    "Pripeljite stranke v Delovit in prejmite 50 % naročnine za vsako pridobljeno podjetje, vsak mesec. Odprto za računovodje, svetovalce, freelancerje in vse s stiki ali veščino prodaje.",
   keywords: [
     "partnerski program",
-    "provizija računovodje",
+    "provizija priporočilo",
     "affiliate evidenca delovnega časa",
     "partnerstvo Delovit",
-    "priporočilni program računovodstvo",
+    "zaslužek priporočilo SaaS",
   ],
   alternates: { canonical: "/partnerji" },
   openGraph: {
-    title: "Partnerski program za računovodje – 50 % provizije",
+    title: "Partnerski program Delovit: 50 % provizije",
     description:
-      "Priporočite Delovit strankam in prejmite 50 % naročnine, vsak mesec. Brez dodatnega dela.",
+      "Pripeljite stranke v Delovit in prejmite 50 % naročnine, vsak mesec. Odprto za vse.",
     type: "website",
     locale: "sl_SI",
     url: "/partnerji",
@@ -42,31 +42,35 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Partnerski program za računovodje – 50 % provizije",
-    description: "Priporočite Delovit strankam in prejmite 50 % naročnine, vsak mesec.",
+    title: "Partnerski program Delovit: 50 % provizije",
+    description: "Pripeljite stranke v Delovit in prejmite 50 % naročnine, vsak mesec.",
   },
 };
 
 const FAQ: FaqItem[] = [
   {
+    q: "Kdo lahko postane partner?",
+    a: "Kdorkoli lahko pripelje plačujoče stranke. Računovodje, poslovni svetovalci, freelancerji, marketinške agencije ali posamezniki, ki so dobri v prodaji in cold outreachu. Ni pogojev in ni potrebnih izkušenj z našim orodjem.",
+  },
+  {
     q: "Koliko in kako pogosto prejmem provizijo?",
-    a: "50 % naročnine za vsako pridobljeno podjetje, ponavljajoče se, dokler stranka ostane. Obračun poteka po dogovoru (mesečno ali kvartalno) proti računu, ki nam ga izstavite, kar se lepo prilega vašemu knjigovodstvu.",
+    a: "50 % naročnine za vsako pridobljeno podjetje, ponavljajoče se, dokler stranka ostane. Način in ritem izplačila (mesečno ali kvartalno) se dogovorimo ob vpisu v program.",
   },
   {
     q: "Kaj moram narediti jaz?",
-    a: "Samo priporočite Delovit strankam, ki potrebujejo evidenco delovnega časa. Registracijo in žigosanje uredi stranka sama v nekaj minutah, vi nimate dodatnega dela z uvajanjem.",
+    a: "Samo pripeljete oziroma priporočite Delovit podjetjem, ki potrebujejo evidenco delovnega časa. Registracijo in žigosanje uredi stranka sama v nekaj minutah, vi nimate dela z uvajanjem ali podporo.",
   },
   {
     q: "Kako se stranka pripiše meni?",
-    a: "Dobite svojo kodo, ki jo stranka uporabi ob registraciji oziroma plačilu (in pri tem dobi ugodnost). Tako je jasno, katere stranke so vaše in za katere vam pripada provizija.",
+    a: "Dobite svojo kodo, ki jo stranka uporabi ob registraciji oziroma plačilu in pri tem dobi ugodnost. Tako je jasno, katere stranke so vaše in za katere vam pripada provizija.",
   },
   {
     q: "Za katera podjetja je Delovit primeren?",
-    a: "Za mikro podjetja in s.p. z zaposlenimi ali študenti (do 10 oseb) — gostinstvo, trgovine, salone, obrt. Vsi ti morajo po ZEPDSV voditi dnevno evidenco delovnega časa.",
+    a: "Za mikro podjetja in s.p. z zaposlenimi ali študenti (do 10 oseb). Gostinstvo, trgovine, saloni, obrt, storitve. Vsi ti morajo po ZEPDSV voditi dnevno evidenco delovnega časa, kar je vaš odpiralec pri prodaji.",
   },
   {
     q: "Ali me kaj zavezuje?",
-    a: "Ne. Sodelovanje je brez obveznosti in brez stroškov. Priporočate takrat, ko se vam zdi smiselno; provizijo prejmete le za stranke, ki dejansko postanejo plačniki.",
+    a: "Ne. Sodelovanje je brez obveznosti in brez stroškov. Priporočate takrat, ko se vam zdi smiselno. Provizijo prejmete le za stranke, ki dejansko postanejo plačniki.",
   },
 ];
 
@@ -115,23 +119,29 @@ export default function PartnerjiPage() {
         <Reveal>
           <div className="inline-flex items-center gap-2 rounded-full bg-brand-50/80 px-3.5 py-1.5 text-xs font-semibold text-brand-700 ring-1 ring-brand-200/70">
             <HandCoins className="h-3.5 w-3.5" />
-            Partnerski program · za računovodje
+            Partnerski program · odprto za vse
           </div>
         </Reveal>
         <Reveal delay={80}>
           <h1 className="mt-6 text-[2.4rem] font-extrabold leading-[1.06] tracking-tight text-slate-900 sm:text-[3.2rem]">
-            Priporočite Delovit svojim strankam in{" "}
+            Pripeljite stranke v Delovit in{" "}
             <span className="text-holo">zaslužite 50 % provizije.</span>
           </h1>
         </Reveal>
         <Reveal delay={160}>
           <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-slate-600">
-            Vaše stranke morajo voditi evidenco delovnega časa po ZEPDSV. Vi jim priporočite
-            orodje, ki to uredi v petih minutah — in za vsako pridobljeno podjetje prejmete{" "}
+            Vsako mikro podjetje mora po ZEPDSV voditi evidenco delovnega časa. Vi pripeljete
+            stranke, mi jih obdržimo, vi pa za vsako pridobljeno podjetje prejmete{" "}
             <strong className="text-slate-900">polovico naročnine, vsak mesec.</strong>
           </p>
         </Reveal>
-        <Reveal delay={240}>
+        <Reveal delay={220}>
+          <p className="mx-auto mt-3 max-w-xl text-sm text-slate-500">
+            Računovodja, svetovalec, freelancer ali mojster cold outreacha. Program je odprt za
+            vsakogar, ki zna pripeljati stranke.
+          </p>
+        </Reveal>
+        <Reveal delay={280}>
           <div className="mt-9 flex flex-col items-center justify-center gap-3">
             <PartnerMailButton>Postanite partner</PartnerMailButton>
             <p className="text-sm font-medium text-brand-700">
@@ -158,17 +168,17 @@ export default function PartnerjiPage() {
             {
               icon: <Repeat className="h-5 w-5" />,
               title: "Ponavljajoč prihod",
-              text: "Ne enkraten bonus. Provizijo prejemate vsak mesec, dokler stranka ostane naročnik.",
+              text: "Ni enkraten bonus. Provizijo prejemate vsak mesec, dokler stranka ostane naročnik.",
             },
             {
-              icon: <Sparkles className="h-5 w-5" />,
-              title: "Nič dodatnega dela",
-              text: "Vi le priporočite. Stranka se registrira sama, žigosa s telefonom, vi izstavite račun.",
+              icon: <Users className="h-5 w-5" />,
+              title: "Odprto za vse",
+              text: "Računovodje, svetovalci, freelancerji, agencije. Šteje le, da pripeljete plačujoče stranke.",
             },
             {
-              icon: <Calculator className="h-5 w-5" />,
-              title: "Naravno se prilega",
-              text: "Evidenca delovnega časa je tik ob obračunu plač, ki ga za stranke že delate.",
+              icon: <TrendingUp className="h-5 w-5" />,
+              title: "Vroč trg",
+              text: "Vsako podjetje z zaposlenimi je potencialna stranka, zakon pa jih sili k ukrepanju.",
             },
           ].map((f, i) => (
             <Reveal key={f.title} delay={i * 80} className="h-full">
@@ -193,7 +203,7 @@ export default function PartnerjiPage() {
             Kako deluje
           </h2>
           <p className="mx-auto mt-3 max-w-lg text-center text-slate-600">
-            Tri koraki. Brez papirologije za vas, brez uvajanja za stranke.
+            Trije koraki. Brez papirologije za vas, brez uvajanja za stranke.
           </p>
         </Reveal>
         <div className="mt-10 grid gap-5 sm:grid-cols-3">
@@ -201,20 +211,20 @@ export default function PartnerjiPage() {
             {
               icon: <UserPlus className="h-5 w-5" />,
               step: "1",
-              title: "Priporočite",
-              text: "Strankam, ki potrebujejo evidenco delovnega časa, poveste za Delovit in jim daste svojo kodo.",
+              title: "Pripeljete",
+              text: "Podjetjem, ki potrebujejo evidenco delovnega časa, poveste za Delovit in jim daste svojo kodo.",
             },
             {
               icon: <ShieldCheck className="h-5 w-5" />,
               step: "2",
               title: "Stranka začne",
-              text: "Registrira se z vašo kodo (in dobi ugodnost), doda ekipo in začne žigosati v petih minutah.",
+              text: "Registrira se z vašo kodo, dobi ugodnost, doda ekipo in začne žigosati v petih minutah.",
             },
             {
               icon: <FileText className="h-5 w-5" />,
               step: "3",
               title: "Prejmete 50 %",
-              text: "Vsak mesec vam pripada polovica naročnine. Izstavite nam račun in nakažemo — čisto in preprosto.",
+              text: "Vsak mesec vam pripada polovica naročnine. Način izplačila se dogovorimo ob vpisu.",
             },
           ].map((s, i) => (
             <Reveal key={s.step} delay={i * 90} className="h-full">
@@ -237,17 +247,17 @@ export default function PartnerjiPage() {
       <section className="mx-auto max-w-3xl px-5 py-10">
         <Reveal>
           <div className="glass-strong iris-edge rounded-3xl p-7 sm:p-9">
-            <h2 className="text-xl font-bold text-slate-900">Vaše stranke to potrebujejo zdaj</h2>
+            <h2 className="text-xl font-bold text-slate-900">Povpraševanje je že tu</h2>
             <p className="mt-2 text-slate-600">
-              Od leta 2023 mora vsak delodajalec voditi dnevno evidenco delovnega časa po ZEPDSV —
-              tudi za dijake in študente na napotnici. Inšpektorat (IRSD) nadzore poostruje, globe
-              za mikro podjetja pa segajo do 8.000 €, za pravne osebe do 20.000 €. Vi ste prva oseba,
-              ki ji stranka zaupa pri takih obveznostih — z Delovitom ji ponudite rešitev in ob tem
-              zaslužite.
+              Od leta 2023 mora vsak delodajalec voditi dnevno evidenco delovnega časa po ZEPDSV,
+              tudi za dijake in študente na napotnici. Inšpektorat (IRSD) nadzore poostruje, globe za
+              mikro podjetja pa segajo do 8.000 €, za pravne osebe do 20.000 €. To pomeni ogromno
+              podjetij, ki rešitev potrebujejo takoj. Vi jih pripeljete, mi poskrbimo za produkt in
+              podporo, vi pa zaslužite ob vsaki naročnini.
             </p>
             <p className="mt-4 rounded-2xl bg-white/60 px-4 py-3 text-sm text-slate-500 ring-1 ring-white/70">
               Delovit je narejen za mikro podjetja: fiksna cena na podjetje, žigosanje s telefonom,
-              izvoz evidence v PDF in Excel za inšpekcijo.
+              izvoz evidence v PDF in Excel za inšpekcijo. Lahek za prodajo, ker rešuje pravo bolečino.
             </p>
           </div>
         </Reveal>
