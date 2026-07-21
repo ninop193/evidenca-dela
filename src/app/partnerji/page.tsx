@@ -167,7 +167,7 @@ export default function PartnerjiPage() {
             },
             {
               icon: <Repeat className="h-5 w-5" />,
-              title: "Ponavljajoč prihod",
+              title: "Ponavljajoč prihodek",
               text: "Ni enkraten bonus. Provizijo prejemate vsak mesec, dokler stranka ostane naročnik.",
             },
             {
