@@ -62,7 +62,7 @@ const FAQ: FaqItem[] = [
   },
   {
     q: "Kako se stranka pripiše meni?",
-    a: "Dobite svojo kodo, ki jo stranka uporabi ob registraciji oziroma plačilu in pri tem dobi ugodnost. Tako je jasno, katere stranke so vaše in za katere vam pripada provizija.",
+    a: "Dobite svojo kodo. Ko se podjetje odloči za plačljiv paket, ob naročilu vnese vašo kodo in je s tem pripisano vam. Tako je jasno, katere stranke so vaše in za katere vam pripada provizija.",
   },
   {
     q: "Za katera podjetja je Delovit primeren?",
@@ -110,7 +110,7 @@ export default function PartnerjiPage() {
           <Link href="/">
             <Wordmark className="relative z-10" />
           </Link>
-          <PartnerMailButton>Postanite partner</PartnerMailButton>
+          <PartnerMailButton size="sm">Postani partner</PartnerMailButton>
         </div>
       </header>
 
@@ -173,7 +173,7 @@ export default function PartnerjiPage() {
             {
               icon: <Users className="h-5 w-5" />,
               title: "Odprto za vse",
-              text: "Računovodje, svetovalci, freelancerji, agencije. Šteje le, da pripeljete plačujoče stranke.",
+              text: "Računovodje, svetovalci, freelancerji ali agencije. Pomembno je le, da pripeljete podjetja, ki postanejo naročniki.",
             },
             {
               icon: <TrendingUp className="h-5 w-5" />,
@@ -217,14 +217,14 @@ export default function PartnerjiPage() {
             {
               icon: <ShieldCheck className="h-5 w-5" />,
               step: "2",
-              title: "Stranka začne",
-              text: "Registrira se z vašo kodo, dobi ugodnost, doda ekipo in začne žigosati v petih minutah.",
+              title: "Stranka izbere paket",
+              text: "Ko se podjetje odloči za plačljiv paket, ob naročilu vnese vašo kodo in je pripisano vam.",
             },
             {
               icon: <FileText className="h-5 w-5" />,
               step: "3",
               title: "Prejmete 50 %",
-              text: "Vsak mesec vam pripada polovica naročnine. Način izplačila se dogovorimo ob vpisu.",
+              text: "Vsak mesec vam pripada polovica njegove naročnine, dokler ostane naročnik. Način izplačila se dogovorimo ob vpisu.",
             },
           ].map((s, i) => (
             <Reveal key={s.step} delay={i * 90} className="h-full">
@@ -274,8 +274,9 @@ export default function PartnerjiPage() {
               Pošljite nam sporočilo in dogovorimo se za sodelovanje. Brez obveznosti, odgovorimo v
               enem delovnem dnevu.
             </p>
-            <div className="mt-7 flex justify-center">
-              <PartnerMailButton variant="light">Pišite nam na info@delovit.si</PartnerMailButton>
+            <div className="mt-7 flex flex-col items-center gap-3">
+              <PartnerMailButton variant="light">Pošljite sporočilo</PartnerMailButton>
+              <p className="text-sm text-brand-50/90">ali pišite na info@delovit.si</p>
             </div>
           </div>
         </Reveal>
