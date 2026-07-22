@@ -10,7 +10,7 @@ export default function Image() {
     badge: "Odprto za vse",
     line1: "Partnerski program:",
     line2: "50 % provizije.",
-    sub: "Pripeljite stranke v Delovit in prejmite polovico naročnine, vsak mesec.",
+    sub: "Priporočite Delovit in prejmite 50 % provizije prvo leto vsake stranke, nato 25 % trajno.",
     url: "www.delovit.si/partnerji",
   });
 }
