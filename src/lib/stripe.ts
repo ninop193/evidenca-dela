@@ -15,3 +15,9 @@ export const STRIPE_PRICES: Record<"month" | "year", string> = {
 // Vklop samodejnega DDV (Stripe Tax). Če Tax še ni nastavljen, lahko začasno
 // nastaviš STRIPE_AUTOMATIC_TAX=false v okolju.
 export const AUTOMATIC_TAX = (process.env.STRIPE_AUTOMATIC_TAX ?? "true") !== "false";
+
+// Partnerski program: pri LETNEM paketu se popust (npr. 10 %) uporabi prek tega
+// skupnega kupona namesto partnerjeve promo kode (ta je na 20 % kuponu za mesečni
+// paket). ID kupona (co_...) nastaviš v okolju; če je prazen, letni paket ne dobi
+// samodejnega partnerskega popusta.
+export const YEARLY_REF_COUPON = process.env.STRIPE_YEARLY_REF_COUPON ?? "";

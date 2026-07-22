@@ -3,9 +3,9 @@
 import { headers, cookies } from "next/headers";
 import { getProfile } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { stripe, STRIPE_PRICES, AUTOMATIC_TAX } from "@/lib/stripe";
+import { stripe, STRIPE_PRICES, AUTOMATIC_TAX, YEARLY_REF_COUPON } from "@/lib/stripe";
 
-type CheckoutParams = Parameters<typeof stripe.checkout.sessions.create>[0];
+type CheckoutParams = NonNullable<Parameters<typeof stripe.checkout.sessions.create>[0]>;
 
 async function getOrigin() {
   const h = await headers();
@@ -51,18 +51,25 @@ export async function createCheckout(
     const rawRef = ck.get("delovit_ref")?.value;
     const ref = rawRef && /^[A-Za-z0-9_-]{1,40}$/.test(rawRef) ? rawRef : null;
 
-    // Poišči partnerjevo promocijsko kodo v Stripu (če obstaja) za popust.
-    let promoId: string | null = null;
+    // Odloči popust glede na paket:
+    //  - LETNI + skupni letni kupon nastavljen → 10 % prek skupnega kupona,
+    //  - MESEČNI → partnerjeva promo koda (20 %), če obstaja v Stripu,
+    //  - sicer brez samodejnega popusta (dovoli ročni vnos kode).
+    let discounts: CheckoutParams["discounts"] | null = null;
     if (ref) {
-      try {
-        const pcs = await stripe.promotionCodes.list({ code: ref, active: true, limit: 1 });
-        promoId = pcs.data[0]?.id ?? null;
-      } catch (e) {
-        console.error("Iskanje promo kode spodletelo:", e);
+      if (interval === "year" && YEARLY_REF_COUPON) {
+        discounts = [{ coupon: YEARLY_REF_COUPON }];
+      } else if (interval === "month") {
+        try {
+          const pcs = await stripe.promotionCodes.list({ code: ref, active: true, limit: 1 });
+          if (pcs.data[0]) discounts = [{ promotion_code: pcs.data[0].id }];
+        } catch (e) {
+          console.error("Iskanje promo kode spodletelo:", e);
+        }
       }
     }
 
-    // partner_code v metadata = pripis partnerju (tudi če kupon še ne obstaja).
+    // partner_code v metadata = pripis partnerju (tudi če kupona še ni ali gre za letni).
     const meta: Record<string, string> = { app: "delovit", company_id: company.id };
     if (ref) meta.partner_code = ref;
 
@@ -82,8 +89,8 @@ export async function createCheckout(
       metadata: meta,
     };
     // discounts in allow_promotion_codes ne smeta biti nastavljena hkrati.
-    const params: CheckoutParams = promoId
-      ? { ...base, discounts: [{ promotion_code: promoId }] }
+    const params: CheckoutParams = discounts
+      ? { ...base, discounts }
       : { ...base, allow_promotion_codes: true };
 
     let session;
@@ -92,7 +99,7 @@ export async function createCheckout(
     } catch (e) {
       // Popust ni bil sprejemljiv (npr. koda ni za prvo transakcijo) →
       // ponovi brez popusta, a ohrani pripis partnerju.
-      if (promoId) {
+      if (discounts) {
         console.error("Checkout z discounts spodletel, poskus brez popusta:", e);
         session = await stripe.checkout.sessions.create({ ...base, allow_promotion_codes: true });
       } else {
