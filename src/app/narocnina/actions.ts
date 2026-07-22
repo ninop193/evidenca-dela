@@ -1,9 +1,11 @@
 "use server";
 
-import { headers } from "next/headers";
+import { headers, cookies } from "next/headers";
 import { getProfile } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { stripe, STRIPE_PRICES, AUTOMATIC_TAX } from "@/lib/stripe";
+
+type CheckoutParams = Parameters<typeof stripe.checkout.sessions.create>[0];
 
 async function getOrigin() {
   const h = await headers();
@@ -44,22 +46,59 @@ export async function createCheckout(
       await supabase.from("companies").update({ stripe_customer_id: customerId }).eq("id", company.id);
     }
 
+    // Partnerska koda iz piškotka (nastavi jo proxy ob ?ref=KODA).
+    const ck = await cookies();
+    const rawRef = ck.get("delovit_ref")?.value;
+    const ref = rawRef && /^[A-Za-z0-9_-]{1,40}$/.test(rawRef) ? rawRef : null;
+
+    // Poišči partnerjevo promocijsko kodo v Stripu (če obstaja) za popust.
+    let promoId: string | null = null;
+    if (ref) {
+      try {
+        const pcs = await stripe.promotionCodes.list({ code: ref, active: true, limit: 1 });
+        promoId = pcs.data[0]?.id ?? null;
+      } catch (e) {
+        console.error("Iskanje promo kode spodletelo:", e);
+      }
+    }
+
+    // partner_code v metadata = pripis partnerju (tudi če kupon še ne obstaja).
+    const meta: Record<string, string> = { app: "delovit", company_id: company.id };
+    if (ref) meta.partner_code = ref;
+
     const origin = await getOrigin();
-    const session = await stripe.checkout.sessions.create({
+    const base: CheckoutParams = {
       mode: "subscription",
       customer: customerId,
       line_items: [{ price, quantity: 1 }],
       success_url: `${origin}/dashboard?narocnina=ok`,
       cancel_url: `${origin}/narocnina`,
       client_reference_id: company.id,
-      allow_promotion_codes: true,
       billing_address_collection: AUTOMATIC_TAX ? "required" : "auto",
       automatic_tax: { enabled: AUTOMATIC_TAX },
       tax_id_collection: { enabled: AUTOMATIC_TAX },
       ...(AUTOMATIC_TAX ? { customer_update: { address: "auto" as const, name: "auto" as const } } : {}),
-      subscription_data: { metadata: { app: "delovit", company_id: company.id } },
-      metadata: { app: "delovit", company_id: company.id },
-    });
+      subscription_data: { metadata: meta },
+      metadata: meta,
+    };
+    // discounts in allow_promotion_codes ne smeta biti nastavljena hkrati.
+    const params: CheckoutParams = promoId
+      ? { ...base, discounts: [{ promotion_code: promoId }] }
+      : { ...base, allow_promotion_codes: true };
+
+    let session;
+    try {
+      session = await stripe.checkout.sessions.create(params);
+    } catch (e) {
+      // Popust ni bil sprejemljiv (npr. koda ni za prvo transakcijo) →
+      // ponovi brez popusta, a ohrani pripis partnerju.
+      if (promoId) {
+        console.error("Checkout z discounts spodletel, poskus brez popusta:", e);
+        session = await stripe.checkout.sessions.create({ ...base, allow_promotion_codes: true });
+      } else {
+        throw e;
+      }
+    }
     return { url: session.url ?? undefined };
   } catch (e) {
     console.error("Stripe checkout napaka:", e);
