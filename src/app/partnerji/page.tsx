@@ -69,7 +69,11 @@ const FAQ: FaqItem[] = [
   },
   {
     q: "Kako se stranka pripiše meni?",
-    a: "Dobite svojo kodo. Ko se podjetje odloči za plačljiv paket, ob naročilu vnese vašo kodo in je s tem pripisano vam. Tako je jasno, katere stranke so vaše in za katere vam pripada provizija.",
+    a: "Dobite svojo osebno povezavo in kodo. Ko podjetje pride prek vaše povezave in izbere plačljiv paket, je samodejno pripisano vam. Tako je jasno, katere stranke so vaše in za katere vam pripada provizija.",
+  },
+  {
+    q: "Ali stranka z mojo kodo dobi popust?",
+    a: "Da. Prek vaše povezave dobi uvodni popust: 20 % na prvi mesec pri mesečnem paketu ali 10 % na prvo leto pri letnem. Popust je enkraten in velja za prvo obdobje, zato ga zlahka predstavite kot razlog za takojšnjo odločitev.",
   },
   {
     q: "Kaj če stranka pozabi vnesti mojo kodo?",
@@ -267,13 +271,13 @@ export default function PartnerjiPage() {
               icon: <UserPlus className="h-5 w-5" />,
               step: "1",
               title: "Priporočite",
-              text: "Podjetjem, ki potrebujejo evidenco delovnega časa, poveste za Delovit in jim daste svojo kodo.",
+              text: "Podjetjem, ki potrebujejo evidenco delovnega časa, poveste za Delovit in jim daste svojo osebno povezavo z vašo kodo.",
             },
             {
               icon: <ShieldCheck className="h-5 w-5" />,
               step: "2",
               title: "Stranka izbere paket",
-              text: "Ko se podjetje odloči za plačljiv paket, ob naročilu vnese vašo kodo in je pripisano vam.",
+              text: "Podjetje pride prek vaše povezave in je ob naročilu samodejno pripisano vam. Z vašo kodo dobi tudi uvodni popust: 20 % na prvi mesec ali 10 % na prvo leto.",
             },
             {
               icon: <FileText className="h-5 w-5" />,
