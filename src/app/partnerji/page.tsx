@@ -76,6 +76,10 @@ const FAQ: FaqItem[] = [
     a: "Da. Prek vaše povezave dobi uvodni popust: 20 % na prvi mesec pri mesečnem paketu ali 10 % na prvo leto pri letnem. Popust je enkraten in velja za prvo obdobje, zato ga zlahka predstavite kot razlog za takojšnjo odločitev.",
   },
   {
+    q: "Kako se provizija obračuna, če stranka dobi popust?",
+    a: "Provizija se obračuna od dejansko plačanega zneska naročnine. V obdobju z uvodnim popustom (prvi mesec ali prvo leto) je torej izračunana od znižane cene, po njem pa od polne. Ker je popust enkraten, se to izravna že v naslednjem obdobju.",
+  },
+  {
     q: "Kaj če stranka pozabi vnesti mojo kodo?",
     a: "Nič hudega. Javite se nam v 30 dneh od nakupa stranke in provizijo ročno pripišemo vam.",
   },
