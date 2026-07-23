@@ -8,6 +8,7 @@ const FREE_ACCESS_EMAILS = new Set<string>([
   "nino.pavalec01@gmail.com",
   "marytsy.work@gmail.com",
   "billing@futuristica.com",
+  "jure.franci8@gmail.com", // partner
 ]);
 
 export function isFreeAccessEmail(email?: string | null): boolean {
