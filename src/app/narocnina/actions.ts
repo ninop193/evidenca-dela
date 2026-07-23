@@ -89,19 +89,31 @@ export async function createCheckout(
       metadata: meta,
     };
     // discounts in allow_promotion_codes ne smeta biti nastavljena hkrati.
-    const params: CheckoutParams = discounts
-      ? { ...base, discounts }
-      : { ...base, allow_promotion_codes: true };
+    // Ročni vnos promo kode dovolimo SAMO pri mesečnem paketu (rezerva za partnerjevo
+    // 20 % kodo, ki na mesečnem da pravilnih 20 %). Pri LETNEM paketu ročnega vnosa NE
+    // dovolimo: sicer bi lahko nekdo ročno vpisal mesečno 20 % kodo na letni paket in
+    // dobil previsok popust. Letni popust (10 %) se uporabi izključno prek ?ref povezave.
+    let params: CheckoutParams;
+    if (discounts) {
+      params = { ...base, discounts };
+    } else if (interval === "month") {
+      params = { ...base, allow_promotion_codes: true };
+    } else {
+      params = base;
+    }
 
     let session;
     try {
       session = await stripe.checkout.sessions.create(params);
     } catch (e) {
       // Popust ni bil sprejemljiv (npr. koda ni za prvo transakcijo) →
-      // ponovi brez popusta, a ohrani pripis partnerju.
+      // ponovi brez popusta, a ohrani pripis partnerju. Ročni vnos tudi tu dovolimo
+      // le pri mesečnem paketu (letni ostane brez polja za kodo).
       if (discounts) {
         console.error("Checkout z discounts spodletel, poskus brez popusta:", e);
-        session = await stripe.checkout.sessions.create({ ...base, allow_promotion_codes: true });
+        const retry: CheckoutParams =
+          interval === "month" ? { ...base, allow_promotion_codes: true } : base;
+        session = await stripe.checkout.sessions.create(retry);
       } else {
         throw e;
       }
