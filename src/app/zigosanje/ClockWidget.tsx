@@ -178,7 +178,7 @@ export default function ClockWidget({
         {/* kupola — modra plast (osnova) */}
         <span
           aria-hidden
-          className="absolute inset-3 rounded-full"
+          className="absolute inset-[5px] rounded-full"
           style={{
             background:
               "radial-gradient(120% 120% at 32% 24%, #78a2ff 0%, #2f63ff 36%, #1d4ed8 72%, #1a3fae 100%)",
@@ -187,7 +187,7 @@ export default function ClockWidget({
         {/* kupola — roza plast (navzkrižni preliv → gladek preklop barve, brez skoka) */}
         <span
           aria-hidden
-          className="absolute inset-3 rounded-full transition-opacity duration-500 ease-out"
+          className="absolute inset-[5px] rounded-full transition-opacity duration-500 ease-out"
           style={{
             background:
               "radial-gradient(120% 120% at 32% 24%, #ffa9c6 0%, #fb5c8b 34%, #e11d5f 70%, #b8134f 100%)",
@@ -197,16 +197,16 @@ export default function ClockWidget({
         {/* svetla specular pika + gloss + 3D kupola senca (konstantno, nad barvo) */}
         <span
           aria-hidden
-          className="pointer-events-none absolute inset-3 rounded-full"
+          className="pointer-events-none absolute inset-[5px] rounded-full"
           style={{
             background:
               "radial-gradient(56% 42% at 33% 23%, rgba(255,255,255,0.72), rgba(255,255,255,0) 62%)",
           }}
         />
-        <span className="pointer-events-none absolute inset-3 rounded-full bg-gradient-to-t from-transparent via-transparent to-white/30" />
+        <span className="pointer-events-none absolute inset-[5px] rounded-full bg-gradient-to-t from-transparent via-transparent to-white/30" />
         <span
           aria-hidden
-          className="pointer-events-none absolute inset-3 rounded-full ring-1 ring-inset ring-white/40"
+          className="pointer-events-none absolute inset-[5px] rounded-full ring-1 ring-inset ring-white/40"
           style={{
             boxShadow:
               "inset 0 3px 12px rgba(255,255,255,0.5), inset 0 -18px 38px rgba(10,20,60,0.28)",
