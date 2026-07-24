@@ -16,12 +16,26 @@ const ITEMS = [
   { href: "/dashboard/odsotnosti", label: "Odsotnosti" },
 ];
 
-export default function AppNav({ companyName }: { companyName: string }) {
+export default function AppNav({
+  companyName,
+  pendingCount = 0,
+}: {
+  companyName: string;
+  pendingCount?: number;
+}) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
   const isActive = (href: string, exact?: boolean) =>
     exact ? pathname === href : pathname === href || pathname.startsWith(href + "/") || pathname === href;
+
+  // Oranžna značka pri "Ure": število vnosov, ki čakajo na potrditev.
+  const pendingBadge = (href: string) =>
+    href === "/dashboard/ure" && pendingCount > 0 ? (
+      <span className="grid h-[18px] min-w-[18px] place-items-center rounded-full bg-amber-500 px-1 text-[11px] font-bold leading-none text-white">
+        {pendingCount > 99 ? "99+" : pendingCount}
+      </span>
+    ) : null;
 
   return (
     <header className="sticky top-0 z-30 px-3 pt-3">
@@ -36,13 +50,14 @@ export default function AppNav({ companyName }: { companyName: string }) {
                 key={it.href}
                 href={it.href}
                 className={cn(
-                  "rounded-full px-3 py-1.5 text-sm font-medium transition",
+                  "inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium transition",
                   isActive(it.href, it.exact)
                     ? "bg-brand-600 text-white shadow-[0_6px_16px_-6px_rgba(29,78,216,0.7)]"
                     : "text-slate-600 hover:bg-white/60 hover:text-slate-900",
                 )}
               >
                 {it.label}
+                {pendingBadge(it.href)}
               </Link>
             ))}
           </nav>
@@ -71,12 +86,16 @@ export default function AppNav({ companyName }: { companyName: string }) {
           </form>
           <button
             onClick={() => setOpen((v) => !v)}
-            className="rounded-full bg-white/60 p-2 text-slate-600 ring-1 ring-white/70 md:hidden"
+            className="relative rounded-full bg-white/60 p-2 text-slate-600 ring-1 ring-white/70 md:hidden"
             aria-label="Meni"
           >
             <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M4 6h16M4 12h16M4 18h16" strokeLinecap="round" />
             </svg>
+            {/* Oranžna pika: v meniju te nekaj čaka */}
+            {pendingCount > 0 && (
+              <span className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full bg-amber-500 ring-2 ring-white" />
+            )}
           </button>
         </div>
       </div>
@@ -90,13 +109,14 @@ export default function AppNav({ companyName }: { companyName: string }) {
               href={it.href}
               onClick={() => setOpen(false)}
               className={cn(
-                "block rounded-xl px-3 py-2 text-sm font-medium",
+                "flex items-center justify-between rounded-xl px-3 py-2 text-sm font-medium",
                 isActive(it.href, it.exact)
                   ? "bg-brand-600 text-white"
                   : "text-slate-700 hover:bg-white/60",
               )}
             >
               {it.label}
+              {pendingBadge(it.href)}
             </Link>
           ))}
           <div className="my-1 h-px bg-slate-300/50" />

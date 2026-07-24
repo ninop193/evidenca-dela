@@ -98,6 +98,23 @@ export async function updateEntry(id: string, input: EntryInput): Promise<EntryR
   return {};
 }
 
+// Potrdi vnos "za pregled" brez sprememb — ure so pravilne, oznaka se počisti.
+// (En klik namesto odpiranja obrazca; za popravke ostaja "Uredi".)
+export async function approveEntry(id: string): Promise<EntryResult> {
+  const profile = await requireAdmin();
+  if (!profile) return { error: "Samo delodajalec lahko potrjuje vnose." };
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("time_entries")
+    .update({ needs_review: false })
+    .eq("id", id)
+    .eq("company_id", profile.company_id);
+  if (error) return { error: "Napaka pri potrjevanju vnosa." };
+  revalidatePath("/dashboard/ure");
+  revalidatePath("/dashboard");
+  return {};
+}
+
 // Izbris vnosa.
 export async function deleteEntry(id: string): Promise<EntryResult> {
   const profile = await requireAdmin();
