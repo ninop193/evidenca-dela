@@ -49,6 +49,29 @@ export function dayLabel(dateStr: string): string {
   }).format(new Date(`${dateStr}T12:00:00Z`));
 }
 
+// Datum, premaknjen za N dni (YYYY-MM-DD ± delta).
+export function shiftDays(dateStr: string, delta: number): string {
+  const d = new Date(`${dateStr}T12:00:00Z`);
+  d.setUTCDate(d.getUTCDate() + delta);
+  return d.toISOString().slice(0, 10);
+}
+
+// Odmik (v minutah) cone Europe/Ljubljana ob danem trenutku (upošteva poletni/zimski čas).
+function ljubljanaOffsetMinutes(at: Date): number {
+  const utc = new Date(at.toLocaleString("en-US", { timeZone: "UTC" }));
+  const local = new Date(at.toLocaleString("en-US", { timeZone: TZ }));
+  return Math.round((local.getTime() - utc.getTime()) / 60000);
+}
+
+// Datum (YYYY-MM-DD) + ura (HH:MM) po slovenskem času → ISO (UTC) niz, ali null.
+export function combineLjubljana(dateStr: string, timeStr?: string): string | null {
+  if (!dateStr || !timeStr) return null;
+  const asUtc = new Date(`${dateStr}T${timeStr}:00Z`);
+  if (Number.isNaN(asUtc.getTime())) return null;
+  const offset = ljubljanaOffsetMinutes(asUtc);
+  return new Date(asUtc.getTime() - offset * 60000).toISOString();
+}
+
 // "07:32" iz ISO časovnega žiga.
 export function timeLabel(iso: string | null): string {
   if (!iso) return "—";

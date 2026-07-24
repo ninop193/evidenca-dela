@@ -3,24 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { getProfile } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-
-const TZ = "Europe/Ljubljana";
-
-// Odmik (v minutah) cone Europe/Ljubljana ob danem trenutku (upošteva poletni/zimski čas).
-function ljubljanaOffsetMinutes(at: Date): number {
-  const utc = new Date(at.toLocaleString("en-US", { timeZone: "UTC" }));
-  const local = new Date(at.toLocaleString("en-US", { timeZone: TZ }));
-  return Math.round((local.getTime() - utc.getTime()) / 60000);
-}
-
-// Datum (YYYY-MM-DD) + ura (HH:MM) po slovenskem času → ISO (UTC) niz, ali null.
-function combineLjubljana(dateStr: string, timeStr?: string): string | null {
-  if (!dateStr || !timeStr) return null;
-  const asUtc = new Date(`${dateStr}T${timeStr}:00Z`);
-  if (Number.isNaN(asUtc.getTime())) return null;
-  const offset = ljubljanaOffsetMinutes(asUtc);
-  return new Date(asUtc.getTime() - offset * 60000).toISOString();
-}
+import { combineLjubljana } from "@/lib/tzdate";
 
 const num = (v?: string): number | null =>
   v != null && v !== "" && !Number.isNaN(Number(v)) ? Number(v) : null;

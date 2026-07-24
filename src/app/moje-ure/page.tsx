@@ -10,10 +10,12 @@ import {
   weekStart,
   monthEnd,
   shiftMonth,
+  shiftDays,
   monthLabel,
   dayLabel,
   timeLabel,
 } from "@/lib/tzdate";
+import { SelfEntry } from "@/app/zigosanje/SelfEntryDialog";
 
 // Prikaz vrste odsotnosti po domače.
 const ABSENCE_LABELS: Record<string, string> = {
@@ -45,6 +47,7 @@ type Entry = {
   sunday_hours: number | null;
   holiday_hours: number | null;
   needs_review: boolean | null;
+  confirmed: boolean | null;
 };
 
 // Moje ure — osebni pregled za zaposlenega (vidi samo svoje vnose; RLS).
@@ -79,7 +82,7 @@ export default async function MojeUrePage({
     supabase
       .from("time_entries")
       .select(
-        "id, date, clock_in, clock_out, break_minutes, total_worked_hours, overtime_hours, night_hours, sunday_hours, holiday_hours, needs_review",
+        "id, date, clock_in, clock_out, break_minutes, total_worked_hours, overtime_hours, night_hours, sunday_hours, holiday_hours, needs_review, confirmed",
       )
       .eq("employee_id", employee.id)
       .gte("date", mStart)
@@ -102,6 +105,12 @@ export default async function MojeUrePage({
   ]);
 
   const entries = (monthEntries ?? []) as Entry[];
+
+  // Vnosi, ki jih zaposleni sme popraviti sam: nepotrjeni, pomanjkljivi
+  // (odprti ali označeni "za pregled") in največ 7 dni nazaj. Ostalo delodajalec.
+  const selfFixFrom = shiftDays(today, -6);
+  const canSelfFix = (e: Entry) =>
+    !e.confirmed && (e.clock_out == null || !!e.needs_review) && e.date >= selfFixFrom;
 
   // Seštevki za kartice (Danes / Ta teden / Ta mesec — vedno tekoči, ne izbrani mesec).
   const weekTotal = (weekRows ?? []).reduce((a, e) => a + (Number(e.total_worked_hours) || 0), 0);
@@ -215,8 +224,13 @@ export default async function MojeUrePage({
           )}
         </div>
 
+        {/* Pozabljeno žigosanje — zaposleni doda vnos, delodajalec ga potrdi */}
+        <div className="mt-3 flex justify-end">
+          <SelfEntry mode="create" variant="chip" label="Dodaj pozabljen vnos" />
+        </div>
+
         {/* Dnevni vnosi */}
-        <div className="mt-3">
+        <div className="mt-2">
           {entries.length === 0 ? (
             <div className="glass rounded-2xl p-6 text-center text-sm text-slate-400">
               V tem mesecu ni vnosov.
@@ -233,6 +247,20 @@ export default async function MojeUrePage({
                       </p>
                     </div>
                     <div className="flex shrink-0 items-center gap-2">
+                      {canSelfFix(e) && (
+                        <SelfEntry
+                          mode="fix"
+                          variant="chip"
+                          label="Popravi"
+                          fix={{
+                            id: e.id,
+                            date: e.date,
+                            clockInIso: e.clock_in,
+                            clockOutIso: e.clock_out,
+                            breakMinutes: Number(e.break_minutes) || 0,
+                          }}
+                        />
+                      )}
                       {e.needs_review && <Badge tone="amber">za pregled</Badge>}
                       {e.clock_out == null ? (
                         <Badge tone="brand">v teku</Badge>
@@ -317,7 +345,8 @@ export default async function MojeUrePage({
             </div>
             <p className="mt-3 flex items-start gap-1.5 px-1 text-xs leading-snug text-slate-400">
               <CalendarDays className="mt-0.5 h-3.5 w-3.5 shrink-0" />
-              Če kakšen vnos ne drži, se obrni na delodajalca, ki ga lahko popravi.
+              Pozabljeno žigosanje lahko do 7 dni nazaj vneseš ali popraviš sam — vnos se
+              označi »za pregled« in ga potrdi delodajalec. Ostale popravke uredi delodajalec.
             </p>
           </div>
         )}

@@ -3,7 +3,13 @@
 import { getProfile } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { getAccess } from "@/lib/billing";
-import { workerCategory, autostopHoursFor, autoCapNote } from "@/lib/workLimits";
+import {
+  workerCategory,
+  autostopHoursFor,
+  autoCapNote,
+  ABSOLUTE_CEILING_HOURS,
+} from "@/lib/workLimits";
+import { combineLjubljana, shiftDays } from "@/lib/tzdate";
 
 const TZ = "Europe/Ljubljana";
 
@@ -137,4 +143,169 @@ export async function clockOut(breakMinutes?: number): Promise<ActionResult> {
     .eq("id", open.id);
   if (error) return { error: "Napaka pri beleženju odhoda." };
   return { capped: overCap };
+}
+
+// =============================================================================
+// Ročni vnos zaposlenega (pozabljeno žigosanje) — "predlagaj, delodajalec potrdi".
+// Vsak ročni poseg zaposlenega se OBVEZNO označi "za pregled" (needs_review),
+// da delodajalec obdrži nadzor nad evidenco. Dovoljeno največ 7 dni nazaj.
+// =============================================================================
+
+const SELF_ENTRY_DAYS = 7;
+
+export type SelfEntryInput = {
+  date: string; // YYYY-MM-DD
+  clockInTime?: string; // HH:MM
+  clockOutTime?: string; // HH:MM
+  breakMinutes?: number;
+  note?: string;
+};
+
+// Opomba, ki delodajalcu pove, da je vnos ročno dodal/popravil zaposleni.
+function selfNote(note?: string): string {
+  const base = "Ročni vnos zaposlenega (pozabljeno žigosanje).";
+  const extra = note?.trim();
+  return extra ? `${base} Opomba: ${extra}` : base;
+}
+
+// Datum mora biti danes ali največ 7 dni nazaj (starejše popravke ureja delodajalec).
+function dateInSelfWindow(dateStr: string, today: string): boolean {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return false;
+  return dateStr <= today && dateStr >= shiftDays(today, -(SELF_ENTRY_DAYS - 1));
+}
+
+const clampBreak = (v?: number) =>
+  Number.isFinite(v) ? Math.min(480, Math.max(0, Math.round(v as number))) : 0;
+
+// Zaposleni doda manjkajoč vnos za pretekli dan (ali za danes, če je pozabil žigosati).
+export async function selfCreateEntry(input: SelfEntryInput): Promise<ActionResult> {
+  const { supabase, employee, hasAccess } = await getEmployee();
+  if (!hasAccess) return { error: "Naročnina podjetja je potekla." };
+  if (!employee) return { error: "Ni najdenega zaposlenega." };
+  if (!employee.active) return { error: "Vaš račun je deaktiviran. Obrnite se na delodajalca." };
+
+  const today = todayLjubljana();
+  if (!dateInSelfWindow(input.date, today)) {
+    return { error: `Sam lahko vneseš največ ${SELF_ENTRY_DAYS} dni nazaj. Za starejše se obrni na delodajalca.` };
+  }
+
+  const clockIn = combineLjubljana(input.date, input.clockInTime);
+  const clockOut = combineLjubljana(input.date, input.clockOutTime);
+  if (!clockIn || !clockOut) return { error: "Vpiši uro prihoda in odhoda." };
+
+  const start = new Date(clockIn);
+  const end = new Date(clockOut);
+  if (end.getTime() <= start.getTime()) {
+    return { error: "Odhod mora biti kasneje od prihoda." };
+  }
+  const hours = Math.round(((end.getTime() - start.getTime()) / 3_600_000) * 100) / 100;
+  if (hours > ABSOLUTE_CEILING_HOURS) {
+    return { error: `Vnos je daljši od ${ABSOLUTE_CEILING_HOURS} ur. Tako dolg dan vnese delodajalec.` };
+  }
+
+  // Prekrivanje z obstoječimi vnosi istega dne (dvojni vnos = neveljavna evidenca).
+  const { data: sameDay } = await supabase
+    .from("time_entries")
+    .select("id, clock_in, clock_out")
+    .eq("employee_id", employee.id)
+    .eq("date", input.date);
+  for (const e of sameDay ?? []) {
+    if (e.clock_out == null) {
+      return { error: "Za ta dan imaš odprt vnos. Žigosaj odhod ali popravi obstoječi vnos." };
+    }
+    const eIn = new Date(e.clock_in as string).getTime();
+    const eOut = new Date(e.clock_out as string).getTime();
+    if (start.getTime() < eOut && end.getTime() > eIn) {
+      return { error: "Vnos se prekriva z že zabeleženim vnosom za ta dan." };
+    }
+  }
+
+  const { error } = await supabase.from("time_entries").insert({
+    company_id: employee.company_id,
+    employee_id: employee.id,
+    date: input.date,
+    clock_in: clockIn,
+    clock_out: clockOut,
+    hours_count: hours,
+    total_worked_hours: hours,
+    sunday_hours: isSunday(start) ? hours : 0,
+    break_minutes: clampBreak(input.breakMinutes),
+    needs_review: true,
+    notes: selfNote(input.note),
+  });
+  if (error) return { error: "Napaka pri shranjevanju vnosa." };
+  return {};
+}
+
+// Zaposleni popravi svoj pomanjkljiv vnos: odprt vnos (pozabljen odhod) ali
+// samodejno zaprt vnos "za pregled". Potrjenih (zaključenih) vnosov ne more.
+export async function selfFixEntry(
+  entryId: string,
+  input: Omit<SelfEntryInput, "date">,
+): Promise<ActionResult> {
+  const { supabase, employee, hasAccess } = await getEmployee();
+  if (!hasAccess) return { error: "Naročnina podjetja je potekla." };
+  if (!employee) return { error: "Ni najdenega zaposlenega." };
+  if (!employee.active) return { error: "Vaš račun je deaktiviran. Obrnite se na delodajalca." };
+
+  const { data: entry } = await supabase
+    .from("time_entries")
+    .select("id, date, clock_in, clock_out, needs_review, confirmed, break_minutes")
+    .eq("id", entryId)
+    .eq("employee_id", employee.id)
+    .maybeSingle();
+  if (!entry) return { error: "Vnos ni najden." };
+
+  const today = todayLjubljana();
+  if (entry.confirmed) return { error: "Vnos je že potrjen. Popravke uredi delodajalec." };
+  if (entry.clock_out != null && !entry.needs_review) {
+    return { error: "Ta vnos je zaključen. Popravke uredi delodajalec." };
+  }
+  if (!dateInSelfWindow(entry.date as string, today)) {
+    return { error: `Sam lahko popraviš največ ${SELF_ENTRY_DAYS} dni nazaj. Za starejše se obrni na delodajalca.` };
+  }
+
+  const clockIn = input.clockInTime
+    ? combineLjubljana(entry.date as string, input.clockInTime)
+    : (entry.clock_in as string | null);
+  const clockOut = input.clockOutTime
+    ? combineLjubljana(entry.date as string, input.clockOutTime)
+    : (entry.clock_out as string | null);
+  if (!clockIn) return { error: "Vpiši uro prihoda." };
+
+  // Odhod lahko ostane prazen samo pri še odprtem današnjem vnosu (izmena v teku).
+  const stillOpen = clockOut == null;
+  if (stillOpen && entry.date !== today) {
+    return { error: "Vpiši uro odhoda." };
+  }
+
+  let hours: number | null = null;
+  const start = new Date(clockIn);
+  if (!stillOpen) {
+    const end = new Date(clockOut as string);
+    if (end.getTime() <= start.getTime()) {
+      return { error: "Odhod mora biti kasneje od prihoda." };
+    }
+    hours = Math.round(((end.getTime() - start.getTime()) / 3_600_000) * 100) / 100;
+    if (hours > ABSOLUTE_CEILING_HOURS) {
+      return { error: `Vnos je daljši od ${ABSOLUTE_CEILING_HOURS} ur. Tako dolg dan vnese delodajalec.` };
+    }
+  }
+
+  const { error } = await supabase
+    .from("time_entries")
+    .update({
+      clock_in: clockIn,
+      clock_out: clockOut,
+      hours_count: hours,
+      total_worked_hours: hours,
+      sunday_hours: !stillOpen && isSunday(start) ? hours : 0,
+      break_minutes:
+        input.breakMinutes != null ? clampBreak(input.breakMinutes) : (entry.break_minutes ?? 0),
+      needs_review: true,
+      notes: selfNote(input.note),
+    })
+    .eq("id", entry.id);
+  if (error) return { error: "Napaka pri shranjevanju popravka." };
+  return {};
 }

@@ -11,6 +11,7 @@ import { signOut } from "../(auth)/actions";
 import { workerCategory, reminderHoursFor } from "@/lib/workLimits";
 import { todayLjubljana, weekStart } from "@/lib/tzdate";
 import ClockWidget from "./ClockWidget";
+import { SelfEntry } from "./SelfEntryDialog";
 
 export default async function ZigosanjePage() {
   const profile = await getProfile();
@@ -151,6 +152,24 @@ export default async function ZigosanjePage() {
                 <ChevronRight className="h-4 w-4" />
               </span>
             </Link>
+
+            {/* Pozabljeno žigosanje — zaposleni predlaga, delodajalec potrdi */}
+            <div className="mt-5 flex flex-col items-center gap-2">
+              {isOpen && openSince && (
+                <SelfEntry
+                  mode="fix"
+                  label="Napačna ura prihoda? Popravi"
+                  fix={{
+                    id: todayEntries.find((e) => e.clock_out == null)!.id,
+                    date: todayLjubljana(),
+                    clockInIso: openSince,
+                    clockOutIso: null,
+                    breakMinutes: 0,
+                  }}
+                />
+              )}
+              <SelfEntry mode="create" label="Si pozabil žigosati? Vnesi ročno" />
+            </div>
           </>
         )}
       </div>
