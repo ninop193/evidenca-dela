@@ -150,11 +150,11 @@ body {
    tudi na cenejših Android telefonih (kjer so blur/box-shadow animacije drage). */
 @keyframes clockSpin { to { transform: rotate(360deg); } }
 @keyframes clockBreathe {
-  0%, 100% { transform: scale(1); opacity: 0.5; }
-  50% { transform: scale(1.06); opacity: 0.78; }
+  0%, 100% { transform: scale(1); opacity: 0.35; }
+  50% { transform: scale(1.04); opacity: 0.6; }
 }
-.clock-ring { animation: clockSpin 14s linear infinite; will-change: transform; }
-.clock-breathe { animation: clockBreathe 5s ease-in-out infinite; will-change: transform, opacity; }
+.clock-ring { animation: clockSpin 22s linear infinite; will-change: transform; }
+.clock-breathe { animation: clockBreathe 5.5s ease-in-out infinite; will-change: transform, opacity; }
 
 .reveal { opacity: 0; animation: fadeUp 0.8s cubic-bezier(0.16, 0.84, 0.44, 1) forwards; }
 .float-a { animation: floatA 16s ease-in-out infinite; }

@@ -56,12 +56,24 @@ export default function ClockWidget({
   const [clockOffset] = useState(() => serverNow - Date.now());
   const correctedNow = now + clockOffset;
 
+  // Optimističen preklop: ob uspešnem žigosanju TAKOJ obrnemo videz gumba
+  // (brez čakanja na strežnik → ni "štekanja"), nato router.refresh() uskladi
+  // resnično stanje. Ko strežnik vrne novo stanje, useEffect počisti preklop.
+  const [optimistic, setOptimistic] = useState<{ open: boolean; since: string | null } | null>(
+    null,
+  );
+  useEffect(() => {
+    setOptimistic(null);
+  }, [isOpen, openSince]);
+  const activeOpen = optimistic ? optimistic.open : isOpen;
+  const activeSince = optimistic ? optimistic.since : openSince;
+
   // Živi števec časa, ko je zaposleni na delu.
   useEffect(() => {
-    if (!isOpen) return;
+    if (!activeOpen) return;
     const t = setInterval(() => setNow(Date.now()), 1000);
     return () => clearInterval(t);
-  }, [isOpen]);
+  }, [activeOpen]);
 
   async function submit(action: "in" | "out") {
     if (loading) return;
@@ -78,12 +90,16 @@ export default function ClockWidget({
       setError(res.error);
       return;
     }
+    // Takojšen preklop videza; strežnik uskladi ob refresh.
+    setOptimistic(
+      action === "in" ? { open: true, since: new Date().toISOString() } : { open: false, since: null },
+    );
     router.refresh();
   }
 
   function handleClick() {
     if (loading) return;
-    if (isOpen) {
+    if (activeOpen) {
       // Odhod je "dokončen" (popravke ureja delodajalec) → najprej potrditev.
       setError(null);
       setBreakMin(0);
@@ -97,21 +113,21 @@ export default function ClockWidget({
 
   // Opomnik: če je odprta izmena presegla zakonsko dnevno mejo, spomni na odhod.
   const overLimit =
-    isOpen &&
-    openSince != null &&
-    correctedNow - new Date(openSince).getTime() >= reminderHours * 3_600_000;
+    activeOpen &&
+    activeSince != null &&
+    correctedNow - new Date(activeSince).getTime() >= reminderHours * 3_600_000;
 
   return (
     <div className="flex w-full flex-col items-center">
       {/* Status */}
       <div className="mb-8 text-center">
-        {isOpen ? (
+        {activeOpen ? (
           <span className="glass inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 text-sm font-medium text-slate-700">
             <span className="relative flex h-2 w-2">
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
               <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
             </span>
-            Na delu od {fmtTime(openSince)}
+            Na delu od {fmtTime(activeSince)}
           </span>
         ) : (
           <span className="glass inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 text-sm font-medium text-slate-500">
@@ -125,87 +141,101 @@ export default function ClockWidget({
       <button
         onClick={handleClick}
         disabled={loading}
-        aria-label={isOpen ? "Žigosaj odhod" : "Žigosaj prihod"}
-        className="group relative grid h-64 w-64 place-items-center rounded-full outline-none transition-transform duration-200 active:scale-[0.955] disabled:cursor-wait"
+        aria-label={activeOpen ? "Žigosaj odhod" : "Žigosaj prihod"}
+        className="group relative grid h-64 w-64 place-items-center rounded-full outline-none transition-transform duration-300 active:scale-[0.955] disabled:cursor-wait"
       >
-        {/* dihajoč barvni sij za gumbom (kompozitorska animacija — poceni) */}
+        {/* dihajoč barvni sij za gumbom — nežen, barva se gladko prelije */}
         <span
           className={
-            "clock-breathe absolute -inset-4 rounded-full blur-2xl transition-colors duration-500 " +
-            (isOpen ? "bg-rose-400/45" : "bg-brand-500/45")
+            "clock-breathe absolute -inset-3 rounded-full blur-2xl transition-colors duration-700 " +
+            (activeOpen ? "bg-rose-400/25" : "bg-brand-500/25")
           }
         />
 
-        {/* počasi vrteč iridescenten obroč (premium podpis) */}
+        {/* mehek iridescenten aura obroč (subtilen premium podpis) */}
         <span
           aria-hidden
-          className="clock-ring absolute -inset-[2px] rounded-full opacity-80"
+          className="clock-ring absolute -inset-px rounded-full opacity-40 blur-[1.5px]"
           style={{
             background:
-              "conic-gradient(from 0deg, transparent 10%, rgba(124,174,255,0.95) 32%, rgba(116,247,192,0.7) 50%, rgba(185,139,255,0.95) 66%, rgba(255,143,214,0.6) 80%, transparent 94%)",
+              "conic-gradient(from 0deg, transparent 14%, rgba(124,174,255,0.8) 34%, rgba(116,247,192,0.55) 50%, rgba(185,139,255,0.8) 66%, rgba(255,143,214,0.45) 80%, transparent 90%)",
             WebkitMask:
-              "radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 4px))",
-            mask: "radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 4px))",
+              "radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 3px))",
+            mask: "radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 3px))",
           }}
         />
 
         {/* frosted stekleni bezel z zunanjim dvigom (drop shadow v barvi stanja) */}
         <span
           className={
-            "glass-strong absolute inset-0 rounded-full transition-shadow duration-500 " +
-            (isOpen
-              ? "shadow-[0_22px_55px_-16px_rgba(244,63,94,0.55)]"
-              : "shadow-[0_22px_55px_-16px_rgba(47,99,255,0.55)]")
+            "glass-strong absolute inset-0 rounded-full transition-shadow duration-700 " +
+            (activeOpen
+              ? "shadow-[0_20px_50px_-18px_rgba(244,63,94,0.5)]"
+              : "shadow-[0_20px_50px_-18px_rgba(47,99,255,0.5)]")
           }
         />
 
-        {/* obarvana kupola — bogat radialni preliv z osvetljeno »ročko« zgoraj levo */}
+        {/* kupola — modra plast (osnova) */}
         <span
           aria-hidden
-          className="absolute inset-3 rounded-full transition-colors duration-500"
+          className="absolute inset-3 rounded-full"
           style={{
-            background: isOpen
-              ? "radial-gradient(120% 120% at 32% 24%, #ffa9c6 0%, #fb5c8b 34%, #e11d5f 70%, #b8134f 100%)"
-              : "radial-gradient(120% 120% at 32% 24%, #78a2ff 0%, #2f63ff 36%, #1d4ed8 72%, #1a3fae 100%)",
-            boxShadow:
-              "inset 0 3px 12px rgba(255,255,255,0.5), inset 0 -18px 38px rgba(10,20,60,0.28)",
+            background:
+              "radial-gradient(120% 120% at 32% 24%, #78a2ff 0%, #2f63ff 36%, #1d4ed8 72%, #1a3fae 100%)",
           }}
         />
-        {/* svetla specular pika (odsev vira svetlobe) */}
+        {/* kupola — roza plast (navzkrižni preliv → gladek preklop barve, brez skoka) */}
+        <span
+          aria-hidden
+          className="absolute inset-3 rounded-full transition-opacity duration-500 ease-out"
+          style={{
+            background:
+              "radial-gradient(120% 120% at 32% 24%, #ffa9c6 0%, #fb5c8b 34%, #e11d5f 70%, #b8134f 100%)",
+            opacity: activeOpen ? 1 : 0,
+          }}
+        />
+        {/* svetla specular pika + gloss + 3D kupola senca (konstantno, nad barvo) */}
         <span
           aria-hidden
           className="pointer-events-none absolute inset-3 rounded-full"
           style={{
             background:
-              "radial-gradient(56% 42% at 33% 23%, rgba(255,255,255,0.75), rgba(255,255,255,0) 62%)",
+              "radial-gradient(56% 42% at 33% 23%, rgba(255,255,255,0.72), rgba(255,255,255,0) 62%)",
           }}
         />
-        {/* mehak gloss čez zgornjo polovico + notranji hairline rob */}
-        <span className="pointer-events-none absolute inset-3 rounded-full bg-gradient-to-t from-transparent via-transparent to-white/35" />
-        <span className="pointer-events-none absolute inset-3 rounded-full ring-1 ring-inset ring-white/45" />
+        <span className="pointer-events-none absolute inset-3 rounded-full bg-gradient-to-t from-transparent via-transparent to-white/30" />
+        <span
+          aria-hidden
+          className="pointer-events-none absolute inset-3 rounded-full ring-1 ring-inset ring-white/40"
+          style={{
+            boxShadow:
+              "inset 0 3px 12px rgba(255,255,255,0.5), inset 0 -18px 38px rgba(10,20,60,0.28)",
+          }}
+        />
 
-        {/* vsebina — napis je fiksno na sredini; ikona lebdi nad njim, števec pod njim */}
+        {/* vsebina — uravnotežena skupina: ikona · napis · (števec).
+            Napis ostane fiksno na sredini, zato se ob preklopu nič ne premakne. */}
         <span className="absolute inset-0 grid place-items-center text-white [text-shadow:0_1px_10px_rgba(10,20,60,0.28)]">
           {/* ikona nad sredino */}
-          <span className="pointer-events-none absolute left-1/2 top-[26%] -translate-x-1/2 -translate-y-1/2 drop-shadow-[0_2px_6px_rgba(10,20,60,0.35)]">
+          <span className="pointer-events-none absolute left-1/2 top-[30%] -translate-x-1/2 -translate-y-1/2 drop-shadow-[0_2px_6px_rgba(10,20,60,0.35)]">
             {loading ? (
-              <Loader2 className="h-7 w-7 animate-spin" />
-            ) : isOpen ? (
-              <Square className="h-6 w-6 fill-white" strokeWidth={0} />
+              <Loader2 className="h-6 w-6 animate-spin" />
+            ) : activeOpen ? (
+              <Square className="h-5 w-5 fill-white" strokeWidth={0} />
             ) : (
-              <Play className="ml-0.5 h-7 w-7 fill-white" strokeWidth={0} />
+              <Play className="ml-0.5 h-6 w-6 fill-white" strokeWidth={0} />
             )}
           </span>
 
           {/* napis — geometrijsko središče */}
-          <span className="text-[2.1rem] font-bold leading-none tracking-tight">
-            {isOpen ? "Odhod" : "Prihod"}
+          <span className="text-[2rem] font-bold leading-none tracking-tight">
+            {activeOpen ? "Odhod" : "Prihod"}
           </span>
 
           {/* živ števec pod sredino — v prefinjeni frosted kapsuli */}
-          {isOpen && (
-            <span className="pointer-events-none absolute left-1/2 top-[72%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/15 px-3 py-1 font-mono text-[15px] tabular-nums text-white ring-1 ring-inset ring-white/25 backdrop-blur-sm [text-shadow:none]">
-              {elapsedStr(openSince, correctedNow)}
+          {activeOpen && (
+            <span className="pointer-events-none absolute left-1/2 top-[70%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/15 px-3 py-1 font-mono text-sm tabular-nums text-white ring-1 ring-inset ring-white/25 backdrop-blur-sm [text-shadow:none]">
+              {elapsedStr(activeSince, correctedNow)}
             </span>
           )}
         </span>
@@ -226,7 +256,7 @@ export default function ClockWidget({
             </div>
             <h3 className="mt-4 text-center text-lg font-bold text-slate-900">Žigosaš odhod?</h3>
             <p className="mt-1.5 text-center text-sm leading-relaxed text-slate-600">
-              Na delu si od {fmtTime(openSince)} ({elapsedStr(openSince, correctedNow)}).
+              Na delu si od {fmtTime(activeSince)} ({elapsedStr(activeSince, correctedNow)}).
               Odhoda kasneje ne moreš popraviti sam; popravke lahko uredi delodajalec.
             </p>
 
