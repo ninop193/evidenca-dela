@@ -121,39 +121,73 @@ export default function ClockWidget({
         )}
       </div>
 
-      {/* Apple-style liquid glass gumb */}
+      {/* Premium liquid-glass "dial" gumb */}
       <button
         onClick={handleClick}
         disabled={loading}
         aria-label={isOpen ? "Žigosaj odhod" : "Žigosaj prihod"}
-        className="group relative grid h-64 w-64 place-items-center rounded-full outline-none transition-transform duration-200 active:scale-[0.96] disabled:cursor-wait"
+        className="group relative grid h-64 w-64 place-items-center rounded-full outline-none transition-transform duration-200 active:scale-[0.955] disabled:cursor-wait"
       >
-        {/* žareče ozadje */}
+        {/* dihajoč barvni sij za gumbom (kompozitorska animacija — poceni) */}
         <span
           className={
-            "absolute inset-0 rounded-full blur-2xl transition-colors duration-500 " +
-            (isOpen ? "bg-rose-400/50" : "bg-brand-500/50")
+            "clock-breathe absolute -inset-4 rounded-full blur-2xl transition-colors duration-500 " +
+            (isOpen ? "bg-rose-400/45" : "bg-brand-500/45")
           }
         />
-        {/* frosted stekleni obroč */}
-        <span className="glass-strong iris-edge absolute inset-0 rounded-full" />
-        {/* obarvano jedro z gloss odsevom */}
+
+        {/* počasi vrteč iridescenten obroč (premium podpis) */}
+        <span
+          aria-hidden
+          className="clock-ring absolute -inset-[2px] rounded-full opacity-80"
+          style={{
+            background:
+              "conic-gradient(from 0deg, transparent 10%, rgba(124,174,255,0.95) 32%, rgba(116,247,192,0.7) 50%, rgba(185,139,255,0.95) 66%, rgba(255,143,214,0.6) 80%, transparent 94%)",
+            WebkitMask:
+              "radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 4px))",
+            mask: "radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 4px))",
+          }}
+        />
+
+        {/* frosted stekleni bezel z zunanjim dvigom (drop shadow v barvi stanja) */}
         <span
           className={
-            "absolute inset-5 rounded-full shadow-[inset_0_2px_10px_rgba(255,255,255,0.5),inset_0_-12px_30px_rgba(0,0,0,0.18)] transition-colors duration-500 " +
+            "glass-strong absolute inset-0 rounded-full transition-shadow duration-500 " +
             (isOpen
-              ? "bg-gradient-to-br from-rose-400 to-rose-600"
-              : "bg-gradient-to-br from-brand-400 to-brand-700")
+              ? "shadow-[0_22px_55px_-16px_rgba(244,63,94,0.55)]"
+              : "shadow-[0_22px_55px_-16px_rgba(47,99,255,0.55)]")
           }
         />
-        {/* specular sij na vrhu */}
-        <span className="absolute inset-5 rounded-full bg-gradient-to-t from-transparent via-transparent to-white/45" />
-        <span className="absolute inset-5 rounded-full ring-1 ring-white/40" />
+
+        {/* obarvana kupola — bogat radialni preliv z osvetljeno »ročko« zgoraj levo */}
+        <span
+          aria-hidden
+          className="absolute inset-3 rounded-full transition-colors duration-500"
+          style={{
+            background: isOpen
+              ? "radial-gradient(120% 120% at 32% 24%, #ffa9c6 0%, #fb5c8b 34%, #e11d5f 70%, #b8134f 100%)"
+              : "radial-gradient(120% 120% at 32% 24%, #78a2ff 0%, #2f63ff 36%, #1d4ed8 72%, #1a3fae 100%)",
+            boxShadow:
+              "inset 0 3px 12px rgba(255,255,255,0.5), inset 0 -18px 38px rgba(10,20,60,0.28)",
+          }}
+        />
+        {/* svetla specular pika (odsev vira svetlobe) */}
+        <span
+          aria-hidden
+          className="pointer-events-none absolute inset-3 rounded-full"
+          style={{
+            background:
+              "radial-gradient(56% 42% at 33% 23%, rgba(255,255,255,0.75), rgba(255,255,255,0) 62%)",
+          }}
+        />
+        {/* mehak gloss čez zgornjo polovico + notranji hairline rob */}
+        <span className="pointer-events-none absolute inset-3 rounded-full bg-gradient-to-t from-transparent via-transparent to-white/35" />
+        <span className="pointer-events-none absolute inset-3 rounded-full ring-1 ring-inset ring-white/45" />
 
         {/* vsebina — napis je fiksno na sredini; ikona lebdi nad njim, števec pod njim */}
-        <span className="absolute inset-0 grid place-items-center text-white">
+        <span className="absolute inset-0 grid place-items-center text-white [text-shadow:0_1px_10px_rgba(10,20,60,0.28)]">
           {/* ikona nad sredino */}
-          <span className="pointer-events-none absolute left-1/2 top-[27%] -translate-x-1/2 -translate-y-1/2">
+          <span className="pointer-events-none absolute left-1/2 top-[26%] -translate-x-1/2 -translate-y-1/2 drop-shadow-[0_2px_6px_rgba(10,20,60,0.35)]">
             {loading ? (
               <Loader2 className="h-7 w-7 animate-spin" />
             ) : isOpen ? (
@@ -164,13 +198,13 @@ export default function ClockWidget({
           </span>
 
           {/* napis — geometrijsko središče */}
-          <span className="text-[2rem] font-bold leading-none tracking-tight">
+          <span className="text-[2.1rem] font-bold leading-none tracking-tight">
             {isOpen ? "Odhod" : "Prihod"}
           </span>
 
-          {/* živ števec pod sredino */}
+          {/* živ števec pod sredino — v prefinjeni frosted kapsuli */}
           {isOpen && (
-            <span className="pointer-events-none absolute left-1/2 top-[73%] -translate-x-1/2 -translate-y-1/2 font-mono text-base tabular-nums text-white/90">
+            <span className="pointer-events-none absolute left-1/2 top-[72%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/15 px-3 py-1 font-mono text-[15px] tabular-nums text-white ring-1 ring-inset ring-white/25 backdrop-blur-sm [text-shadow:none]">
               {elapsedStr(openSince, correctedNow)}
             </span>
           )}

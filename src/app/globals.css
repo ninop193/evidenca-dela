@@ -145,6 +145,17 @@ body {
   50% { transform: translateY(-10px); }
 }
 
+/* Žigosni gumb — premium liquid-glass "dial".
+   Uporablja samo transform/opacity (kompozitorske) animacije, zato je gladek
+   tudi na cenejših Android telefonih (kjer so blur/box-shadow animacije drage). */
+@keyframes clockSpin { to { transform: rotate(360deg); } }
+@keyframes clockBreathe {
+  0%, 100% { transform: scale(1); opacity: 0.5; }
+  50% { transform: scale(1.06); opacity: 0.78; }
+}
+.clock-ring { animation: clockSpin 14s linear infinite; will-change: transform; }
+.clock-breathe { animation: clockBreathe 5s ease-in-out infinite; will-change: transform, opacity; }
+
 .reveal { opacity: 0; animation: fadeUp 0.8s cubic-bezier(0.16, 0.84, 0.44, 1) forwards; }
 .float-a { animation: floatA 16s ease-in-out infinite; }
 .float-b { animation: floatB 20s ease-in-out infinite; }
@@ -162,7 +173,8 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .reveal, .float-a, .float-b, .float-y, .glow-pulse, .hue-spin, .text-holo {
+  .reveal, .float-a, .float-b, .float-y, .glow-pulse, .hue-spin, .text-holo,
+  .clock-ring, .clock-breathe {
     animation: none !important;
     opacity: 1 !important;
   }
