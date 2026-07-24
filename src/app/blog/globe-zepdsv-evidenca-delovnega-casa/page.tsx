@@ -309,6 +309,17 @@ export default function Page() {
           </p>
           <TrialButton />
 
+          <p>
+            Ste računovodja in svetujete strankam o skladnosti z ZEPDSV? V okviru{" "}
+            <Link
+              href="/partnerji"
+              className="font-semibold text-brand-700 hover:text-brand-800"
+            >
+              partnerskega programa
+            </Link>{" "}
+            lahko Delovit priporočite svojim strankam in prejmete ponavljajočo se provizijo.
+          </p>
+
           <h2 className="!mt-12 text-2xl font-bold tracking-tight text-slate-900">
             Pogosta vprašanja
           </h2>
