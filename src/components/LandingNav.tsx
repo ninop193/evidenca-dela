@@ -9,6 +9,7 @@ const LINKS = [
   { href: "/#cena", label: "Cena" },
   { href: "/kalkulator", label: "Kalkulator" },
   { href: "/blog", label: "Blog" },
+  { href: "/partnerji", label: "Partnerji" },
 ];
 
 const linkClass =
