@@ -1,15 +1,12 @@
 "use client";
 
+import Link from "next/link";
 import { Mail, ArrowRight } from "lucide-react";
 
-const MAILTO =
-  "mailto:info@delovit.si" +
-  "?subject=" +
-  encodeURIComponent("Zanima me partnerski program Delovit") +
-  "&body=" +
-  encodeURIComponent(
-    "Pozdravljeni,\n\nzanima me partnerski program Delovit (50 % provizija).\n\nIme:\nČime se ukvarjam (računovodstvo, svetovanje, prodaja, drugo):\nTelefon:\nKako bi pripeljal/a stranke:\n\nLep pozdrav,",
-  );
+// Vodi na delujoč kontaktni obrazec (pošilja prek Resend), s predizpolnjeno
+// temo za partnerje. Prej mailto: link, ki na napravah brez nastavljenega
+// e-poštnega odjemalca (pogosto na namizju) ni naredil ničesar.
+const HREF = "/kontakt?tema=partnerji";
 
 export function PartnerMailButton({
   variant = "primary",
@@ -39,12 +36,12 @@ export function PartnerMailButton({
       : (size === "lg" ? " glow-pulse" : "") + " bg-brand-600 text-white hover:bg-brand-500";
 
   return (
-    <a href={MAILTO} onClick={track} className={base + sz + tone}>
+    <Link href={HREF} onClick={track} className={base + sz + tone}>
       <Mail className={size === "sm" ? "h-3.5 w-3.5" : "h-4 w-4"} />
       {children}
       {size === "lg" && (
         <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
       )}
-    </a>
+    </Link>
   );
 }

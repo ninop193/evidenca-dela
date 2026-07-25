@@ -17,6 +17,8 @@ export const metadata: Metadata = {
 const PREFILL: Record<string, string> = {
   "vec-zaposlenih":
     "Pozdravljeni, zanima me Delovit za več kot 10 zaposlenih. Prosim za ponudbo.",
+  partnerji:
+    "Pozdravljeni, zanima me partnerski program Delovit (50 % provizija).\n\nUkvarjam se z (računovodstvo, svetovanje, prodaja, drugo): \nKako bi pripeljal/a stranke: \nTelefon: ",
 };
 
 export default async function KontaktPage({
