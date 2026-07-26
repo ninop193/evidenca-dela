@@ -7,6 +7,7 @@ import {
   BellRing,
   CheckCircle2,
   ChevronRight,
+  Sun,
 } from "lucide-react";
 import { getProfile } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
@@ -35,6 +36,7 @@ export default async function DashboardPage() {
     { data: entries },
     { data: pendingData, count: pendingCount },
     { data: onDuty },
+    { count: leavePendingCount },
   ] = await Promise.all([
     supabase.from("employees").select("id", { count: "exact", head: true }),
     supabase
@@ -60,8 +62,14 @@ export default async function DashboardPage() {
       .is("clock_out", null)
       .eq("date", today)
       .order("clock_in", { ascending: true }),
+    // Prošnje za dopust, ki čakajo na odločitev.
+    supabase
+      .from("leave_requests")
+      .select("id", { count: "exact", head: true })
+      .eq("status", "pending"),
   ]);
 
+  const leavePending = leavePendingCount ?? 0;
   const monthHours = (entries ?? []).reduce((a, e) => a + (Number(e.total_worked_hours) || 0), 0);
   const pending = (pendingData ?? []) as unknown as PendingRow[];
   const pendingTotal = pendingCount ?? pending.length;
@@ -142,6 +150,22 @@ export default async function DashboardPage() {
             Vse urejeno — noben vnos ne čaka na tvojo potrditev.
           </p>
         </div>
+      )}
+
+      {/* Prošnje za dopust čakajo na odločitev */}
+      {leavePending > 0 && (
+        <Link
+          href="/dashboard/dopust"
+          className="mt-4 flex items-center gap-3 rounded-2xl bg-amber-50/80 px-5 py-3.5 ring-1 ring-amber-200/80 transition hover:bg-amber-100/70"
+        >
+          <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-amber-500 text-white">
+            <Sun className="h-4.5 w-4.5" />
+          </span>
+          <span className="flex-1 text-sm font-semibold text-amber-900">
+            {leavePending} {leavePending === 1 ? "prošnja za dopust čaka" : "prošenj za dopust čaka"} na tvojo odločitev
+          </span>
+          <ChevronRight className="h-4 w-4 text-amber-700" />
+        </Link>
       )}
 
       {/* ── Številke ──────────────────────────────────────────────────── */}

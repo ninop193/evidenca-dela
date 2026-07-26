@@ -304,3 +304,56 @@ export function openEntriesAlertEmail(opts: {
     }),
   };
 }
+
+// Slovenski zapis datuma iz YYYY-MM-DD (npr. "12. 8. 2026").
+function sloDate(iso: string): string {
+  const [y, m, d] = iso.split("-");
+  return `${Number(d)}. ${Number(m)}. ${y}`;
+}
+
+// Odločitev delodajalca o prošnji za dopust → obvestilo ZAPOSLENEMU.
+export function leaveDecisionEmployeeEmail(opts: {
+  fullName?: string | null;
+  approved: boolean;
+  dateFrom: string;
+  dateTo: string;
+  days: string; // že formatirano št. dni
+  decisionNote?: string | null;
+  remainingDays?: string | null;
+}): RenderedEmail {
+  const esc = (s: string) =>
+    s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  const range =
+    opts.dateFrom === opts.dateTo
+      ? sloDate(opts.dateFrom)
+      : `${sloDate(opts.dateFrom)} – ${sloDate(opts.dateTo)}`;
+  const rows: Array<[string, string]> = [
+    ["Obdobje", range],
+    ["Število dni", `${opts.days}`],
+  ];
+  if (opts.approved && opts.remainingDays != null) {
+    rows.push(["Preostali dopust", `${opts.remainingDays} dni`]);
+  }
+  return {
+    subject: opts.approved ? "Vaš dopust je potrjen ✅" : "Vaša prošnja za dopust je zavrnjena",
+    html: renderEmail({
+      preview: opts.approved
+        ? "Delodajalec je potrdil vaš dopust."
+        : "Delodajalec je zavrnil vašo prošnjo za dopust.",
+      heading: opts.approved ? "Dopust potrjen ✅" : "Dopust zavrnjen",
+      intro: opts.approved
+        ? `${hi(opts.fullName)} Vaš delodajalec je <strong>potrdil</strong> vašo prošnjo za dopust.`
+        : `${hi(opts.fullName)} Vaš delodajalec je <strong>zavrnil</strong> vašo prošnjo za dopust.`,
+      bodyHtml:
+        infoBox(rows) +
+        (opts.decisionNote
+          ? p(`<strong>Opomba delodajalca:</strong><br>${esc(opts.decisionNote).replace(/\n/g, "<br>")}`)
+          : "") +
+        (opts.approved
+          ? p("Dopust je zabeležen v evidenci. Podrobnosti vidite v aplikaciji pod »Moj dopust«.")
+          : p("Za več informacij se obrnite na delodajalca. Novo prošnjo lahko oddate v aplikaciji.")),
+      button: { label: "Odpri Moj dopust", href: `${EMAIL_BASE}/moj-dopust` },
+      footnote: "To obvestilo ste prejeli, ker uporabljate Delovit za evidenco delovnega časa.",
+    }),
+  };
+}

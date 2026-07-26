@@ -18,6 +18,7 @@ type Employee = {
   birth_date: string | null;
   is_management: boolean | null;
   worker_type: string | null;
+  annual_leave_days: number | null;
   email?: string | null;
 };
 
@@ -43,6 +44,7 @@ export function EditEmployeeForm({ employee }: { employee: Employee }) {
       birthDate: String(form.get("birthDate") ?? ""),
       isManagement: form.get("isManagement") === "on",
       workerType: String(form.get("workerType") ?? "zaposlen"),
+      annualLeaveDays: String(form.get("annualLeaveDays") ?? ""),
     });
 
     if (res.error) {
@@ -124,6 +126,19 @@ export function EditEmployeeForm({ employee }: { employee: Employee }) {
                 hint="Za mladoletne dijake (<18): dnevna meja 8 ur (146. in 193. člen ZDR-1). Pusti prazno za polnoletne."
               >
                 <SloDateInput name="birthDate" defaultValue={employee.birth_date ?? ""} />
+              </Field>
+              <Field
+                label="Letni dopust (dni)"
+                hint="Kvota letnega dopusta. Samo za redno zaposlene (za študente se ne upošteva). Zakonski minimum je 20 dni."
+              >
+                <Input
+                  name="annualLeaveDays"
+                  type="number"
+                  min="0"
+                  step="0.5"
+                  defaultValue={employee.annual_leave_days ?? ""}
+                  placeholder="25"
+                />
               </Field>
               <label className="flex items-center gap-2 text-sm text-slate-700">
                 <input

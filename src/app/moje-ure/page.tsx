@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { ArrowLeft, ChevronLeft, ChevronRight, CalendarDays } from "lucide-react";
+import { ArrowLeft, ChevronLeft, ChevronRight, CalendarDays, Sun } from "lucide-react";
 import { getProfile } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { Aurora } from "@/components/Aurora";
@@ -62,11 +62,12 @@ export default async function MojeUrePage({
   const supabase = await createClient();
   const { data: employee } = await supabase
     .from("employees")
-    .select("id")
+    .select("id, worker_type")
     .eq("user_id", profile.id)
     .maybeSingle();
   // Brez zapisa zaposlenega (npr. čisti admin) ta stran nima vsebine.
   if (!employee) redirect("/dashboard");
+  const showLeave = employee.worker_type === "zaposlen";
 
   const today = todayLjubljana();
   const currentMonth = today.slice(0, 7);
@@ -200,6 +201,24 @@ export default async function MojeUrePage({
             </div>
           ))}
         </div>
+
+        {/* Vstop v pregled dopusta (samo redno zaposleni) */}
+        {showLeave && (
+          <Link
+            href="/moj-dopust"
+            className="glass-strong iris-edge mt-3 flex items-center justify-between rounded-2xl px-5 py-4 transition active:scale-[0.99]"
+          >
+            <span className="flex items-center gap-2.5">
+              <span className="grid h-9 w-9 place-items-center rounded-xl bg-amber-100 text-amber-600">
+                <Sun className="h-4.5 w-4.5" />
+              </span>
+              <span className="text-sm font-semibold text-slate-900">Moj dopust</span>
+            </span>
+            <span className="flex items-center gap-1 text-sm font-semibold text-brand-600">
+              Odpri <ChevronRight className="h-4 w-4" />
+            </span>
+          </Link>
+        )}
 
         {/* Preklop meseca */}
         <div className="mt-6 flex items-center justify-between">

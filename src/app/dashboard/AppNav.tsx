@@ -14,14 +14,17 @@ const ITEMS = [
   { href: "/dashboard/ure", label: "Ure" },
   { href: "/dashboard/pregled", label: "Mesečni pregled" },
   { href: "/dashboard/odsotnosti", label: "Odsotnosti" },
+  { href: "/dashboard/dopust", label: "Dopust" },
 ];
 
 export default function AppNav({
   companyName,
   pendingCount = 0,
+  leavePendingCount = 0,
 }: {
   companyName: string;
   pendingCount?: number;
+  leavePendingCount?: number;
 }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
@@ -29,13 +32,17 @@ export default function AppNav({
   const isActive = (href: string, exact?: boolean) =>
     exact ? pathname === href : pathname === href || pathname.startsWith(href + "/") || pathname === href;
 
-  // Oranžna značka pri "Ure": število vnosov, ki čakajo na potrditev.
-  const pendingBadge = (href: string) =>
-    href === "/dashboard/ure" && pendingCount > 0 ? (
+  // Oranžna značka pri "Ure" (vnosi za pregled) in "Dopust" (prošnje).
+  const badgeCount = (href: string) =>
+    href === "/dashboard/ure" ? pendingCount : href === "/dashboard/dopust" ? leavePendingCount : 0;
+  const pendingBadge = (href: string) => {
+    const n = badgeCount(href);
+    return n > 0 ? (
       <span className="grid h-[18px] min-w-[18px] place-items-center rounded-full bg-amber-500 px-1 text-[11px] font-bold leading-none text-white">
-        {pendingCount > 99 ? "99+" : pendingCount}
+        {n > 99 ? "99+" : n}
       </span>
     ) : null;
+  };
 
   return (
     <header className="sticky top-0 z-30 px-3 pt-3">
@@ -93,7 +100,7 @@ export default function AppNav({
               <path d="M4 6h16M4 12h16M4 18h16" strokeLinecap="round" />
             </svg>
             {/* Oranžna pika: v meniju te nekaj čaka */}
-            {pendingCount > 0 && (
+            {(pendingCount > 0 || leavePendingCount > 0) && (
               <span className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full bg-amber-500 ring-2 ring-white" />
             )}
           </button>

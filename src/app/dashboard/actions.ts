@@ -113,7 +113,15 @@ export type CreateEmployeeInput = {
   birthDate?: string;
   isManagement?: boolean;
   workerType?: string;
+  annualLeaveDays?: string;
 };
+
+// Letna kvota dopusta (dni) — le za redno zaposlene; za študente shranimo null.
+function leaveDaysFor(workerType: string | undefined, raw: string | undefined): number | null {
+  if (workerType === "student") return null;
+  const n = Number(raw);
+  return raw != null && raw !== "" && Number.isFinite(n) && n >= 0 ? n : null;
+}
 
 export type CreateEmployeeResult = { error?: string; email?: string; inviteSent?: boolean };
 
@@ -186,6 +194,7 @@ export async function createEmployee(
     birth_date: input.birthDate || null,
     is_management: !!input.isManagement,
     worker_type: input.workerType === "student" ? "student" : "zaposlen",
+    annual_leave_days: leaveDaysFor(input.workerType, input.annualLeaveDays),
   });
   if (empErr) {
     await admin.from("users").delete().eq("id", userId);
@@ -245,6 +254,7 @@ export type UpdateEmployeeInput = {
   birthDate?: string;
   isManagement?: boolean;
   workerType?: string;
+  annualLeaveDays?: string;
 };
 
 // Uredi podatke obstoječega zaposlenega (vključno z oznako "poslovodna oseba").
@@ -269,6 +279,7 @@ export async function updateEmployee(input: UpdateEmployeeInput): Promise<Action
       birth_date: input.birthDate || null,
       is_management: !!input.isManagement,
       worker_type: input.workerType === "student" ? "student" : "zaposlen",
+      annual_leave_days: leaveDaysFor(input.workerType, input.annualLeaveDays),
     })
     .eq("id", input.id);
   if (error) return { error: "Shranjevanje ni uspelo." };

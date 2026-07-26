@@ -30,6 +30,7 @@ export default function NewEmployeePage() {
       birthDate: String(form.get("birthDate") ?? ""),
       isManagement: form.get("isManagement") === "on",
       workerType: String(form.get("workerType") ?? "zaposlen"),
+      annualLeaveDays: String(form.get("annualLeaveDays") ?? ""),
     });
 
     if (res.error) {
@@ -125,6 +126,12 @@ export default function NewEmployeePage() {
                 hint="Za mladoletne dijake (<18): dnevna meja 8 ur (146. in 193. člen ZDR-1). Pusti prazno za polnoletne."
               >
                 <SloDateInput name="birthDate" />
+              </Field>
+              <Field
+                label="Letni dopust (dni)"
+                hint="Kvota letnega dopusta. Samo za redno zaposlene (za študente se ne upošteva). Zakonski minimum je 20 dni."
+              >
+                <Input name="annualLeaveDays" type="number" min="0" step="0.5" placeholder="25" />
               </Field>
               <label className="flex items-center gap-2 text-sm text-slate-700">
                 <input type="checkbox" name="isManagement" className="h-4 w-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500" />

@@ -32,11 +32,14 @@ export function SloDateInput({
   defaultValue = "",
   required = false,
   className,
+  onChange,
 }: {
   name: string;
   defaultValue?: string;
   required?: boolean;
   className?: string;
+  // Neobvezno: obvesti starša o novi ISO vrednosti (za žive izračune).
+  onChange?: (iso: string) => void;
 }) {
   const [iso, setIso] = useState(defaultValue || "");
   const [text, setText] = useState(isoToSlo(defaultValue));
@@ -53,12 +56,14 @@ export function SloDateInput({
     setText(t);
     setIso(newIso);
     applyValidity(t, newIso);
+    onChange?.(newIso);
   }
   function onPick(e: React.ChangeEvent<HTMLInputElement>) {
     const v = e.target.value; // ISO iz nativnega izbirnika
     setIso(v);
     setText(isoToSlo(v));
     textRef.current?.setCustomValidity("");
+    onChange?.(v);
   }
 
   return (
