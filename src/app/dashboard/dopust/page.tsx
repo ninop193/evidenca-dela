@@ -98,11 +98,14 @@ export default async function DopustPage() {
           </div>
           <ul className="divide-y divide-amber-200/60 border-t border-amber-200/60 bg-white/60">
             {pending.map((p) => (
-              <li key={p.id} className="flex flex-wrap items-center gap-x-4 gap-y-3 px-5 py-4">
+              <li
+                key={p.id}
+                className="flex flex-col items-start gap-3 px-5 py-4 sm:flex-row sm:items-center sm:gap-4"
+              >
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-semibold text-slate-900">
                     {p.employees?.full_name ?? "—"}
-                    <span className="ml-2 font-normal text-slate-500">
+                    <span className="ml-2 whitespace-nowrap font-normal text-slate-500">
                       {fmtRange(p.date_from, p.date_to)}
                     </span>
                   </p>

@@ -84,6 +84,9 @@ export default async function MojDopustPage() {
   const entitlement = employee.annual_leave_days == null ? null : Number(employee.annual_leave_days);
   const remaining = entitlement == null ? null : entitlement - usedDays;
   const usedPct = entitlement && entitlement > 0 ? Math.min(100, (usedDays / entitlement) * 100) : 0;
+  // "V obravnavi" prikažemo kot svetlejši segment za porabljenim (do 100 %).
+  const pendingPct =
+    entitlement && entitlement > 0 ? Math.min(100 - usedPct, (pendingDays / entitlement) * 100) : 0;
 
   return (
     <main className="relative min-h-screen text-slate-800">
@@ -144,16 +147,25 @@ export default async function MojDopustPage() {
                       od {fmtDays(entitlement)} dni ostane
                     </span>
                   </p>
-                  <div className="mt-3 h-2.5 w-full overflow-hidden rounded-full bg-slate-200/70">
+                  <div className="mt-3 flex h-2.5 w-full overflow-hidden rounded-full bg-slate-200/70">
                     <div
-                      className="h-full rounded-full bg-gradient-to-r from-brand-400 to-brand-600"
+                      className="h-full bg-gradient-to-r from-brand-400 to-brand-600"
                       style={{ width: `${usedPct}%` }}
                     />
+                    {pendingPct > 0 && (
+                      <div className="h-full bg-amber-300" style={{ width: `${pendingPct}%` }} />
+                    )}
                   </div>
                   <div className="mt-2.5 flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500">
-                    <span>Porabljeno: <strong className="text-slate-700">{fmtDays(usedDays)}</strong></span>
+                    <span className="inline-flex items-center gap-1.5">
+                      <span className="h-2 w-2 rounded-full bg-brand-500" />
+                      Porabljeno: <strong className="text-slate-700">{fmtDays(usedDays)}</strong>
+                    </span>
                     {pendingDays > 0 && (
-                      <span>V obravnavi: <strong className="text-amber-600">{fmtDays(pendingDays)}</strong></span>
+                      <span className="inline-flex items-center gap-1.5">
+                        <span className="h-2 w-2 rounded-full bg-amber-300" />
+                        V obravnavi: <strong className="text-amber-600">{fmtDays(pendingDays)}</strong>
+                      </span>
                     )}
                   </div>
                 </>
