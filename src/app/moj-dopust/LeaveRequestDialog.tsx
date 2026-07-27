@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import { CalendarPlus, Loader2, Sun } from "lucide-react";
 import { SloDateInput } from "@/components/SloDateInput";
@@ -12,8 +13,11 @@ import { submitLeaveRequest } from "./actions";
 // (izločeni vikendi in prazniki), po želji doda opombo delodajalcu.
 export function LeaveRequestDialog({ remaining }: { remaining: number | null }) {
   const router = useRouter();
+  const [mounted, setMounted] = useState(false);
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  // Portal je na voljo šele po montaži (odjemalec) — prepreči SSR/hydration težave.
+  useEffect(() => setMounted(true), []);
   const [error, setError] = useState<string | null>(null);
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
@@ -55,7 +59,7 @@ export function LeaveRequestDialog({ remaining }: { remaining: number | null }) 
         Napovej dopust
       </button>
 
-      {open && (
+      {open && mounted && createPortal(
         <div
           className="fixed inset-0 z-50 grid place-items-center bg-slate-900/40 p-4"
           onClick={() => !loading && setOpen(false)}
@@ -145,7 +149,8 @@ export function LeaveRequestDialog({ remaining }: { remaining: number | null }) 
               </button>
             </div>
           </form>
-        </div>
+        </div>,
+        document.body,
       )}
     </>
   );
