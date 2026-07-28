@@ -161,9 +161,9 @@ export default function EvidencaLandingPage() {
         </Reveal>
         <Reveal delay={80}>
           <h1 className="mt-6 text-[2.3rem] font-extrabold leading-[1.08] tracking-tight text-slate-900 sm:text-5xl">
-            Aplikacija za evidenco delovnega časa.
+            Orodje za evidenco delovnega časa.
             <br />
-            <span className="text-holo">Enostavna kot en gumb.</span>
+            <span className="text-holo">Brez terminalov in papirja.</span>
           </h1>
         </Reveal>
         <Reveal delay={160}>
@@ -219,8 +219,8 @@ export default function EvidencaLandingPage() {
             },
             {
               icon: <BellRing className="h-5 w-5" />,
-              title: "Opomniki, preden inšpektor",
-              text: "Pozabljen odhod? Aplikacija opomni zaposlenega, obvesti vas in vnos označi za pregled. Nič se ne izgubi.",
+              title: "Opomni, preden opazi inšpektor",
+              text: "Pozabljen odhod? Delovit opomni zaposlenega, obvesti vas in vnos označi za pregled. Nič se ne izgubi.",
             },
             {
               icon: <FileSpreadsheet className="h-5 w-5" />,
