@@ -52,8 +52,9 @@ type CompanyRow = {
   trial_ends_at: string | null;
   current_period_end: string | null;
   stripe_customer_id: string | null;
-  users: { full_name: string | null; email: string | null; role: string }[] | null;
+  users: { id: string; full_name: string | null; email: string | null; role: string }[] | null;
   employees: { count: number }[] | null;
+  time_entries: { created_at: string }[] | null;
 };
 
 export default async function NadzorPage() {
@@ -71,10 +72,21 @@ export default async function NadzorPage() {
   const { data } = await admin
     .from("companies")
     .select(
-      "id, name, tax_id, subscription_status, created_at, trial_ends_at, current_period_end, stripe_customer_id, users(full_name, email, role), employees(count)",
+      "id, name, tax_id, subscription_status, created_at, trial_ends_at, current_period_end, stripe_customer_id, users(id, full_name, email, role), employees(count), time_entries(created_at)",
     )
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false })
+    .order("created_at", { referencedTable: "time_entries", ascending: false })
+    .limit(1, { referencedTable: "time_entries" });
   const companies = (data ?? []) as unknown as CompanyRow[];
+
+  // Zadnja prijava adminov (auth.users.last_sign_in_at) — en zajem, mapiran po id.
+  const lastLogin = new Map<string, string | null>();
+  for (let page = 1; ; page++) {
+    const { data: au, error } = await admin.auth.admin.listUsers({ page, perPage: 200 });
+    if (error) break;
+    for (const u of au.users) lastLogin.set(u.id, u.last_sign_in_at ?? null);
+    if (au.users.length < 200) break;
+  }
 
   const rows = companies.map((c) => {
     const adm = (c.users ?? []).find((u) => u.role === "admin") ?? (c.users ?? [])[0] ?? null;
@@ -90,6 +102,20 @@ export default async function NadzorPage() {
     }
     const until =
       c.subscription_status === "trialing" ? c.trial_ends_at : c.current_period_end;
+
+    // Zadnja aktivnost = najkasnejše od (zadnja prijava admina, zadnji vnos ur).
+    const lastEntry = c.time_entries?.[0]?.created_at ?? null;
+    const adminLogin = adm ? lastLogin.get(adm.id) ?? null : null;
+    const hasEntries = (c.time_entries ?? []).length > 0;
+    const activityIso =
+      [lastEntry, adminLogin].filter(Boolean).sort().slice(-1)[0] ?? null; // ISO nizi so leksikografsko urejeni
+    const activityDays = activityIso
+      ? Math.floor((Date.now() - Date.parse(activityIso)) / 86400000)
+      : null;
+    const activityLabel = activityIso ? relLabel(activityIso) || fmtDate(activityIso) : "—";
+    const activityTone: "green" | "slate" | "muted" =
+      activityDays == null ? "muted" : activityDays <= 7 ? "green" : activityDays <= 30 ? "slate" : "muted";
+
     return {
       id: c.id,
       name: c.name,
@@ -104,6 +130,9 @@ export default async function NadzorPage() {
       created: c.created_at,
       rel: relLabel(c.created_at),
       isToday: relLabel(c.created_at) === "danes",
+      activityLabel,
+      activityTone,
+      hasEntries,
     };
   });
 
@@ -121,6 +150,7 @@ export default async function NadzorPage() {
     status: r.statusLabel + (r.statusSub ? ` (${r.statusSub})` : ""),
     until: fmtDate(r.until),
     registered: fmtDate(r.created),
+    activity: r.activityLabel + (r.hasEntries ? "" : " (brez vnosov)"),
   }));
 
   return (
@@ -179,6 +209,7 @@ export default async function NadzorPage() {
                       <Th>Status</Th>
                       <Th>Naročnina do</Th>
                       <Th>Registrirano</Th>
+                      <Th>Zadnja aktivnost</Th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-50">
@@ -202,6 +233,23 @@ export default async function NadzorPage() {
                           <span className="text-slate-700">{fmtDate(r.created)}</span>
                           {r.rel && <span className="ml-1.5 text-xs text-slate-400">· {r.rel}</span>}
                         </td>
+                        <td className="px-4 py-3.5">
+                          <span
+                            className={
+                              "font-medium " +
+                              (r.activityTone === "green"
+                                ? "text-emerald-600"
+                                : r.activityTone === "slate"
+                                  ? "text-slate-600"
+                                  : "text-slate-400")
+                            }
+                          >
+                            {r.activityLabel}
+                          </span>
+                          {!r.hasEntries && (
+                            <p className="mt-0.5 text-xs font-medium text-amber-600">brez vnosov</p>
+                          )}
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -224,6 +272,17 @@ export default async function NadzorPage() {
                       <span>{r.empCount} zaposlenih</span>
                       {r.statusSub && <span>{r.statusSub}</span>}
                       <span>Registriran {fmtDate(r.created)}{r.rel ? ` · ${r.rel}` : ""}</span>
+                      <span
+                        className={
+                          r.activityTone === "green"
+                            ? "font-semibold text-emerald-600"
+                            : !r.hasEntries
+                              ? "font-semibold text-amber-600"
+                              : "text-slate-500"
+                        }
+                      >
+                        Aktivnost: {r.activityLabel}{!r.hasEntries ? " · brez vnosov" : ""}
+                      </span>
                     </div>
                   </li>
                 ))}

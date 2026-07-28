@@ -11,6 +11,7 @@ export type CsvRow = {
   status: string;
   until: string;
   registered: string;
+  activity: string;
 };
 
 // Prenos preglednice registracij kot CSV (odpre se v Excelu/Google Sheets).
@@ -25,6 +26,7 @@ export function ExportCsvButton({ rows }: { rows: CsvRow[] }) {
       "Status",
       "Naročnina/preizkus do",
       "Registrirano",
+      "Zadnja aktivnost",
     ];
     const esc = (v: string | number) => {
       const s = String(v ?? "");
@@ -33,7 +35,7 @@ export function ExportCsvButton({ rows }: { rows: CsvRow[] }) {
     const lines = [
       header.join(";"),
       ...rows.map((r) =>
-        [r.company, r.taxId, r.admin, r.email, r.employees, r.status, r.until, r.registered]
+        [r.company, r.taxId, r.admin, r.email, r.employees, r.status, r.until, r.registered, r.activity]
           .map(esc)
           .join(";"),
       ),
