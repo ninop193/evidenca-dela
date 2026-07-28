@@ -10,6 +10,8 @@ import {
   Clock,
   PenLine,
   Lock,
+  Sun,
+  BellRing,
 } from "lucide-react";
 import { Aurora } from "@/components/Aurora";
 import { Reveal } from "@/components/Reveal";
@@ -44,6 +46,10 @@ const FAQ: FaqItem[] = [
     a: "Delodajalec lahko kadarkoli ročno vnese ali popravi ure za nazaj. Pozabljen odhod sistem samodejno označi za pregled, da evidenca ostane urejena.",
   },
   {
+    q: "Ali lahko vodim dopust zaposlenih?",
+    a: "Da. Nastaviš letno kvoto dopusta, zaposleni pa dopust napove kar z mobitela — ti ga potrdiš ali zavrneš. Vsak vidi, koliko dni mu je ostalo, potrjen dopust pa se samodejno zabeleži v evidenco odsotnosti.",
+  },
+  {
     q: "Kje so shranjeni podatki?",
     a: "V EU (Frankfurt), skladno z GDPR. Vsako podjetje vidi izključno svoje podatke. Med podjetji velja stroga izolacija od prve sekunde.",
   },
@@ -66,6 +72,14 @@ export default function Home() {
         applicationCategory: "BusinessApplication",
         operatingSystem: "Web, iOS, Android",
         description: SITE.description,
+        featureList: [
+          "Žigosanje prihoda in odhoda z mobitelom",
+          "Evidenca dopusta in odsotnosti",
+          "Napoved in potrjevanje dopusta",
+          "Nadure, nočno, nedeljsko in praznično delo",
+          "Izvoz evidence v PDF in Excel za inšpekcijo",
+          "Opomniki pri pozabljenem žigosanju",
+        ],
         inLanguage: "sl",
         offers: {
           "@type": "Offer",
@@ -155,10 +169,13 @@ export default function Home() {
 
       {/* FEATURES */}
       <section className="mx-auto max-w-6xl px-5 py-12">
-        <div className="grid gap-5 sm:grid-cols-3">
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {[
             { icon: <Smartphone className="h-5 w-5" />, title: "Žigosanje z enim tapom", text: "Velik gumb na telefonu za prihod, odhod in odmor. Brez izobraževanja in brez navodil." },
+            { icon: <Sun className="h-5 w-5" />, title: "Dopust in odsotnosti", text: "Zaposleni napove dopust kar z mobitela, ti ga potrdiš. Vsak vidi, koliko dni mu ostane. Dopust, bolniška in druge odsotnosti na enem mestu." },
+            { icon: <Clock className="h-5 w-5" />, title: "Zaposleni vidi svoje ure", text: "Vsak zaposleni na telefonu spremlja svoje ure, nadure in dopust. Manj vprašanj zate." },
             { icon: <FileSpreadsheet className="h-5 w-5" />, title: "Pripravljeno za inšpekcijo", text: "Vsa zakonska polja po ZEPDSV. Mesečno evidenco izvoziš v PDF ali Excel z enim klikom." },
+            { icon: <BellRing className="h-5 w-5" />, title: "Opomni pred napako", text: "Pozabljen odhod ali ura, ki čaka na potrditev? Delovit te opozori, preden to opazi inšpektor." },
             { icon: <Wallet className="h-5 w-5" />, title: "Fiksna cena", text: "En znesek na podjetje, ne na zaposlenega. S.p. z dvema ali pet ljudi plača enako." },
           ].map((f, i) => (
             <Reveal key={f.title} delay={i * 100}>

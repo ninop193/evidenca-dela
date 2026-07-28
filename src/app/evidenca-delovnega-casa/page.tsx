@@ -33,6 +33,7 @@ export const metadata: Metadata = {
     "evidenca delovnega časa aplikacija",
     "evidenca delovnega časa program",
     "orodje za evidenco delovnega časa",
+    "evidenca dopusta",
   ],
   alternates: { canonical: "/evidenca-delovnega-casa" },
   openGraph: {
@@ -78,6 +79,10 @@ const FAQ: FaqItem[] = [
     a: "Aplikacija ga na to sama opomni po e-pošti, delodajalec pa dobi obvestilo in vnos, označen za pregled — ure nikoli ne izginejo in se nikoli ne popravijo na skrivaj.",
   },
   {
+    q: "Ali Delovit vodi tudi evidenco dopusta?",
+    a: "Da. Delodajalec nastavi letno kvoto dopusta, zaposleni pa dopust napove kar s telefonom — delodajalec ga potrdi ali zavrne. Vsak vidi, koliko dni dopusta mu je ostalo, potrjen dopust pa se samodejno zabeleži med odsotnosti. Za študente in dijake dopust ni prikazan.",
+  },
+  {
     q: "Kako hitro lahko začnemo?",
     a: "V manj kot 5 minutah. Registrirate podjetje, dodate zaposlene (vsak dobi povabilo po e-pošti), oni pa žigosajo prihod in odhod kar s telefonom. Brez uvajanja in brez navodil.",
   },
@@ -95,7 +100,7 @@ export default function EvidencaLandingPage() {
         applicationCategory: "BusinessApplication",
         operatingSystem: "Web",
         description:
-          "Aplikacija za evidenco delovnega časa po ZEPDSV za mikro podjetja in s.p. Žigosanje s telefonom, izvoz PDF/Excel, opomniki.",
+          "Aplikacija za evidenco delovnega časa po ZEPDSV za mikro podjetja in s.p. Žigosanje s telefonom, evidenca dopusta in odsotnosti, izvoz PDF/Excel, opomniki.",
         url: `${SITE.url}/evidenca-delovnega-casa`,
         offers: {
           "@type": "Offer",
@@ -209,8 +214,8 @@ export default function EvidencaLandingPage() {
             },
             {
               icon: <Clock className="h-5 w-5" />,
-              title: "Zaposleni vidi svoje ure",
-              text: "Vsak zaposleni ima svoj pregled ur, nadur in odsotnosti — mesečno obveščanje po ZEPDSV-B je s tem pokrito.",
+              title: "Zaposleni vidi ure in dopust",
+              text: "Vsak zaposleni na telefonu spremlja svoje ure, nadure in dopust — in dopust napove kar sam, ti ga potrdiš. Mesečno obveščanje po ZEPDSV-B je s tem pokrito.",
             },
             {
               icon: <BellRing className="h-5 w-5" />,

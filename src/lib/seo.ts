@@ -20,6 +20,8 @@ export const SITE = {
     "evidenca dela",
     "delovni čas aplikacija",
     "evidenca delovnega časa s.p.",
+    "evidenca dopusta",
+    "pregled dopusta",
     "ZEPDSV-B",
   ],
   twitter: "@delovit",
