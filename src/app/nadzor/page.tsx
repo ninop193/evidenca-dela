@@ -5,10 +5,11 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { isSuperadmin } from "@/lib/superadmin";
 import { Aurora } from "@/components/Aurora";
-import { Wordmark, Badge, Card } from "@/components/ui";
+import { Wordmark, Card } from "@/components/ui";
 import { signOut } from "../(auth)/actions";
 import { todayLjubljana, shiftDays } from "@/lib/tzdate";
 import { ExportCsvButton, type CsvRow } from "./ExportCsvButton";
+import { NadzorTable, type Row, type EmpRow } from "./NadzorTable";
 
 export const metadata = { robots: { index: false, follow: false }, title: "Nadzor" };
 export const dynamic = "force-dynamic";
@@ -34,6 +35,12 @@ function daysLeft(iso: string | null): number | null {
   if (!iso) return null;
   return Math.ceil((Date.parse(iso) - Date.now()) / 86400000);
 }
+// Barvni ton glede na starost aktivnosti: zeleno ≤7 dni, sivo ≤30, sicer medlo.
+function toneOf(iso: string | null): "green" | "slate" | "muted" {
+  if (!iso) return "muted";
+  const d = Math.floor((Date.now() - Date.parse(iso)) / 86400000);
+  return d <= 7 ? "green" : d <= 30 ? "slate" : "muted";
+}
 
 const STATUS: Record<string, { label: string; tone: "amber" | "green" | "red" | "slate" }> = {
   trialing: { label: "V preizkusu", tone: "amber" },
@@ -53,8 +60,16 @@ type CompanyRow = {
   current_period_end: string | null;
   stripe_customer_id: string | null;
   users: { id: string; full_name: string | null; email: string | null; role: string }[] | null;
-  employees: { count: number }[] | null;
   time_entries: { created_at: string }[] | null;
+};
+type EmployeeRec = {
+  id: string;
+  company_id: string;
+  full_name: string | null;
+  worker_type: string | null;
+  user_id: string | null;
+  active: boolean | null;
+  created_at: string;
 };
 
 export default async function NadzorPage() {
@@ -69,17 +84,27 @@ export default async function NadzorPage() {
 
   // 3) Podatki (service role — obide RLS, samo strežnik)
   const admin = createAdminClient();
-  const { data } = await admin
-    .from("companies")
-    .select(
-      "id, name, tax_id, subscription_status, created_at, trial_ends_at, current_period_end, stripe_customer_id, users(id, full_name, email, role), employees(count), time_entries(created_at)",
-    )
-    .order("created_at", { ascending: false })
-    .order("created_at", { referencedTable: "time_entries", ascending: false })
-    .limit(1, { referencedTable: "time_entries" });
-  const companies = (data ?? []) as unknown as CompanyRow[];
+  const [{ data: coData }, { data: empData }, { data: teAll }] = await Promise.all([
+    admin
+      .from("companies")
+      .select(
+        "id, name, tax_id, subscription_status, created_at, trial_ends_at, current_period_end, stripe_customer_id, users(id, full_name, email, role), time_entries(created_at)",
+      )
+      .order("created_at", { ascending: false })
+      .order("created_at", { referencedTable: "time_entries", ascending: false })
+      .limit(1, { referencedTable: "time_entries" }),
+    admin
+      .from("employees")
+      .select("id, company_id, full_name, worker_type, user_id, active, created_at")
+      .order("full_name", { ascending: true }),
+    // Vsi vnosi ur (2 stolpca) — za zadnje žigosanje na zaposlenega. Urejeno padajoče,
+    // prvi po zaposlenem = najnovejši. (Za večji obseg kasneje RPC z max(created_at).)
+    admin.from("time_entries").select("employee_id, created_at").order("created_at", { ascending: false }),
+  ]);
+  const companies = (coData ?? []) as unknown as CompanyRow[];
+  const employees = (empData ?? []) as EmployeeRec[];
 
-  // Zadnja prijava adminov (auth.users.last_sign_in_at) — en zajem, mapiran po id.
+  // Zadnja prijava po uporabniku (auth.users.last_sign_in_at) — velja za admine IN zaposlene.
   const lastLogin = new Map<string, string | null>();
   for (let page = 1; ; page++) {
     const { data: au, error } = await admin.auth.admin.listUsers({ page, perPage: 200 });
@@ -87,12 +112,42 @@ export default async function NadzorPage() {
     for (const u of au.users) lastLogin.set(u.id, u.last_sign_in_at ?? null);
     if (au.users.length < 200) break;
   }
+  // Zadnje žigosanje po zaposlenem.
+  const lastClock = new Map<string, string>();
+  for (const t of teAll ?? []) {
+    const eid = (t as { employee_id: string | null }).employee_id;
+    if (eid && !lastClock.has(eid)) lastClock.set(eid, (t as { created_at: string }).created_at);
+  }
 
-  const rows = companies.map((c) => {
+  // Zaposleni po podjetju (z izračunanim prikazom prijave/žigosanja/statusa).
+  const empByCompany = new Map<string, EmpRow[]>();
+  for (const e of employees) {
+    const login = e.user_id ? lastLogin.get(e.user_id) ?? null : null;
+    const clock = lastClock.get(e.id) ?? null;
+    const statusEmp = !e.active
+      ? { label: "Deaktiviran", tone: "slate" as const }
+      : login || clock
+        ? { label: "Aktiven", tone: "green" as const }
+        : { label: "Čaka na prijavo", tone: "amber" as const };
+    const row: EmpRow = {
+      name: e.full_name ?? "—",
+      workerLabel: e.worker_type === "student" ? "Študent" : "Zaposlen",
+      statusLabel: statusEmp.label,
+      statusTone: statusEmp.tone,
+      loginLabel: login ? relLabel(login) || fmtDate(login) : "nikoli",
+      loginTone: toneOf(login),
+      clockLabel: clock ? relLabel(clock) || fmtDate(clock) : "—",
+      clockTone: toneOf(clock),
+    };
+    const arr = empByCompany.get(e.company_id) ?? [];
+    arr.push(row);
+    empByCompany.set(e.company_id, arr);
+  }
+
+  const rows: Row[] = companies.map((c) => {
     const adm = (c.users ?? []).find((u) => u.role === "admin") ?? (c.users ?? [])[0] ?? null;
-    const empCount = c.employees?.[0]?.count ?? 0;
+    const emps = empByCompany.get(c.id) ?? [];
     const st = STATUS[c.subscription_status] ?? { label: c.subscription_status, tone: "slate" as const };
-    // Podnapis statusa: dnevi preizkusa / plačnik / brezplačen dostop
     let statusSub = "";
     if (c.subscription_status === "trialing") {
       const d = daysLeft(c.trial_ends_at);
@@ -100,21 +155,14 @@ export default async function NadzorPage() {
     } else if (c.subscription_status === "active") {
       statusSub = c.stripe_customer_id ? "plačnik" : "brezplačen dostop";
     }
-    const until =
-      c.subscription_status === "trialing" ? c.trial_ends_at : c.current_period_end;
+    const until = c.subscription_status === "trialing" ? c.trial_ends_at : c.current_period_end;
 
-    // Zadnja aktivnost = najkasnejše od (zadnja prijava admina, zadnji vnos ur).
+    // Zadnja aktivnost podjetja = najkasnejše od (zadnja prijava admina, zadnji vnos ur).
     const lastEntry = c.time_entries?.[0]?.created_at ?? null;
     const adminLogin = adm ? lastLogin.get(adm.id) ?? null : null;
     const hasEntries = (c.time_entries ?? []).length > 0;
-    const activityIso =
-      [lastEntry, adminLogin].filter(Boolean).sort().slice(-1)[0] ?? null; // ISO nizi so leksikografsko urejeni
-    const activityDays = activityIso
-      ? Math.floor((Date.now() - Date.parse(activityIso)) / 86400000)
-      : null;
+    const activityIso = [lastEntry, adminLogin].filter(Boolean).sort().slice(-1)[0] ?? null;
     const activityLabel = activityIso ? relLabel(activityIso) || fmtDate(activityIso) : "—";
-    const activityTone: "green" | "slate" | "muted" =
-      activityDays == null ? "muted" : activityDays <= 7 ? "green" : activityDays <= 30 ? "slate" : "muted";
 
     return {
       id: c.id,
@@ -122,23 +170,25 @@ export default async function NadzorPage() {
       taxId: c.tax_id ?? "",
       adminName: adm?.full_name ?? "—",
       adminEmail: adm?.email ?? "—",
-      empCount,
+      empCount: emps.length,
       statusLabel: st.label,
       statusTone: st.tone,
       statusSub,
-      until,
-      created: c.created_at,
+      untilLabel: fmtDate(until),
+      createdLabel: fmtDate(c.created_at),
       rel: relLabel(c.created_at),
       isToday: relLabel(c.created_at) === "danes",
       activityLabel,
-      activityTone,
+      activityTone: toneOf(activityIso),
       hasEntries,
+      employees: emps,
     };
   });
 
   const total = rows.length;
-  const trialing = rows.filter((r) => companies.find((c) => c.id === r.id)?.subscription_status === "trialing").length;
-  const active = rows.filter((r) => companies.find((c) => c.id === r.id)?.subscription_status === "active").length;
+  const statusById = new Map(companies.map((c) => [c.id, c.subscription_status]));
+  const trialing = rows.filter((r) => statusById.get(r.id) === "trialing").length;
+  const active = rows.filter((r) => statusById.get(r.id) === "active").length;
   const todayCount = rows.filter((r) => r.isToday).length;
 
   const csvRows: CsvRow[] = rows.map((r) => ({
@@ -148,8 +198,8 @@ export default async function NadzorPage() {
     email: r.adminEmail,
     employees: r.empCount,
     status: r.statusLabel + (r.statusSub ? ` (${r.statusSub})` : ""),
-    until: fmtDate(r.until),
-    registered: fmtDate(r.created),
+    until: r.untilLabel,
+    registered: r.createdLabel,
     activity: r.activityLabel + (r.hasEntries ? "" : " (brez vnosov)"),
   }));
 
@@ -178,7 +228,7 @@ export default async function NadzorPage() {
           <div>
             <h1 className="text-2xl font-bold tracking-tight text-slate-900">Registracije</h1>
             <p className="mt-1 flex items-center gap-1.5 text-sm text-slate-500">
-              <RefreshCw className="h-3.5 w-3.5" /> V živo · osveženo {fmtTime()} (osveži z F5)
+              <RefreshCw className="h-3.5 w-3.5" /> V živo · osveženo {fmtTime()} (osveži z F5) · klikni podjetje za zaposlene
             </p>
           </div>
           <ExportCsvButton rows={csvRows} />
@@ -198,95 +248,7 @@ export default async function NadzorPage() {
             <Card className="px-6 py-16 text-center text-sm text-slate-500">Še ni registracij.</Card>
           ) : (
             <Card className="overflow-hidden">
-              {/* Desktop */}
-              <div className="hidden overflow-x-auto lg:block">
-                <table className="w-full text-left text-sm">
-                  <thead className="border-b border-slate-100 bg-white/45 text-slate-500">
-                    <tr>
-                      <Th>Podjetje</Th>
-                      <Th>Admin</Th>
-                      <Th right>Zaposleni</Th>
-                      <Th>Status</Th>
-                      <Th>Naročnina do</Th>
-                      <Th>Registrirano</Th>
-                      <Th>Zadnja aktivnost</Th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-50">
-                    {rows.map((r) => (
-                      <tr key={r.id} className={"transition hover:bg-white/45 " + (r.isToday ? "bg-brand-50/40" : "")}>
-                        <td className="px-4 py-3.5">
-                          <p className="font-semibold text-slate-900">{r.name}</p>
-                          {r.taxId && <p className="text-xs text-slate-400">Davčna {r.taxId}</p>}
-                        </td>
-                        <td className="px-4 py-3.5">
-                          <p className="text-slate-700">{r.adminName}</p>
-                          <p className="text-xs text-slate-400">{r.adminEmail}</p>
-                        </td>
-                        <td className="px-4 py-3.5 text-right tabular-nums text-slate-700">{r.empCount}</td>
-                        <td className="px-4 py-3.5">
-                          <Badge tone={r.statusTone}>{r.statusLabel}</Badge>
-                          {r.statusSub && <p className="mt-0.5 text-xs text-slate-400">{r.statusSub}</p>}
-                        </td>
-                        <td className="px-4 py-3.5 text-slate-600">{fmtDate(r.until)}</td>
-                        <td className="px-4 py-3.5">
-                          <span className="text-slate-700">{fmtDate(r.created)}</span>
-                          {r.rel && <span className="ml-1.5 text-xs text-slate-400">· {r.rel}</span>}
-                        </td>
-                        <td className="px-4 py-3.5">
-                          <span
-                            className={
-                              "font-medium " +
-                              (r.activityTone === "green"
-                                ? "text-emerald-600"
-                                : r.activityTone === "slate"
-                                  ? "text-slate-600"
-                                  : "text-slate-400")
-                            }
-                          >
-                            {r.activityLabel}
-                          </span>
-                          {!r.hasEntries && (
-                            <p className="mt-0.5 text-xs font-medium text-amber-600">brez vnosov</p>
-                          )}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-
-              {/* Mobilno / ozko */}
-              <ul className="divide-y divide-slate-100 lg:hidden">
-                {rows.map((r) => (
-                  <li key={r.id} className={"p-4 " + (r.isToday ? "bg-brand-50/40" : "")}>
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="min-w-0">
-                        <p className="font-semibold text-slate-900">{r.name}</p>
-                        <p className="truncate text-sm text-slate-500">{r.adminName} · {r.adminEmail}</p>
-                      </div>
-                      <Badge tone={r.statusTone}>{r.statusLabel}</Badge>
-                    </div>
-                    <div className="mt-2 flex flex-wrap gap-x-4 gap-y-0.5 text-xs text-slate-400">
-                      {r.taxId && <span>Davčna {r.taxId}</span>}
-                      <span>{r.empCount} zaposlenih</span>
-                      {r.statusSub && <span>{r.statusSub}</span>}
-                      <span>Registriran {fmtDate(r.created)}{r.rel ? ` · ${r.rel}` : ""}</span>
-                      <span
-                        className={
-                          r.activityTone === "green"
-                            ? "font-semibold text-emerald-600"
-                            : !r.hasEntries
-                              ? "font-semibold text-amber-600"
-                              : "text-slate-500"
-                        }
-                      >
-                        Aktivnost: {r.activityLabel}{!r.hasEntries ? " · brez vnosov" : ""}
-                      </span>
-                    </div>
-                  </li>
-                ))}
-              </ul>
+              <NadzorTable rows={rows} />
             </Card>
           )}
         </div>
@@ -315,13 +277,5 @@ function Stat({
       </p>
       <p className={"mt-1 text-2xl font-bold tabular-nums " + color}>{value}</p>
     </Card>
-  );
-}
-
-function Th({ children, right }: { children: React.ReactNode; right?: boolean }) {
-  return (
-    <th className={"px-4 py-3 text-xs font-semibold uppercase tracking-wide " + (right ? "text-right" : "")}>
-      {children}
-    </th>
   );
 }
