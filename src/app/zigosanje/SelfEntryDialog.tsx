@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import { CalendarClock, Loader2, Pencil } from "lucide-react";
 import { selfCreateEntry, selfFixEntry } from "./actions";
@@ -56,9 +57,12 @@ export function SelfEntry({
   // Nov vnos: zadnjih 7 dni (privzeto včeraj — najpogostejši primer pozabe).
   const dayOptions = Array.from({ length: 7 }, (_, i) => shiftDays(today, -i));
 
+  const [mounted, setMounted] = useState(false);
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // Portal je na voljo šele po montaži (odjemalec) — prepreči SSR/hydration težave.
+  useEffect(() => setMounted(true), []);
   const [date, setDate] = useState(mode === "create" ? shiftDays(today, -1) : (fix?.date ?? today));
   const [inTime, setInTime] = useState(fix ? isoToHM(fix.clockInIso) : "");
   const [outTime, setOutTime] = useState(fix ? isoToHM(fix.clockOutIso) : "");
@@ -120,11 +124,12 @@ export function SelfEntry({
         {label}
       </button>
 
-      {open && (
+      {open && mounted && createPortal(
         <div
-          className="fixed inset-0 z-50 grid place-items-center bg-slate-900/40 p-4"
+          className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/40"
           onClick={() => !loading && setOpen(false)}
         >
+          <div className="flex min-h-full items-center justify-center p-4">
           <form
             onSubmit={submit}
             onClick={(e) => e.stopPropagation()}
@@ -253,7 +258,9 @@ export function SelfEntry({
               </button>
             </div>
           </form>
-        </div>
+          </div>
+        </div>,
+        document.body,
       )}
     </>
   );

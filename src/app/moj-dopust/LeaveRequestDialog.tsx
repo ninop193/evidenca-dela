@@ -61,9 +61,10 @@ export function LeaveRequestDialog({ remaining }: { remaining: number | null }) 
 
       {open && mounted && createPortal(
         <div
-          className="fixed inset-0 z-50 grid place-items-center bg-slate-900/40 p-4"
+          className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/40"
           onClick={() => !loading && setOpen(false)}
         >
+          <div className="flex min-h-full items-center justify-center p-4">
           <form
             onSubmit={submit}
             onClick={(e) => e.stopPropagation()}
@@ -149,6 +150,7 @@ export function LeaveRequestDialog({ remaining }: { remaining: number | null }) 
               </button>
             </div>
           </form>
+          </div>
         </div>,
         document.body,
       )}
