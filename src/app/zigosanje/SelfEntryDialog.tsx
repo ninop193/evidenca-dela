@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
-import { CalendarClock, Loader2, Pencil } from "lucide-react";
+import { CalendarClock, Loader2, Pencil, LogIn, LogOut } from "lucide-react";
 import { selfCreateEntry, selfFixEntry } from "./actions";
 import { todayLjubljana, shiftDays, dayLabel } from "@/lib/tzdate";
 
@@ -148,47 +148,53 @@ export function SelfEntry({
             </p>
 
             {/* Dan */}
-            <label className="mt-5 block text-xs font-semibold uppercase tracking-wide text-slate-400">
-              Dan
-            </label>
-            {mode === "create" ? (
-              <select value={date} onChange={(e) => setDate(e.target.value)} className={`mt-1.5 ${inputCls}`}>
-                {dayOptions.map((d) => (
-                  <option key={d} value={d}>
-                    {d === today ? `danes (${dayLabel(d)})` : dayLabel(d)}
-                  </option>
-                ))}
-              </select>
-            ) : (
-              <p className="mt-1.5 rounded-xl bg-slate-100 px-3 py-2.5 text-sm font-medium text-slate-700 ring-1 ring-slate-200">
-                {date === today ? `danes (${dayLabel(date)})` : dayLabel(date)}
-              </p>
-            )}
+            <div className="mt-5 rounded-2xl bg-slate-50 px-3.5 py-2.5 ring-1 ring-slate-200 transition focus-within:ring-2 focus-within:ring-brand-500">
+              <label className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-slate-400">
+                <CalendarClock className="h-3.5 w-3.5" /> Dan
+              </label>
+              {mode === "create" ? (
+                <select
+                  value={date}
+                  onChange={(e) => setDate(e.target.value)}
+                  className="-ml-0.5 mt-0.5 w-full bg-transparent text-[15px] font-semibold text-slate-900 focus:outline-none"
+                >
+                  {dayOptions.map((d) => (
+                    <option key={d} value={d}>
+                      {d === today ? `danes (${dayLabel(d)})` : dayLabel(d)}
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <p className="mt-0.5 text-[15px] font-semibold text-slate-900">
+                  {date === today ? `danes (${dayLabel(date)})` : dayLabel(date)}
+                </p>
+              )}
+            </div>
 
             {/* Prihod / odhod */}
-            <div className="mt-4 grid grid-cols-2 gap-2">
-              <div>
-                <label className="block text-xs font-semibold uppercase tracking-wide text-slate-400">
-                  Prihod
+            <div className="mt-3 grid grid-cols-2 gap-2.5">
+              <div className="rounded-2xl bg-slate-50 px-3.5 py-2.5 ring-1 ring-slate-200 transition focus-within:ring-2 focus-within:ring-brand-500">
+                <label className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-emerald-600">
+                  <LogIn className="h-3.5 w-3.5" /> Prihod
                 </label>
                 <input
                   type="time"
                   value={inTime}
                   onChange={(e) => setInTime(e.target.value)}
                   required
-                  className={`mt-1.5 ${inputCls}`}
+                  className="mt-0.5 w-full bg-transparent text-xl font-bold tabular-nums text-slate-900 focus:outline-none"
                 />
               </div>
-              <div>
-                <label className="block text-xs font-semibold uppercase tracking-wide text-slate-400">
-                  Odhod
+              <div className="rounded-2xl bg-slate-50 px-3.5 py-2.5 ring-1 ring-slate-200 transition focus-within:ring-2 focus-within:ring-brand-500">
+                <label className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-rose-500">
+                  <LogOut className="h-3.5 w-3.5" /> Odhod
                 </label>
                 <input
                   type="time"
                   value={outTime}
                   onChange={(e) => setOutTime(e.target.value)}
                   required={!outOptional}
-                  className={`mt-1.5 ${inputCls}`}
+                  className="mt-0.5 w-full bg-transparent text-xl font-bold tabular-nums text-slate-900 focus:outline-none"
                 />
               </div>
             </div>
