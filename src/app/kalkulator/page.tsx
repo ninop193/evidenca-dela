@@ -135,6 +135,31 @@ export default function KalkulatorPage() {
           <Calculator />
         </Reveal>
 
+        {/* Interni link na produktno stran (prelije avtoriteto kalkulatorja) + konverzija */}
+        <Reveal className="mt-8">
+          <div className="glass iris-edge rounded-2xl p-6 sm:flex sm:items-center sm:justify-between sm:gap-6">
+            <div>
+              <h2 className="text-lg font-bold text-slate-900">Vodiš evidenco ur ročno?</h2>
+              <p className="mt-1 text-sm leading-relaxed text-slate-600">
+                Delovit poskrbi za obračun ur, dopust in izvoz za inšpekcijo. Poglej, kako{" "}
+                <Link
+                  href="/evidenca-delovnega-casa"
+                  className="font-semibold text-brand-700 underline decoration-brand-300 underline-offset-2 hover:text-brand-800"
+                >
+                  aplikacija za evidenco delovnega časa
+                </Link>{" "}
+                deluje v praksi.
+              </p>
+            </div>
+            <Link
+              href="/register"
+              className={buttonClasses("primary") + " mt-4 shrink-0 sm:mt-0"}
+            >
+              Začni brezplačno
+            </Link>
+          </div>
+        </Reveal>
+
         {/* SEO besedilo + FAQ */}
         <section className="mt-14 space-y-10">
           <Reveal>

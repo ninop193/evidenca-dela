@@ -331,6 +331,45 @@ export default function EvidencaLandingPage() {
         </Reveal>
       </section>
 
+      {/* IZVOZ / POVEZLJIVOST ZA RAČUNOVODJO */}
+      <section className="mx-auto max-w-3xl px-5 py-8">
+        <Reveal>
+          <div className="glass-strong iris-edge rounded-3xl p-7 sm:p-9">
+            <div className="flex items-start gap-4">
+              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-brand-50 text-brand-600">
+                <FileSpreadsheet className="h-5 w-5" />
+              </span>
+              <div>
+                <h2 className="text-xl font-bold text-slate-900">
+                  Izvoz in povezljivost za računovodjo
+                </h2>
+                <p className="mt-3 text-slate-600">
+                  Mesečno evidenco izvozite v <strong className="text-slate-800">Excel (.xlsx)</strong>{" "}
+                  ali <strong className="text-slate-800">PDF</strong> z enim klikom — pripravljeno za
+                  inšpekcijo ali za vašega računovodjo.
+                </p>
+                <ul className="mt-3 space-y-2 text-slate-600">
+                  <li>
+                    <strong className="text-slate-800">Kaj se izvozi:</strong> mesečni povzetek ur,
+                    nadure, nočno, nedeljsko in praznično delo ter odsotnosti — podatki, ki jih
+                    računovodja potrebuje za obračun plače.
+                  </li>
+                  <li>
+                    <strong className="text-slate-800">Format:</strong> Excel in PDF, strukturirano po
+                    ZEPDSV, z mestom za podpis odgovorne osebe in delavca.
+                  </li>
+                </ul>
+                <p className="mt-4 rounded-2xl bg-white/60 px-4 py-3 text-sm text-slate-500 ring-1 ring-white/70">
+                  Neposredne integracije z računovodskimi programi (npr. Minimax, Pantheon) trenutno
+                  ni — izvoz v Excel/PDF pa pokrije večino potreb: podatke preprosto pošljete
+                  računovodji.
+                </p>
+              </div>
+            </div>
+          </div>
+        </Reveal>
+      </section>
+
       {/* FAQ */}
       <section id="vprasanja" className="mx-auto max-w-3xl px-5 py-14">
         <Reveal>
