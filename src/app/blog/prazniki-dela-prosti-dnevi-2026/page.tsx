@@ -218,6 +218,17 @@ export default function Page() {
               prosto, od 25. 12. 2026 do 3. 1. 2027
             </li>
           </ul>
+          <p>
+            Ker za izrabo letnega dopusta delavcem pripada tudi regres, si oglejte, koliko znaša in
+            do kdaj mora biti izplačan, v članku{" "}
+            <Link
+              href="/blog/regres-2026"
+              className="font-semibold text-brand-700 hover:text-brand-800"
+            >
+              regres 2026
+            </Link>
+            .
+          </p>
 
           <h2 className="!mt-12 text-2xl font-bold tracking-tight text-slate-900">
             Kako se praznik evidentira

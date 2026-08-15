@@ -14,6 +14,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${base}/frizerski-salon`, lastModified: now, changeFrequency: "monthly", priority: 0.8 },
     { url: `${base}/sp`, lastModified: now, changeFrequency: "monthly", priority: 0.8 },
     { url: `${base}/blog`, lastModified: now, changeFrequency: "weekly", priority: 0.7 },
+    { url: `${base}/blog/regres-2026`, lastModified: now, changeFrequency: "monthly", priority: 0.8 },
     { url: `${base}/blog/evidenca-delovnega-casa-excel`, lastModified: now, changeFrequency: "monthly", priority: 0.8 },
     { url: `${base}/blog/globe-zepdsv-evidenca-delovnega-casa`, lastModified: now, changeFrequency: "monthly", priority: 0.8 },
     { url: `${base}/blog/prazniki-dela-prosti-dnevi-2026`, lastModified: now, changeFrequency: "monthly", priority: 0.8 },

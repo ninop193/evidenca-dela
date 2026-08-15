@@ -11,6 +11,16 @@ export type BlogPost = {
 
 export const BLOG_POSTS: BlogPost[] = [
   {
+    slug: "regres-2026",
+    title: "Regres 2026: koliko, kdaj in za koga (z izračunom)",
+    description:
+      "Regres za letni dopust 2026: koliko znaša, do kdaj ga mora delodajalec izplačati, za koga velja, kako se obdavči in kako se izračuna sorazmerni del.",
+    date: "2026-08-15",
+    excerpt:
+      "Regres je pravica, ne nagrada: vsaj minimalna plača, praviloma do 1. julija, sorazmerno za tiste, ki niso zaposleni celo leto. Višina, rok, obdavčitev in izračun.",
+    readMins: 6,
+  },
+  {
     slug: "evidenca-delovnega-casa-vodnik",
     title: "Evidenca delovnega časa: kaj zahteva zakon in kako jo voditi",
     description:
