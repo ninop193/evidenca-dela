@@ -8,8 +8,11 @@ import { sendEmail } from "@/lib/email/send";
 import { employeeInviteEmail } from "@/lib/email/templates";
 import { EMAIL_BASE } from "@/lib/email/render";
 
-// Baza za povezave v mailih (lokalno: localhost, produkcija: delovit.si).
-const APP_BASE = (process.env.NEXT_PUBLIC_APP_URL || EMAIL_BASE).replace(/\/$/, "");
+// Baza za povezave v povabilnih mailih. VEDNO kanonična produkcijska domena
+// (www.delovit.si) — povabila gredo pravim uporabnikom v produkcijo. NE beremo
+// NEXT_PUBLIC_APP_URL: bil je v Vercelu nastavljen na mrtev vercel.app URL in je
+// povzročil, da so povezave za nastavitev gesla vodile na 404 (DEPLOYMENT_NOT_FOUND).
+const APP_BASE = EMAIL_BASE.replace(/\/$/, "");
 
 // Ustvari enkratno povezavo, prek katere si zaposleni sam nastavi geslo,
 // in mu pošlje povabilo. Geslo pozna samo zaposleni (ne delodajalec, ne mail).
