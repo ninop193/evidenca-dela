@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { getProfile } from "@/lib/auth";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { PLAN } from "@/lib/billing";
+import { employeeLimitFor } from "@/lib/plan-overrides";
 import { sendEmail } from "@/lib/email/send";
 import { employeeInviteEmail } from "@/lib/email/templates";
 import { EMAIL_BASE } from "@/lib/email/render";
@@ -146,12 +147,13 @@ export async function createEmployee(
 
   const admin = createAdminClient();
 
-  // Omejitev paketa: do 10 zaposlenih.
+  // Omejitev paketa: privzeto do 10 zaposlenih (nekatera podjetja imajo dvig — glej plan-overrides).
+  const limit = employeeLimitFor(profile.company_id);
   const { count } = await admin
     .from("employees")
     .select("id", { count: "exact", head: true })
     .eq("company_id", profile.company_id);
-  if ((count ?? 0) >= PLAN.maxEmployees) {
+  if ((count ?? 0) >= limit) {
     return {
       error: `Paket Delovit dopušča do ${PLAN.maxEmployees} zaposlenih. Za več pošlji povpraševanje na info@delovit.si.`,
     };
