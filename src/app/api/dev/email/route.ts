@@ -7,12 +7,13 @@ import {
   authConfirmEmail,
   authResetEmail,
   employeeInviteEmail,
+  trialWinbackEmail,
 } from "@/lib/email/templates";
 
 export const dynamic = "force-dynamic";
 
 // Predogled transakcijskih mailov — SAMO izven produkcije.
-// /api/dev/email?t=welcome|trial|paid|failed
+// /api/dev/email?t=welcome|trial|winback|paid|failed
 export async function GET(req: NextRequest) {
   if (process.env.VERCEL_ENV === "production") {
     return NextResponse.json({ error: "Ni na voljo." }, { status: 404 });
@@ -30,6 +31,13 @@ export async function GET(req: NextRequest) {
       nextDate: "13. julij 2026",
     }),
     failed: paymentFailedEmail({ fullName: sample.fullName }),
+    winback: trialWinbackEmail({
+      fullName: sample.fullName,
+      companyName: sample.companyName,
+      entries: 87,
+      employees: 3,
+      expiredDaysAgo: 4,
+    }),
     "confirm-signup": authConfirmEmail(),
     "reset-password": authResetEmail(),
     "employee-invite": employeeInviteEmail({

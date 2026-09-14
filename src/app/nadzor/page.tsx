@@ -9,6 +9,7 @@ import { Wordmark, Card } from "@/components/ui";
 import { signOut } from "../(auth)/actions";
 import { todayLjubljana, shiftDays } from "@/lib/tzdate";
 import { ExportCsvButton, type CsvRow } from "./ExportCsvButton";
+import { TestWinbackButton } from "./TestWinbackButton";
 import { NadzorTable, type Row, type EmpRow } from "./NadzorTable";
 
 export const metadata = { robots: { index: false, follow: false }, title: "Nadzor" };
@@ -231,7 +232,10 @@ export default async function NadzorPage() {
               <RefreshCw className="h-3.5 w-3.5" /> V živo · osveženo {fmtTime()} (osveži z F5) · klikni podjetje za zaposlene
             </p>
           </div>
-          <ExportCsvButton rows={csvRows} />
+          <div className="flex flex-wrap items-center gap-2">
+            <TestWinbackButton />
+            <ExportCsvButton rows={csvRows} />
+          </div>
         </div>
 
         {/* Povzetek */}

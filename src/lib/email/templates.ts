@@ -357,3 +357,70 @@ export function leaveDecisionEmployeeEmail(opts: {
     }),
   };
 }
+
+// Slovenska sklanjatev ob številu vnosov (1 vnos, 2 vnosa, 3 vnosi, 5 vnosov).
+function sloEntries(n: number): string {
+  const r = n % 100;
+  if (r === 1) return `${n} vnos`;
+  if (r === 2) return `${n} vnosa`;
+  if (r === 3 || r === 4) return `${n} vnosi`;
+  return `${n} vnosov`;
+}
+
+// Slovenska sklanjatev ob številu zaposlenih (1 zaposleni, 2 zaposlena, 3 zaposleni, 5 zaposlenih).
+function sloEmployees(n: number): string {
+  const r = n % 100;
+  if (r === 1) return `${n} zaposleni`;
+  if (r === 2) return `${n} zaposlena`;
+  if (r === 3 || r === 4) return `${n} zaposleni`;
+  return `${n} zaposlenih`;
+}
+
+// 6) Win-back: 14-dnevni preizkus je potekel, podjetje ga je uporabljalo,
+//    a paketa ni kupilo. Pošlje se SAMO ENKRAT (companies.winback_email_sent_at).
+export function trialWinbackEmail(opts: {
+  fullName?: string | null;
+  companyName?: string | null;
+  entries?: number | null;      // št. vnosov delovnega časa v preizkusu
+  employees?: number | null;    // št. dodanih zaposlenih
+  expiredDaysAgo?: number | null;
+}): RenderedEmail {
+  const esc = (s: string) =>
+    s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+  const d = opts.expiredDaysAgo ?? 0;
+  const kdaj =
+    d <= 0 ? "danes" : d === 1 ? "včeraj" : d < 30 ? `pred ${d} dnevi` : "pred nekaj tedni";
+
+  const rows: Array<[string, string]> = [];
+  if (opts.entries && opts.entries > 0) {
+    rows.push(["Vnosov delovnega časa", sloEntries(opts.entries)]);
+  }
+  if (opts.employees && opts.employees > 0) {
+    rows.push(["Dodanih zaposlenih", sloEmployees(opts.employees)]);
+  }
+  rows.push(["Mesečno", `${eur(PLAN.monthlyNet)} + DDV`]);
+  rows.push(["Letno", `${eur(PLAN.yearlyNet)} + DDV (2 meseca gratis)`]);
+
+  return {
+    subject: "Vaša evidenca v Delovit je še vedno shranjena",
+    html: renderEmail({
+      preview: "Preizkus je potekel. Aktivirajte paket in nadaljujte tam, kjer ste ostali.",
+      heading: "Preizkus je potekel",
+      intro: `${hi(opts.fullName)} Vaš brezplačni preizkus${
+        opts.companyName ? ` za <strong>${esc(opts.companyName)}</strong>` : ""
+      } se je iztekel <strong>${kdaj}</strong>. Ker ste Delovit v tem času dejansko uporabljali, vas želimo opozoriti na eno stvar: <strong>vaši podatki niso izgubljeni</strong>.`,
+      bodyHtml:
+        infoBox(rows) +
+        p(
+          "Vse, kar ste zabeležili, ostaja varno shranjeno. Takoj ko izberete paket, se evidenca odklene in nadaljujete točno tam, kjer ste ostali — brez ponovnega vnašanja.",
+        ) +
+        p(
+          "Evidenca delovnega časa je po ZEPDSV obvezna za vsakega delodajalca. Ob inšpekcijskem pregledu znaša globa za s.p. od 300 do 8.000 €, za pravno osebo pa od 3.000 do 20.000 €. Delovit poskrbi, da je evidenca ves čas pripravljena za pregled.",
+        ),
+      button: { label: "Aktivirajte paket", href: `${EMAIL_BASE}/narocnina` },
+      footnote:
+        "To je enkratno obvestilo — drugega opomnika ne bomo pošiljali. Če Delovit ne potrebujete več, ga mirno prezrite. Če vas je kaj ustavilo pri odločitvi, odgovorite na ta email in vam pomagamo.",
+    }),
+  };
+}
