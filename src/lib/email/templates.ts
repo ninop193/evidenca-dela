@@ -194,7 +194,7 @@ export function contactEmail(opts: {
           ],
         ) +
         p(`<strong>Sporočilo:</strong><br>${esc(opts.message).replace(/\n/g, "<br>")}`),
-      footnote: "Odgovoriš lahko neposredno na ta mail (Reply) — gre na pošiljateljev naslov.",
+      footnote: "Odgovoriš lahko neposredno na ta mail (Reply), gre na pošiljateljev naslov.",
     }),
   };
 }
@@ -413,14 +413,14 @@ export function trialWinbackEmail(opts: {
       bodyHtml:
         infoBox(rows) +
         p(
-          "Vse, kar ste zabeležili, ostaja varno shranjeno. Takoj ko izberete paket, se evidenca odklene in nadaljujete točno tam, kjer ste ostali — brez ponovnega vnašanja.",
+          "Vse, kar ste zabeležili, ostaja varno shranjeno. Takoj ko izberete paket, se evidenca odklene in nadaljujete točno tam, kjer ste ostali, brez ponovnega vnašanja.",
         ) +
         p(
           "Evidenca delovnega časa je po ZEPDSV obvezna za vsakega delodajalca. Ob inšpekcijskem pregledu znaša globa za s.p. od 300 do 8.000 €, za pravno osebo pa od 3.000 do 20.000 €. Delovit poskrbi, da je evidenca ves čas pripravljena za pregled.",
         ),
       button: { label: "Aktivirajte paket", href: `${EMAIL_BASE}/narocnina` },
       footnote:
-        "To je enkratno obvestilo — drugega opomnika ne bomo pošiljali. Če Delovit ne potrebujete več, ga mirno prezrite. Če vas je kaj ustavilo pri odločitvi, odgovorite na ta email in vam pomagamo.",
+        "To je enkratno obvestilo, drugega opomnika ne bomo pošiljali. Če Delovit ne potrebujete več, ga mirno prezrite. Če vas je kaj ustavilo pri odločitvi, odgovorite na ta email in vam pomagamo.",
     }),
   };
 }

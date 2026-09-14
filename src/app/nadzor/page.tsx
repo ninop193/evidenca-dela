@@ -10,6 +10,7 @@ import { signOut } from "../(auth)/actions";
 import { todayLjubljana, shiftDays } from "@/lib/tzdate";
 import { ExportCsvButton, type CsvRow } from "./ExportCsvButton";
 import { TestWinbackButton } from "./TestWinbackButton";
+import { WinbackPanel, type WinbackCandidate } from "./WinbackPanel";
 import { NadzorTable, type Row, type EmpRow } from "./NadzorTable";
 
 export const metadata = { robots: { index: false, follow: false }, title: "Nadzor" };
@@ -31,6 +32,15 @@ function relLabel(iso: string): string {
   if (day === shiftDays(today, -1)) return "včeraj";
   const diff = Math.round((Date.parse(today + "T12:00:00Z") - Date.parse(day + "T12:00:00Z")) / 86400000);
   return diff > 1 && diff < 60 ? `pred ${diff} dnevi` : "";
+}
+// Win-back kandidat: preizkus je potekel, paketa ni kupil, a je aplikacijo uporabljal.
+function isWinbackCandidate(
+  c: { subscription_status: string; trial_ends_at: string | null } | null,
+  hasEntries: boolean,
+): boolean {
+  if (!c || !hasEntries) return false;
+  if (c.subscription_status !== "trialing") return false;
+  return !!c.trial_ends_at && Date.parse(c.trial_ends_at) < Date.now();
 }
 function daysLeft(iso: string | null): number | null {
   if (!iso) return null;
@@ -187,6 +197,19 @@ export default async function NadzorPage() {
   });
 
   const total = rows.length;
+  const companyById = new Map(companies.map((c) => [c.id, c]));
+
+  // Win-back kandidati: preizkus je potekel, naročnine niso kupili,
+  // a so Delovit dejansko uporabljali (imajo vnose ur).
+  const winbackCandidates: WinbackCandidate[] = rows
+    .filter((r) => isWinbackCandidate(companyById.get(r.id) ?? null, r.hasEntries))
+    .map((r) => ({
+      id: r.id,
+      name: r.name,
+      email: r.adminEmail,
+      expiredLabel: fmtDate(companyById.get(r.id)!.trial_ends_at),
+    }));
+
   const statusById = new Map(companies.map((c) => [c.id, c.subscription_status]));
   const trialing = rows.filter((r) => statusById.get(r.id) === "trialing").length;
   const active = rows.filter((r) => statusById.get(r.id) === "active").length;
@@ -245,6 +268,9 @@ export default async function NadzorPage() {
           <Stat icon={<Users className="h-4 w-4" />} label="Aktivni" value={active} tone="green" />
           <Stat icon={<Sparkles className="h-4 w-4" />} label="Danes" value={todayCount} tone="brand" />
         </div>
+
+        {/* Win-back kandidati */}
+        <WinbackPanel candidates={winbackCandidates} />
 
         {/* Tabela */}
         <div className="mt-6">
