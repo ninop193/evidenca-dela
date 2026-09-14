@@ -1,29 +1,26 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { Send, CalendarPlus, MailCheck } from "lucide-react";
+import { Send, MailCheck } from "lucide-react";
 import { Card } from "@/components/ui";
-import { sendWinbackToCompany, extendTrial, type ActionResult } from "./actions";
+import { sendWinbackToCompany, type ActionResult } from "./actions";
 
 export type WinbackCandidate = {
   id: string;
   name: string;
   email: string;
   expiredLabel: string;
-  hasEntries: boolean;
 };
 
-const EXTEND_DAYS = 14;
-
-// Podjetja s poteklim preizkusom: podaljšanje preizkusa in (če so aplikacijo
-// dejansko uporabljala) ročno pošiljanje win-back maila. Obe dejanji imata
-// dvostopenjsko potrditev, da se ne sprožita po pomoti.
+// Ročno pošiljanje win-back maila posameznemu podjetju, ki mu je preizkus
+// potekel in je Delovit dejansko uporabljalo. Dvostopenjska potrditev, da
+// se mail ne pošlje po pomoti.
 export function WinbackPanel({ candidates }: { candidates: WinbackCandidate[] }) {
   if (candidates.length === 0) return null;
   return (
     <Card className="mt-6 p-4">
       <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-slate-400">
-        <MailCheck className="h-4 w-4" /> Potekel preizkus
+        <MailCheck className="h-4 w-4" /> Win-back: potekel preizkus, z vnosi ur
       </p>
       <ul className="mt-3 divide-y divide-slate-100">
         {candidates.map((c) => (
@@ -34,21 +31,16 @@ export function WinbackPanel({ candidates }: { candidates: WinbackCandidate[] })
   );
 }
 
-type Pending = "winback" | "extend";
-
 function CandidateRow({ candidate }: { candidate: WinbackCandidate }) {
   const [pending, start] = useTransition();
-  const [armed, setArmed] = useState<Pending | null>(null);
+  const [armed, setArmed] = useState(false);
   const [result, setResult] = useState<ActionResult | null>(null);
 
-  const run = (what: Pending) =>
+  const send = () =>
     start(async () => {
-      const r =
-        what === "winback"
-          ? await sendWinbackToCompany(candidate.id)
-          : await extendTrial(candidate.id, EXTEND_DAYS);
+      const r = await sendWinbackToCompany(candidate.id);
       setResult(r);
-      setArmed(null);
+      setArmed(false);
     });
 
   return (
@@ -57,7 +49,6 @@ function CandidateRow({ candidate }: { candidate: WinbackCandidate }) {
         <p className="truncate text-sm font-semibold text-slate-800">{candidate.name}</p>
         <p className="truncate text-xs text-slate-500">
           {candidate.email} · preizkus potekel {candidate.expiredLabel}
-          {candidate.hasEntries ? "" : " · brez vnosov"}
         </p>
       </div>
 
@@ -69,43 +60,28 @@ function CandidateRow({ candidate }: { candidate: WinbackCandidate }) {
         <div className="flex items-center gap-2">
           <button
             disabled={pending}
-            onClick={() => run(armed)}
+            onClick={send}
             className="inline-flex items-center gap-1.5 rounded-full bg-brand-600 px-3.5 py-1.5 text-sm font-semibold text-white transition hover:bg-brand-500 disabled:opacity-60"
           >
             <Send className="h-3.5 w-3.5" />
-            {pending
-              ? "Izvajam…"
-              : armed === "winback"
-                ? "Da, pošlji stranki"
-                : `Da, podaljšaj za ${EXTEND_DAYS} dni`}
+            {pending ? "Pošiljam…" : "Da, pošlji stranki"}
           </button>
           <button
             disabled={pending}
-            onClick={() => setArmed(null)}
+            onClick={() => setArmed(false)}
             className="rounded-full px-3 py-1.5 text-sm font-medium text-slate-500 hover:text-slate-700"
           >
             Prekliči
           </button>
         </div>
       ) : (
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => setArmed("extend")}
-            className="inline-flex items-center gap-1.5 rounded-full bg-white/70 px-3.5 py-1.5 text-sm font-semibold text-slate-700 ring-1 ring-white/80 transition hover:bg-white"
-          >
-            <CalendarPlus className="h-3.5 w-3.5" />
-            Podaljšaj {EXTEND_DAYS} dni
-          </button>
-          {candidate.hasEntries && (
-            <button
-              onClick={() => setArmed("winback")}
-              className="inline-flex items-center gap-1.5 rounded-full bg-white/70 px-3.5 py-1.5 text-sm font-semibold text-slate-700 ring-1 ring-white/80 transition hover:bg-white"
-            >
-              <Send className="h-3.5 w-3.5" />
-              Pošlji win-back
-            </button>
-          )}
-        </div>
+        <button
+          onClick={() => setArmed(true)}
+          className="inline-flex items-center gap-1.5 rounded-full bg-white/70 px-3.5 py-1.5 text-sm font-semibold text-slate-700 ring-1 ring-white/80 transition hover:bg-white"
+        >
+          <Send className="h-3.5 w-3.5" />
+          Pošlji win-back
+        </button>
       )}
     </li>
   );

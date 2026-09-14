@@ -33,11 +33,13 @@ function relLabel(iso: string): string {
   const diff = Math.round((Date.parse(today + "T12:00:00Z") - Date.parse(day + "T12:00:00Z")) / 86400000);
   return diff > 1 && diff < 60 ? `pred ${diff} dnevi` : "";
 }
-// Preizkus je potekel, naročnine pa niso kupili (kandidat za podaljšanje / win-back).
-function isTrialExpired(
+// Win-back kandidat: preizkus je potekel, paketa ni kupil, a je aplikacijo uporabljal.
+function isWinbackCandidate(
   c: { subscription_status: string; trial_ends_at: string | null } | null,
+  hasEntries: boolean,
 ): boolean {
-  if (!c || c.subscription_status !== "trialing") return false;
+  if (!c || !hasEntries) return false;
+  if (c.subscription_status !== "trialing") return false;
   return !!c.trial_ends_at && Date.parse(c.trial_ends_at) < Date.now();
 }
 function daysLeft(iso: string | null): number | null {
@@ -197,16 +199,15 @@ export default async function NadzorPage() {
   const total = rows.length;
   const companyById = new Map(companies.map((c) => [c.id, c]));
 
-  // Podjetja s poteklim preizkusom: kandidati za podaljšanje, tista z vnosi ur
-  // pa tudi za win-back mail.
+  // Win-back kandidati: preizkus je potekel, naročnine niso kupili,
+  // a so Delovit dejansko uporabljali (imajo vnose ur).
   const winbackCandidates: WinbackCandidate[] = rows
-    .filter((r) => isTrialExpired(companyById.get(r.id) ?? null))
+    .filter((r) => isWinbackCandidate(companyById.get(r.id) ?? null, r.hasEntries))
     .map((r) => ({
       id: r.id,
       name: r.name,
       email: r.adminEmail,
       expiredLabel: fmtDate(companyById.get(r.id)!.trial_ends_at),
-      hasEntries: r.hasEntries,
     }));
 
   const statusById = new Map(companies.map((c) => [c.id, c.subscription_status]));
