@@ -70,6 +70,16 @@ export async function GET(req: NextRequest) {
   }
 
   // ── 2) Win-back po izteku preizkusa ──────────────────────────────────────
+  // VARNOSTNO STIKALO: dokler WINBACK_ENABLED ni "1", se strankam ne pošlje nič.
+  // (Testni gumb na /nadzor deluje ne glede na to nastavitev.)
+  if (process.env.WINBACK_ENABLED !== "1") {
+    return NextResponse.json({
+      checked: companies?.length ?? 0,
+      sent,
+      winbackDisabled: true,
+    });
+  }
+
   const winbackFrom = new Date(now - WINBACK_MAX_DAYS * DAY).toISOString();
   const winbackTo = new Date(now - WINBACK_MIN_DAYS * DAY).toISOString();
 
