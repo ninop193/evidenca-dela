@@ -73,7 +73,7 @@ const FAQ: FaqItem[] = [
   },
   {
     q: "Kako poteka registracija delovnega časa v Delovitu?",
-    a: "Zaposleni odpre Delovit na telefonu in z enim tapom žigosa prihod, ob koncu dela pa odhod, z možnostjo zabeležke odmora. Registracija delovnega časa je s tem opravljena sproti, brez terminala, kartic ali dodatne opreme, evidenca pa se izpolnjuje sama.",
+    a: "Zaposleni odpre Delovit na telefonu in z enim klikom žigosa prihod, ob koncu dela pa odhod, z možnostjo zabeležke odmora. Registracija delovnega časa je s tem opravljena sproti, brez terminala, kartic ali dodatne opreme, evidenca pa se izpolnjuje sama.",
   },
   {
     q: "Kaj se zgodi, če zaposleni pozabi žigosati odhod?",
@@ -211,7 +211,7 @@ export default function EvidencaLandingPage() {
           {[
             {
               icon: <Smartphone className="h-5 w-5" />,
-              title: "Žigosanje z enim tapom",
+              title: "Žigosanje z enim klikom",
               text: "Velik gumb na telefonu za prihod in odhod, z zabeležko odmora. Brez nameščanja iz trgovine.",
             },
             {

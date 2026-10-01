@@ -161,7 +161,7 @@ export function employeeInviteEmail(opts: {
       bodyHtml:
         infoBox([["Vaš email za prijavo", esc(opts.email)]]) +
         p(
-          "Po nastavitvi gesla se prijavite na telefonu in žigosajte prihod ter odhod z enim tapom. Aplikacijo si lahko dodate na domači zaslon telefona.",
+          "Po nastavitvi gesla se prijavite na telefonu in žigosajte prihod ter odhod z enim klikom. Aplikacijo si lahko dodate na domači zaslon telefona.",
         ),
       button: { label: "Nastavite si geslo", href: opts.actionUrl },
       footnote:

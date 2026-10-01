@@ -5,7 +5,7 @@ import { PLAN, eur } from "@/lib/billing";
 
 const FEATURES = [
   "Do 10 zaposlenih",
-  "Žigosanje prihoda in odhoda z enim tapom",
+  "Žigosanje prihoda in odhoda z enim klikom",
   "Dnevni in mesečni pregled ur",
   "Vnos odsotnosti (dopust, bolniška)",
   "Izvoz PDF in Excel za inšpekcijo",

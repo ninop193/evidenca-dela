@@ -40,7 +40,7 @@ const FAQ: FaqItem[] = [
   },
   {
     q: "Ali zaposleni potrebujejo posebno aplikacijo iz trgovine?",
-    a: "Ne. Aplikacijo si v dveh tapih dodajo na domači zaslon telefona in žigosajo z enim gumbom. Brez App Store ali Google Play.",
+    a: "Ne. Aplikacijo si v dveh klikih dodajo na domači zaslon telefona in žigosajo z enim gumbom. Brez App Store ali Google Play.",
   },
   {
     q: "Kaj če zaposleni pozabi žigosati?",
@@ -124,7 +124,7 @@ export default function Home() {
             časa, <span className="text-holo">brez panike.</span>
           </h1>
           <p className="reveal mt-6 max-w-md text-lg leading-relaxed text-slate-600" style={delay(0.16)}>
-            Zaposleni žigosajo prihod in odhod z enim tapom. Ti vidiš vse ure in v sekundi
+            Zaposleni žigosajo prihod in odhod z enim klikom. Ti vidiš vse ure in v sekundi
             izvoziš evidenco za inšpekcijo. Fiksna cena na podjetje, brez vezave.
           </p>
           <div className="reveal mt-9 flex flex-col gap-3 sm:flex-row" style={delay(0.24)}>
@@ -173,7 +173,7 @@ export default function Home() {
       <section className="mx-auto max-w-6xl px-5 py-12">
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {[
-            { icon: <Smartphone className="h-5 w-5" />, title: "Žigosanje z enim tapom", text: "Velik gumb na telefonu za prihod, odhod in odmor. Brez izobraževanja in brez navodil." },
+            { icon: <Smartphone className="h-5 w-5" />, title: "Žigosanje z enim klikom", text: "Velik gumb na telefonu za prihod, odhod in odmor. Brez izobraževanja in brez navodil." },
             { icon: <Sun className="h-5 w-5" />, title: "Dopust in odsotnosti", text: "Zaposleni napove dopust kar z mobitela, ti ga potrdiš. Vsak vidi, koliko dni mu ostane. Dopust, bolniška in druge odsotnosti na enem mestu." },
             { icon: <Clock className="h-5 w-5" />, title: "Zaposleni vidi svoje ure", text: "Vsak zaposleni na telefonu spremlja svoje ure, nadure in dopust. Manj vprašanj zate." },
             { icon: <FileSpreadsheet className="h-5 w-5" />, title: "Pripravljeno za inšpekcijo", text: "Vsa zakonska polja po ZEPDSV. Mesečno evidenco izvoziš v PDF ali Excel z enim klikom." },
@@ -198,7 +198,7 @@ export default function Home() {
           {[
             { n: 1, title: "Registriraj podjetje", text: "Ustvari račun in poimenuj podjetje. Brez klicev in pogodb.", icon: <PenLine className="h-5 w-5" /> },
             { n: 2, title: "Dodaj zaposlene", text: "Vpiši ime in email. Zaposleni dobi dostop na telefon.", icon: <Smartphone className="h-5 w-5" /> },
-            { n: 3, title: "Začnite žigosati", text: "Zaposleni tapne 'Prihod', ti spremljaš ure v živo.", icon: <Clock className="h-5 w-5" /> },
+            { n: 3, title: "Začnite žigosati", text: "Zaposleni klikne 'Prihod', ti spremljaš ure v živo.", icon: <Clock className="h-5 w-5" /> },
           ].map((s, i) => (
             <Reveal key={s.n} delay={i * 100}>
               <Step n={s.n} title={s.title} text={s.text} icon={s.icon} />
