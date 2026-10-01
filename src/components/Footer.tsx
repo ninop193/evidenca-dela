@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Wordmark } from "@/components/ui";
+import { CookieSettingsButton } from "@/components/MetaPixel";
 
 export function Footer() {
   const year = new Date().getFullYear();
@@ -56,6 +57,9 @@ export function Footer() {
               <li><Link href="/pravno/pogoji" className="hover:text-brand-700">Pogoji uporabe</Link></li>
               <li><Link href="/pravno/zasebnost" className="hover:text-brand-700">Politika zasebnosti</Link></li>
               <li><Link href="/pravno/vracila" className="hover:text-brand-700">Vračila in odpoved</Link></li>
+              {process.env.NEXT_PUBLIC_META_PIXEL_ID && (
+                <li><CookieSettingsButton className="hover:text-brand-700" /></li>
+              )}
             </ul>
           </div>
         </div>

@@ -12,6 +12,8 @@ import {
 import { getProfile } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { Card } from "@/components/ui";
+import { MetaPixelEvent } from "@/components/MetaPixel";
+import { PLAN } from "@/lib/billing";
 import { todayLjubljana, monthEnd, dayLabel, timeLabel } from "@/lib/tzdate";
 import { ApproveButton } from "./ure/ApproveButton";
 
@@ -25,7 +27,14 @@ type PendingRow = {
   employees: { full_name: string } | null;
 };
 
-export default async function DashboardPage() {
+export default async function DashboardPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ narocnina?: string; paket?: string; cs?: string }>;
+}) {
+  const sp = await searchParams;
+  // Vrnitev iz Stripe Checkouta (success_url) → Meta Pixel "Subscribe", enkrat na sejo.
+  const checkoutId = sp.narocnina === "ok" && sp.cs && /^cs_\w+$/.test(sp.cs) ? sp.cs : null;
   const profile = await getProfile();
   const supabase = await createClient();
   const today = todayLjubljana();
@@ -77,6 +86,16 @@ export default async function DashboardPage() {
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-8">
+      {checkoutId && (
+        <MetaPixelEvent
+          event="Subscribe"
+          eventId={checkoutId}
+          params={{
+            value: sp.paket === "year" ? PLAN.yearlyNet : PLAN.monthlyNet,
+            currency: PLAN.currency,
+          }}
+        />
+      )}
       <div>
         <h1 className="text-2xl font-bold tracking-tight text-slate-900">
           Pozdravljen, {profile?.full_name?.split(" ")[0] ?? "delodajalec"} 👋

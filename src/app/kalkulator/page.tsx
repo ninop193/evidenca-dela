@@ -9,6 +9,7 @@ import { Footer } from "@/components/Footer";
 import { Wordmark, buttonClasses } from "@/components/ui";
 import { SITE, orgJsonLd, websiteJsonLd } from "@/lib/seo";
 import { YandexMetrika } from "@/components/YandexMetrika";
+import { MetaPixel } from "@/components/MetaPixel";
 
 export const metadata: Metadata = {
   title: { absolute: `Bruto-neto kalkulator plače ${PLACA_CONFIG.leto} | Delovit` },
@@ -122,6 +123,7 @@ export default function KalkulatorPage() {
     <main className="relative min-h-screen text-slate-800">
       <Aurora />
       <YandexMetrika />
+      <MetaPixel />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}

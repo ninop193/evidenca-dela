@@ -16,6 +16,7 @@ import { Faq, type FaqItem } from "@/components/Faq";
 import { Footer } from "@/components/Footer";
 import { Wordmark } from "@/components/ui";
 import { YandexMetrika } from "@/components/YandexMetrika";
+import { MetaPixel } from "@/components/MetaPixel";
 import { SITE, orgJsonLd, websiteJsonLd } from "@/lib/seo";
 import { PLAN } from "@/lib/billing";
 import { PartnerMailButton } from "./PartnerMailButton";
@@ -141,6 +142,7 @@ export default function PartnerjiPage() {
     <main className="relative min-h-screen text-slate-800">
       <Aurora />
       <YandexMetrika />
+      <MetaPixel />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 
       {/* NAV */}

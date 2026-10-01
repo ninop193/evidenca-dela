@@ -5,6 +5,7 @@ import { Aurora } from "@/components/Aurora";
 import { Footer } from "@/components/Footer";
 import { Wordmark } from "@/components/ui";
 import { YandexMetrika } from "@/components/YandexMetrika";
+import { MetaPixel } from "@/components/MetaPixel";
 import { ContactForm } from "./ContactForm";
 
 export const metadata: Metadata = {
@@ -33,6 +34,7 @@ export default async function KontaktPage({
     <main className="relative min-h-screen text-slate-800">
       <Aurora />
       <YandexMetrika />
+      <MetaPixel />
 
       <header className="sticky top-0 z-20 px-3 pt-3">
         <div className="glass iris-edge mx-auto flex max-w-4xl items-center justify-between rounded-full px-4 py-2.5">

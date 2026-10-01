@@ -15,6 +15,7 @@ import { Faq, type FaqItem } from "@/components/Faq";
 import { Footer } from "@/components/Footer";
 import { Wordmark, buttonClasses } from "@/components/ui";
 import { YandexMetrika } from "@/components/YandexMetrika";
+import { MetaPixel } from "@/components/MetaPixel";
 import { SITE, orgJsonLd, websiteJsonLd } from "@/lib/seo";
 
 export type NicheConfig = {
@@ -82,6 +83,7 @@ export function NicheLanding({ config }: { config: NicheConfig }) {
     <main className="relative min-h-screen text-slate-800">
       <Aurora />
       <YandexMetrika />
+      <MetaPixel />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 
       {/* NAV */}

@@ -58,7 +58,8 @@ export default function ZasebnostPage() {
         <p>
           Podatke obdelujemo za izvajanje pogodbe (zagotavljanje storitve in obračun), za
           izpolnjevanje zakonskih obveznosti ter na podlagi zakonitega interesa za varnost in
-          izboljšanje storitve.
+          izboljšanje storitve. Oglaševalske piškotke (točka 8) uporabljamo le na podlagi
+          privolitve obiskovalca.
         </p>
       </LSection>
 
@@ -89,8 +90,16 @@ export default function ZasebnostPage() {
 
       <LSection title="8. Piškotki">
         <p>
-          Uporabljamo le nujne piškotke, potrebne za prijavo in delovanje storitve. Ne uporabljamo
-          oglaševalskih ali sledilnih piškotkov.
+          <strong>Nujni piškotki</strong> so potrebni za prijavo in delovanje storitve ter za
+          shranjevanje izbire glede piškotkov. Zanje privolitev ni potrebna.
+        </p>
+        <p>
+          <strong>Oglaševalski piškotki (Meta Pixel).</strong> Le če obiskovalec to dovoli v pasici
+          o piškotkih, na javnih straneh spletnega mesta uporabljamo Meta Pixel družbe Meta
+          Platforms Ireland Ltd. Z njim merimo uspešnost oglasov na Facebooku in Instagramu: beleži
+          obiske strani ter dogodka registracija in sklenitev naročnine. Podatki o zaposlenih in
+          urah se Meti nikoli ne pošiljajo. Pravna podlaga je privolitev, ki jo je mogoče kadarkoli
+          preklicati prek povezave »Nastavitve piškotkov« v nogi strani.
         </p>
       </LSection>
 

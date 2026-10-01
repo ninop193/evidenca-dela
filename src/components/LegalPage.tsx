@@ -5,12 +5,14 @@ import { Footer } from "@/components/Footer";
 import { Wordmark } from "@/components/ui";
 import { LEGAL_UPDATED } from "@/lib/legal";
 import { YandexMetrika } from "@/components/YandexMetrika";
+import { MetaPixel } from "@/components/MetaPixel";
 
 export function LegalPage({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <main className="relative min-h-screen text-slate-800">
       <Aurora />
       <YandexMetrika />
+      <MetaPixel />
 
       <header className="sticky top-0 z-20 px-3 pt-3">
         <div className="glass iris-edge mx-auto flex max-w-3xl items-center justify-between rounded-full px-4 py-2.5">

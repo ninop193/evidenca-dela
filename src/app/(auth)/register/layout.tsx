@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { MetaPixel } from "@/components/MetaPixel";
 
 // /register je "use client" stran, zato metapodatke postavimo v layout (strežnik).
 // SEO higiena: registracijska stran ne sme biti indeksirana (ni vsebina, podvaja
@@ -15,6 +16,13 @@ export const metadata: Metadata = {
   },
 };
 
+// Meta Pixel tudi tukaj: oglasi pogosto vodijo naravnost na registracijo
+// (pasica za privolitev + PageView; pixel ne bere polj obrazca).
 export default function RegisterLayout({ children }: { children: React.ReactNode }) {
-  return children;
+  return (
+    <>
+      {children}
+      <MetaPixel />
+    </>
+  );
 }

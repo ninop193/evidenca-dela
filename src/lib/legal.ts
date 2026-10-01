@@ -13,4 +13,4 @@ export const COMPANY = {
   court: "Maribor",
 };
 
-export const LEGAL_UPDATED = "15. junij 2026";
+export const LEGAL_UPDATED = "1. oktober 2026";

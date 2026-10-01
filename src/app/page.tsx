@@ -21,6 +21,7 @@ import { Pricing } from "@/components/Pricing";
 import { LandingNav } from "@/components/LandingNav";
 import { SITE, orgJsonLd, websiteJsonLd } from "@/lib/seo";
 import { YandexMetrika } from "@/components/YandexMetrika";
+import { MetaPixel } from "@/components/MetaPixel";
 
 const delay = (s: number) => ({ animationDelay: `${s}s` });
 
@@ -104,6 +105,7 @@ export default function Home() {
     <div className="relative min-h-screen overflow-x-hidden text-slate-800">
       <Aurora />
       <YandexMetrika />
+      <MetaPixel />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
 
       {/* NAV */}

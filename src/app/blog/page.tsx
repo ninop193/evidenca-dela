@@ -5,6 +5,7 @@ import { Aurora } from "@/components/Aurora";
 import { Footer } from "@/components/Footer";
 import { Wordmark, buttonClasses } from "@/components/ui";
 import { YandexMetrika } from "@/components/YandexMetrika";
+import { MetaPixel } from "@/components/MetaPixel";
 import { BLOG_POSTS, dateSl } from "@/lib/blog";
 
 export const metadata: Metadata = {
@@ -27,6 +28,7 @@ export default function BlogIndex() {
     <main className="relative min-h-screen text-slate-800">
       <Aurora />
       <YandexMetrika />
+      <MetaPixel />
 
       <header className="sticky top-0 z-30 px-4 pt-4">
         <div className="glass-strong iris-edge mx-auto flex max-w-5xl items-center justify-between rounded-full px-5 py-2.5">

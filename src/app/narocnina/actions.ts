@@ -78,7 +78,9 @@ export async function createCheckout(
       mode: "subscription",
       customer: customerId,
       line_items: [{ price, quantity: 1 }],
-      success_url: `${origin}/dashboard?narocnina=ok`,
+      // paket + cs (ID seje, Stripe ga vstavi sam) → Meta Pixel "Subscribe" z vrednostjo,
+      // enkrat na sejo.
+      success_url: `${origin}/dashboard?narocnina=ok&paket=${interval}&cs={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/narocnina`,
       client_reference_id: company.id,
       billing_address_collection: AUTOMATIC_TAX ? "required" : "auto",

@@ -7,6 +7,7 @@ import { Footer } from "@/components/Footer";
 import { Wordmark, buttonClasses } from "@/components/ui";
 import { SITE, orgJsonLd, websiteJsonLd } from "@/lib/seo";
 import { YandexMetrika } from "@/components/YandexMetrika";
+import { MetaPixel } from "@/components/MetaPixel";
 import GlobCalculator from "./GlobCalculator";
 
 // Cilja "kalkulator" intent (razpon tveganja), ne kanibalizira blog posta o
@@ -96,6 +97,7 @@ export default function KalkulatorGlobPage() {
     <main className="relative min-h-screen text-slate-800">
       <Aurora />
       <YandexMetrika />
+      <MetaPixel />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 
       <header className="sticky top-0 z-20 px-3 pt-3">
