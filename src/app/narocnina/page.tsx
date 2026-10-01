@@ -7,6 +7,7 @@ import { getAccess, PLAN, eur } from "@/lib/billing";
 import { Aurora } from "@/components/Aurora";
 import { Wordmark } from "@/components/ui";
 import { MetaPixelEvent } from "@/components/MetaPixel";
+import { metaUserData, sendMetaEvent } from "@/lib/metaCapi";
 import { signOut } from "../(auth)/actions";
 import { SubscribeButtons } from "./SubscribeButtons";
 import { ManageButton } from "./ManageButton";
@@ -27,6 +28,15 @@ export default async function NarocninaPage({
 
   const sp = await searchParams;
   const welcome = sp.welcome === "1";
+  const metaUser = metaUserData(profile);
+  if (welcome) {
+    await sendMetaEvent({
+      event: "CompleteRegistration",
+      eventId: `reg_${profile.company_id}`,
+      path: "/narocnina?welcome=1",
+      userData: metaUser,
+    });
+  }
 
   const supabase = await createClient();
   const { data: company } = await supabase
@@ -66,7 +76,11 @@ export default async function NarocninaPage({
       <Aurora />
       {/* ?welcome=1 = podjetje je pravkar ustvarjeno (email ali Google) → registracija. */}
       {welcome && (
-        <MetaPixelEvent event="CompleteRegistration" eventId={`reg_${profile.company_id}`} />
+        <MetaPixelEvent
+          event="CompleteRegistration"
+          eventId={`reg_${profile.company_id}`}
+          userData={metaUser}
+        />
       )}
 
       <header className="sticky top-0 z-20 px-3 pt-3">

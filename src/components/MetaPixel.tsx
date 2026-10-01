@@ -15,6 +15,7 @@ const CONSENT_COOKIE = "delovit_consent";
 const CONSENT_MAX_AGE = 60 * 60 * 24 * 180; // 6 mesecev
 
 type Consent = "granted" | "denied" | null;
+type MetaUserData = { em?: string; external_id?: string };
 type Fbq = ((...args: unknown[]) => void) & {
   callMethod?: (...args: unknown[]) => void;
   queue: unknown[];
@@ -59,7 +60,9 @@ function useConsent(): Consent | "unknown" {
 
 // --- Pixel ---
 
-function loadPixel() {
+// userData = zgoščena em / external_id (advanced matching). Upošteva se le ob prvem init;
+// konverzijske strani (/narocnina, /dashboard) se vedno odprejo s polnim nalaganjem.
+function loadPixel(userData?: MetaUserData) {
   if (window.fbq) {
     window.fbq("consent", "grant");
     return;
@@ -82,7 +85,7 @@ function loadPixel() {
   document.head.appendChild(s);
 
   fbq("set", "autoConfig", false, PIXEL_ID);
-  fbq("init", PIXEL_ID);
+  fbq("init", PIXEL_ID, userData ?? {});
 }
 
 function revokePixel() {
@@ -155,17 +158,20 @@ export function MetaPixel() {
 }
 
 // Konverzijski dogodek (npr. registracija, naročnina) — sproži se enkrat na eventId,
-// samo če je obiskovalec prej dal privolitev.
+// samo če je obiskovalec prej dal privolitev. Isti eventId pošlje tudi strežnik
+// (lib/metaCapi), da Meta dogodek šteje enkrat.
 const fired = new Set<string>();
 
 export function MetaPixelEvent({
   event,
   eventId,
   params,
+  userData,
 }: {
   event: string;
   eventId: string;
   params?: Record<string, string | number>;
+  userData?: MetaUserData;
 }) {
   const consent = useConsent();
 
@@ -180,9 +186,9 @@ export function MetaPixelEvent({
     } catch {
       // localStorage ni na voljo — zanesemo se na `fired`.
     }
-    loadPixel();
+    loadPixel(userData);
     window.fbq?.("track", event, params ?? {}, { eventID: eventId });
-  }, [consent, event, eventId, params]);
+  }, [consent, event, eventId, params, userData]);
 
   return null;
 }

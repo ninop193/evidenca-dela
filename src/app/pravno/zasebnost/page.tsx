@@ -97,8 +97,10 @@ export default function ZasebnostPage() {
           <strong>Oglaševalski piškotki (Meta Pixel).</strong> Le če obiskovalec to dovoli v pasici
           o piškotkih, na javnih straneh spletnega mesta uporabljamo Meta Pixel družbe Meta
           Platforms Ireland Ltd. Z njim merimo uspešnost oglasov na Facebooku in Instagramu: beleži
-          obiske strani ter dogodka registracija in sklenitev naročnine. Podatki o zaposlenih in
-          urah se Meti nikoli ne pošiljajo. Pravna podlaga je privolitev, ki jo je mogoče kadarkoli
+          obiske strani ter dogodka registracija in sklenitev naročnine. Ob teh dveh dogodkih Meti
+          posredujemo tudi zgoščeno (SHA-256) obliko e-naslova in interne oznake uporabnika ter ju
+          poleg brskalnika pošljemo še neposredno s strežnika (Meta Conversions API), da ju Meta
+          lahko poveže z oglasom. Podatki o zaposlenih in urah se Meti nikoli ne pošiljajo. Pravna podlaga je privolitev, ki jo je mogoče kadarkoli
           preklicati prek povezave »Nastavitve piškotkov« v nogi strani.
         </p>
       </LSection>

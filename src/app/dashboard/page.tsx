@@ -13,6 +13,7 @@ import { getProfile } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { Card } from "@/components/ui";
 import { MetaPixelEvent } from "@/components/MetaPixel";
+import { metaUserData, sendMetaEvent } from "@/lib/metaCapi";
 import { PLAN } from "@/lib/billing";
 import { todayLjubljana, monthEnd, dayLabel, timeLabel } from "@/lib/tzdate";
 import { ApproveButton } from "./ure/ApproveButton";
@@ -36,6 +37,20 @@ export default async function DashboardPage({
   // Vrnitev iz Stripe Checkouta (success_url) → Meta Pixel "Subscribe", enkrat na sejo.
   const checkoutId = sp.narocnina === "ok" && sp.cs && /^cs_\w+$/.test(sp.cs) ? sp.cs : null;
   const profile = await getProfile();
+  const metaUser = profile ? metaUserData(profile) : undefined;
+  const subscribeValue = {
+    value: sp.paket === "year" ? PLAN.yearlyNet : PLAN.monthlyNet,
+    currency: PLAN.currency,
+  };
+  if (checkoutId && metaUser) {
+    await sendMetaEvent({
+      event: "Subscribe",
+      eventId: checkoutId,
+      path: "/dashboard?narocnina=ok",
+      userData: metaUser,
+      customData: subscribeValue,
+    });
+  }
   const supabase = await createClient();
   const today = todayLjubljana();
   const month = today.slice(0, 7);
@@ -90,10 +105,8 @@ export default async function DashboardPage({
         <MetaPixelEvent
           event="Subscribe"
           eventId={checkoutId}
-          params={{
-            value: sp.paket === "year" ? PLAN.yearlyNet : PLAN.monthlyNet,
-            currency: PLAN.currency,
-          }}
+          params={subscribeValue}
+          userData={metaUser}
         />
       )}
       <div>
