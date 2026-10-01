@@ -2,6 +2,7 @@
 
 import { useEffect, useSyncExternalStore } from "react";
 import Link from "next/link";
+import { Cookie } from "lucide-react";
 
 // Meta Pixel (Facebook/Instagram oglasi) — naloži se SAMO po privolitvi v pasici.
 // Kot Yandex.Metrika je le na javnih straneh (+ /register); v prijavljeni
@@ -107,26 +108,43 @@ export function MetaPixel() {
 
   if (!PIXEL_ID || consent !== null) return null;
 
+  // Večja, osrednja pasica spodaj (opazna, a ne blokira strani). Gumba sta
+  // enako velika — GDPR zahteva, da je zavrnitev enako lahka kot sprejem.
   return (
-    <div className="fixed inset-x-3 bottom-3 z-50 sm:inset-x-auto sm:right-4 sm:bottom-4 sm:max-w-sm">
-      <div className="glass-strong iris-edge rounded-2xl p-4 text-sm text-slate-700 shadow-lg">
-        <p>
-          Z oglaševalskimi piškotki (Meta) merimo uspešnost naših oglasov. Nujni piškotki za
-          delovanje strani so vedno vklopljeni.{" "}
-          <Link href="/pravno/zasebnost" className="font-semibold text-brand-700 hover:text-brand-800">
-            Več
-          </Link>
-        </p>
-        <div className="mt-3 grid grid-cols-2 gap-2">
+    <div
+      role="dialog"
+      aria-labelledby="cookie-title"
+      className="reveal fixed inset-x-3 bottom-3 z-50 sm:inset-x-0 sm:bottom-6 sm:mx-auto sm:max-w-xl"
+    >
+      <div className="glass-strong iris-edge rounded-3xl !bg-white/90 p-5 text-slate-700 sm:p-6">
+        <div className="flex items-start gap-4">
+          <div className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-brand-500 to-holo-violet text-white shadow-md">
+            <Cookie className="h-6 w-6" aria-hidden />
+          </div>
+          <div>
+            <h2 id="cookie-title" className="text-base font-bold text-slate-900 sm:text-lg">
+              Nam dovolite piškotke?
+            </h2>
+            <p className="mt-1 text-sm leading-relaxed sm:text-[15px]">
+              Z oglaševalskimi piškotki (Meta) vidimo, kateri oglasi vas pripeljejo do nas, zato
+              lahko Delovit ostane cenovno ugoden. Nujni piškotki za delovanje strani so vedno
+              vklopljeni.{" "}
+              <Link href="/pravno/zasebnost" className="font-semibold text-brand-700 hover:text-brand-800">
+                Več o piškotkih
+              </Link>
+            </p>
+          </div>
+        </div>
+        <div className="mt-5 grid grid-cols-2 gap-3">
           <button
             onClick={() => setConsent("denied")}
-            className="rounded-full bg-white/70 py-2 font-semibold text-slate-700 ring-1 ring-slate-200 transition hover:bg-white"
+            className="rounded-full bg-white/80 py-3 text-[15px] font-semibold text-slate-700 ring-1 ring-slate-200 transition hover:bg-white"
           >
             Zavrni
           </button>
           <button
             onClick={() => setConsent("granted")}
-            className="rounded-full bg-brand-600 py-2 font-semibold text-white transition hover:bg-brand-500"
+            className="rounded-full bg-brand-600 py-3 text-[15px] font-semibold text-white shadow-[var(--shadow-lift)] transition hover:bg-brand-500"
           >
             Sprejmi
           </button>
