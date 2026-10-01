@@ -2,6 +2,7 @@
 
 import { getProfile } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { getAccess } from "@/lib/billing";
 import {
   workerCategory,
@@ -29,16 +30,20 @@ function isSunday(d: Date): boolean {
 type ActionResult = { error?: string; capped?: boolean };
 
 // Poišče zapis zaposlenega + preveri dostop (preizkus/naročnina) podjetja.
+// Identiteto preverimo z uporabnikovo sejo (RLS); zapisi pa gredo prek strežniškega
+// odjemalca (supabase), ker zaposleni v bazo neposredno NE sme pisati — sicer bi
+// lahko mimo aplikacije prepisal svoje ure. Vsak zapis zato VEDNO filtriramo po
+// employee_id in confirmed = false.
 async function getEmployee() {
-  const supabase = await createClient();
+  const userDb = await createClient();
   const profile = await getProfile();
-  if (!profile) return { supabase, profile: null, employee: null, hasAccess: false };
+  if (!profile) return { supabase: createAdminClient(), profile: null, employee: null, hasAccess: false };
   const [{ data: employee }, { data: company }] = await Promise.all([
-    supabase.from("employees").select("id, company_id, active, worker_type, birth_date").eq("user_id", profile.id).single(),
-    supabase.from("companies").select("subscription_status, trial_ends_at, current_period_end").eq("id", profile.company_id).single(),
+    userDb.from("employees").select("id, company_id, active, worker_type, birth_date").eq("user_id", profile.id).single(),
+    userDb.from("companies").select("subscription_status, trial_ends_at, current_period_end").eq("id", profile.company_id).single(),
   ]);
   const hasAccess = getAccess(company ?? {}).hasAccess;
-  return { supabase, profile, employee, hasAccess };
+  return { supabase: createAdminClient(), profile, employee, hasAccess };
 }
 
 // PRIHOD — odpre nov vnos delovnega časa za danes.
@@ -79,7 +84,9 @@ export async function clockIn(): Promise<ActionResult> {
           needs_review: true,
           notes: autoCapNote(),
         })
-        .eq("id", s.id);
+        .eq("id", s.id)
+        .eq("employee_id", employee.id)
+        .eq("confirmed", false);
     }
   }
 
@@ -140,7 +147,9 @@ export async function clockOut(breakMinutes?: number): Promise<ActionResult> {
       break_minutes: brk,
       ...(overCap ? { needs_review: true, notes: autoCapNote() } : {}),
     })
-    .eq("id", open.id);
+    .eq("id", open.id)
+    .eq("employee_id", employee.id)
+    .eq("confirmed", false);
   if (error) return { error: "Napaka pri beleženju odhoda." };
   return { capped: overCap };
 }
@@ -305,7 +314,9 @@ export async function selfFixEntry(
       needs_review: true,
       notes: selfNote(input.note),
     })
-    .eq("id", entry.id);
+    .eq("id", entry.id)
+    .eq("employee_id", employee.id)
+    .eq("confirmed", false);
   if (error) return { error: "Napaka pri shranjevanju popravka." };
   return {};
 }

@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { getProfile } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { workingDaysBetween } from "@/lib/holidays";
 import { hoursToDays, fmtDays } from "@/lib/leave";
 import { todayLjubljana } from "@/lib/tzdate";
@@ -93,7 +94,9 @@ export async function submitLeaveRequest(input: {
     }
   }
 
-  const { error } = await supabase.from("leave_requests").insert({
+  // Zapis prek strežnika: zaposleni v bazo neposredno ne piše (sicer bi si lahko
+  // sam nastavil status "approved" ali napačno število dni).
+  const { error } = await createAdminClient().from("leave_requests").insert({
     company_id: employee.company_id,
     employee_id: employee.id,
     date_from: dateFrom,
@@ -109,9 +112,9 @@ export async function submitLeaveRequest(input: {
 
 // Zaposleni prekliče svojo še-čakajočo prošnjo.
 export async function cancelLeaveRequest(id: string): Promise<LeaveResult> {
-  const { supabase, employee } = await getSelf();
+  const { employee } = await getSelf();
   if (!employee) return { error: "Vaš račun ni povezan z evidenco zaposlenih." };
-  const { error } = await supabase
+  const { error } = await createAdminClient()
     .from("leave_requests")
     .update({ status: "cancelled" })
     .eq("id", id)

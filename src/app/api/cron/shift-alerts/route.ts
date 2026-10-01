@@ -27,12 +27,10 @@ const fmtTime = (iso: string) =>
 //   3. elapsed >= auto-stop (10h/12h)      → vnos se zapre ob meji + označi "za pregled"
 //      (brez dodatnega maila: delodajalec je bil obveščen v sloju 2; ure se ne odrežejo tiho)
 export async function GET(req: NextRequest) {
+  // Brez nastavljenega CRON_SECRET endpoint ostane ZAKLENJEN (ne odprt).
   const secret = process.env.CRON_SECRET;
-  if (secret) {
-    const auth = req.headers.get("authorization");
-    if (auth !== `Bearer ${secret}`) {
-      return NextResponse.json({ error: "Nedovoljeno." }, { status: 401 });
-    }
+  if (!secret || req.headers.get("authorization") !== `Bearer ${secret}`) {
+    return NextResponse.json({ error: "Nedovoljeno." }, { status: 401 });
   }
 
   const admin = createAdminClient();

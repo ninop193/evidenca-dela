@@ -3,6 +3,7 @@
 import { headers, cookies } from "next/headers";
 import { getProfile } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { stripe, STRIPE_PRICES, AUTOMATIC_TAX, YEARLY_REF_COUPON } from "@/lib/stripe";
 
 type CheckoutParams = NonNullable<Parameters<typeof stripe.checkout.sessions.create>[0]>;
@@ -43,7 +44,11 @@ export async function createCheckout(
         metadata: { app: "delovit", company_id: company.id },
       });
       customerId = customer.id;
-      await supabase.from("companies").update({ stripe_customer_id: customerId }).eq("id", company.id);
+      // Prek strežnika: uporabnik podjetja v bazi ne sme spreminjati neposredno.
+      await createAdminClient()
+        .from("companies")
+        .update({ stripe_customer_id: customerId })
+        .eq("id", company.id);
     }
 
     // Partnerska koda iz piškotka (nastavi jo proxy ob ?ref=KODA).

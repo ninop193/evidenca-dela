@@ -2,6 +2,7 @@
 
 import { sendEmail } from "@/lib/email/send";
 import { contactEmail } from "@/lib/email/templates";
+import { rateLimit, clientIp } from "@/lib/rateLimit";
 
 const INBOX = "info@delovit.si";
 
@@ -26,6 +27,15 @@ export async function sendContact(formData: FormData): Promise<ContactResult> {
   }
   if (message.length > 5000) {
     return { ok: false, error: "Sporočilo je predolgo (največ 5000 znakov)." };
+  }
+
+  // Omejitev: največ 5 sporočil na uro z istega IP in 100 na dan skupaj.
+  const ip = await clientIp();
+  if (
+    !(await rateLimit(`contact:ip:${ip}`, 5, 3_600)) ||
+    !(await rateLimit("contact:all", 100, 86_400))
+  ) {
+    return { ok: false, error: "Preveč sporočil v kratkem času. Poskusi kasneje ali piši na info@delovit.si." };
   }
 
   const sent = await sendEmail(

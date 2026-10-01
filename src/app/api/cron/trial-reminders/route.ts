@@ -19,12 +19,10 @@ const WINBACK_MAX_DAYS = 60;
 //     uporabljala (imajo vnose ur), a paketa niso kupila. Samo enkrat.
 export async function GET(req: NextRequest) {
   // Zaščita: Vercel Cron pošlje "Authorization: Bearer <CRON_SECRET>".
+  // Brez nastavljenega CRON_SECRET endpoint ostane ZAKLENJEN (ne odprt).
   const secret = process.env.CRON_SECRET;
-  if (secret) {
-    const auth = req.headers.get("authorization");
-    if (auth !== `Bearer ${secret}`) {
-      return NextResponse.json({ error: "Nedovoljeno." }, { status: 401 });
-    }
+  if (!secret || req.headers.get("authorization") !== `Bearer ${secret}`) {
+    return NextResponse.json({ error: "Nedovoljeno." }, { status: 401 });
   }
 
   const admin = createAdminClient();

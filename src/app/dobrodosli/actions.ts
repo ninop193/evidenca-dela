@@ -5,6 +5,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { isFreeAccessEmail, grantFreeAccess } from "@/lib/comp";
 import { sendEmail } from "@/lib/email/send";
 import { welcomeEmail } from "@/lib/email/templates";
+import { rateLimit } from "@/lib/rateLimit";
 
 // Po ustvarjenju podjetja (Google onboarding): če je email vnaprej pooblaščen
 // za brezplačen dostop, mu ga vklopi, nato pošlje dobrodošlico (kot pri
@@ -27,7 +28,8 @@ export async function finishGoogleOnboarding(): Promise<void> {
   if (isFreeAccessEmail(user.email)) await grantFreeAccess(profile.company_id);
 
   // Dobrodošlica (sendEmail nikoli ne vrže — ne sme podreti toka).
-  if (user.email) {
+  // Največ ena na uporabnika (akcijo je mogoče poklicati večkrat).
+  if (user.email && (await rateLimit(`welcome:${user.id}`, 1, 365 * 86_400))) {
     const company = profile.companies as { name?: string } | { name?: string }[] | null;
     const companyName = Array.isArray(company) ? company[0]?.name : company?.name;
     await sendEmail(

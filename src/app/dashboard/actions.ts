@@ -8,6 +8,7 @@ import { employeeLimitFor } from "@/lib/plan-overrides";
 import { sendEmail } from "@/lib/email/send";
 import { employeeInviteEmail } from "@/lib/email/templates";
 import { EMAIL_BASE } from "@/lib/email/render";
+import { rateLimit } from "@/lib/rateLimit";
 
 // Baza za povezave v povabilnih mailih. VEDNO kanonična produkcijska domena
 // (www.delovit.si) — povabila gredo pravim uporabnikom v produkcijo. NE beremo
@@ -44,6 +45,14 @@ async function sendInvite(opts: {
 }
 
 export type ActionResult = { error?: string; ok?: boolean };
+
+// Največ povabil (novih + ponovnih) na podjetje v 24 urah — prepreči, da bi kdo
+// z dodajanjem/brisanjem "zaposlenih" prek nas pošiljal neželeno pošto.
+const INVITES_PER_DAY = 20;
+const INVITE_LIMIT_ERROR =
+  "Danes ste poslali že preveč povabil. Poskusite znova jutri ali pišite na info@delovit.si.";
+const inviteAllowed = (companyId: string) =>
+  rateLimit(`invite:${companyId}`, INVITES_PER_DAY, 86_400);
 
 // Preveri, da je klicatelj admin in da zaposleni pripada njegovemu podjetju.
 async function ownedEmployee(employeeId: string) {
@@ -145,6 +154,8 @@ export async function createEmployee(
     return { error: "Ime in email sta obvezna." };
   }
 
+  if (!(await inviteAllowed(profile.company_id))) return { error: INVITE_LIMIT_ERROR };
+
   const admin = createAdminClient();
 
   // Omejitev paketa: privzeto do 10 zaposlenih (nekatera podjetja imajo dvig — glej plan-overrides).
@@ -230,6 +241,7 @@ export async function resendEmployeeInvite(employeeId: string): Promise<ActionRe
   if ("error" in res) return { error: res.error };
   const { admin, emp } = res;
   if (!emp.user_id) return { error: "Ta zaposleni nima prijavnega računa." };
+  if (!(await inviteAllowed(emp.company_id))) return { error: INVITE_LIMIT_ERROR };
 
   const [{ data: u }, { data: company }, { data: empRow }] = await Promise.all([
     admin.from("users").select("email").eq("id", emp.user_id).maybeSingle(),
