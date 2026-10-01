@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { Aurora } from "@/components/Aurora";
 import { Wordmark } from "@/components/ui";
 import { GoogleButton } from "@/components/GoogleButton";
+import { Captcha, CAPTCHA_SITE_KEY, CAPTCHA_MISSING, type CaptchaHandle } from "@/components/Captcha";
 
 const fieldCls =
   "w-full rounded-xl bg-white/70 px-3.5 py-2.5 text-[15px] text-slate-900 ring-1 ring-white/80 shadow-[inset_0_1px_2px_rgba(120,130,200,0.08)] placeholder:text-slate-400 outline-none transition focus:ring-2 focus:ring-brand-500";
@@ -15,6 +16,8 @@ export default function LoginForm() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [savedEmail, setSavedEmail] = useState("");
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const captcha = useRef<CaptchaHandle>(null);
 
   // Zapomni si zadnji email — če uporabnika kadar koli odjavi, vpiše samo še geslo.
   useEffect(() => {
@@ -31,9 +34,19 @@ export default function LoginForm() {
     const form = new FormData(e.currentTarget);
     const email = String(form.get("email") ?? "").trim().toLowerCase();
     const password = String(form.get("password") ?? "");
+    if (CAPTCHA_SITE_KEY && !captchaToken) {
+      setError(CAPTCHA_MISSING);
+      setLoading(false);
+      return;
+    }
 
     const supabase = createClient();
-    const { data, error: signInErr } = await supabase.auth.signInWithPassword({ email, password });
+    const { data, error: signInErr } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+      options: { captchaToken: captchaToken ?? undefined },
+    });
+    captcha.current?.reset();
     if (signInErr || !data.user) {
       setError("Napačen email ali geslo.");
       setLoading(false);
@@ -93,6 +106,8 @@ export default function LoginForm() {
               </div>
               <input name="password" type="password" required placeholder="••••••••" autoComplete="current-password" className={fieldCls} />
             </label>
+
+            <Captcha ref={captcha} onToken={setCaptchaToken} />
 
             {error && (
               <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600 ring-1 ring-red-100">{error}</p>

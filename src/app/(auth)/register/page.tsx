@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Link from "next/link";
 import { ArrowRight, MailCheck } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { Aurora } from "@/components/Aurora";
 import { Wordmark } from "@/components/ui";
 import { GoogleButton } from "@/components/GoogleButton";
+import { Captcha, CAPTCHA_SITE_KEY, CAPTCHA_MISSING, type CaptchaHandle } from "@/components/Captcha";
 
 const fieldCls =
   "w-full rounded-xl bg-white/70 px-3.5 py-2.5 text-[15px] text-slate-900 ring-1 ring-white/80 placeholder:text-slate-400 outline-none transition focus:ring-2 focus:ring-brand-500";
@@ -16,6 +17,8 @@ export default function RegisterPage() {
   const [error, setError] = useState<string | null>(null);
   const [sentTo, setSentTo] = useState<string | null>(null);
   const [resent, setResent] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const captcha = useRef<CaptchaHandle>(null);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -34,6 +37,11 @@ export default function RegisterPage() {
       setLoading(false);
       return;
     }
+    if (CAPTCHA_SITE_KEY && !captchaToken) {
+      setError(CAPTCHA_MISSING);
+      setLoading(false);
+      return;
+    }
 
     const supabase = createClient();
     const { data, error: err } = await supabase.auth.signUp({
@@ -42,8 +50,10 @@ export default function RegisterPage() {
       options: {
         data: { company_name: companyName, full_name: fullName, tax_id: taxId || null },
         emailRedirectTo: `${window.location.origin}/auth/confirm`,
+        captchaToken: captchaToken ?? undefined,
       },
     });
+    captcha.current?.reset();
     setLoading(false);
 
     if (err) {
@@ -64,12 +74,17 @@ export default function RegisterPage() {
 
   async function resend() {
     if (!sentTo) return;
+    if (CAPTCHA_SITE_KEY && !captchaToken) return;
     const supabase = createClient();
     await supabase.auth.resend({
       type: "signup",
       email: sentTo,
-      options: { emailRedirectTo: `${window.location.origin}/auth/confirm` },
+      options: {
+        emailRedirectTo: `${window.location.origin}/auth/confirm`,
+        captchaToken: captchaToken ?? undefined,
+      },
     });
+    captcha.current?.reset();
     setResent(true);
   }
 
@@ -95,9 +110,14 @@ export default function RegisterPage() {
             <div className="mt-6 rounded-xl bg-white/50 p-3 text-xs text-slate-500 ring-1 ring-white/70">
               Ne najdeš emaila? Preveri mapo z neželeno pošto (spam).
             </div>
+            {!resent && (
+              <div className="mt-4">
+                <Captcha ref={captcha} onToken={setCaptchaToken} />
+              </div>
+            )}
             <button
               onClick={resend}
-              disabled={resent}
+              disabled={resent || (!!CAPTCHA_SITE_KEY && !captchaToken)}
               className="mt-4 text-sm font-semibold text-brand-600 hover:text-brand-700 disabled:opacity-50"
             >
               {resent ? "Email ponovno poslan ✓" : "Pošlji ponovno"}
@@ -129,6 +149,8 @@ export default function RegisterPage() {
                   <input name="password" type="password" required placeholder="••••••••" className={fieldCls} />
                 </L>
               </div>
+
+              <Captcha ref={captcha} onToken={setCaptchaToken} />
 
               {error && (
                 <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600 ring-1 ring-red-100">{error}</p>

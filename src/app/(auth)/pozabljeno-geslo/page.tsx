@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Link from "next/link";
 import { MailCheck } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { Aurora } from "@/components/Aurora";
 import { Wordmark } from "@/components/ui";
+import { Captcha, CAPTCHA_SITE_KEY, CAPTCHA_MISSING, type CaptchaHandle } from "@/components/Captcha";
 
 const fieldCls =
   "w-full rounded-xl bg-white/70 px-3.5 py-2.5 text-[15px] text-slate-900 ring-1 ring-white/80 placeholder:text-slate-400 outline-none transition focus:ring-2 focus:ring-brand-500";
@@ -14,17 +15,26 @@ export default function PozabljenoGesloPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [sent, setSent] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const captcha = useRef<CaptchaHandle>(null);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError(null);
     setLoading(true);
     const email = String(new FormData(e.currentTarget).get("email") ?? "").trim().toLowerCase();
+    if (CAPTCHA_SITE_KEY && !captchaToken) {
+      setError(CAPTCHA_MISSING);
+      setLoading(false);
+      return;
+    }
 
     const supabase = createClient();
     const { error: err } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: `${window.location.origin}/auth/reset`,
+      captchaToken: captchaToken ?? undefined,
     });
+    captcha.current?.reset();
     setLoading(false);
     if (err) {
       setError("Napaka pri pošiljanju. Poskusi znova.");
@@ -66,6 +76,7 @@ export default function PozabljenoGesloPage() {
                   <span className="mb-1.5 block text-sm font-medium text-slate-700">Email</span>
                   <input name="email" type="email" required placeholder="ti@podjetje.si" className={fieldCls} />
                 </label>
+                <Captcha ref={captcha} onToken={setCaptchaToken} />
                 {error && (
                   <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600 ring-1 ring-red-100">{error}</p>
                 )}
