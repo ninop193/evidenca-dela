@@ -1,9 +1,10 @@
 import "server-only";
 
-// Emaili, ki smejo videti interni nadzor (/nadzor). SAMO lastnik produkta.
+// Emaili, ki smejo videti interni nadzor (/nadzor). SAMO lastnik produkta in ožja ekipa.
 // Za dodajanje: dopiši email (male črke) in deploy.
 const SUPERADMIN_EMAILS = new Set<string>([
   "nino.pavalec01@gmail.com",
+  "alen.p.l@gmail.com",
 ]);
 
 export function isSuperadmin(email?: string | null): boolean {
