@@ -1,12 +1,23 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 import { createClient } from "@/lib/supabase/client";
+
+// Brskalniki znotraj aplikacij (Facebook, Instagram, Messenger, TikTok …) in Android WebView.
+// Google v njih zavrne prijavo ("403: disallowed_useragent"), zato tam gumba ne ponudimo.
+const IN_APP_UA = /FBAN|FBAV|FB_IAB|FBIOS|Instagram|Messenger|MicroMessenger|Line\/|TikTok|musical_ly|BytedanceWebview|Snapchat|Pinterest|LinkedInApp|; wv\)/i;
+const noop = () => () => {};
+const useInAppBrowser = () =>
+  useSyncExternalStore(noop, () => IN_APP_UA.test(navigator.userAgent), () => false);
+const isAndroid = () => /Android/i.test(navigator.userAgent);
 
 // Gumb "Nadaljuj z Googlom" — sproži Google OAuth prek Supabase.
 export function GoogleButton({ label = "Nadaljuj z Googlom" }: { label?: string }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const inApp = useInAppBrowser();
+
+  if (inApp) return <InAppNotice />;
 
   async function handleClick() {
     setError(null);
@@ -39,9 +50,32 @@ export function GoogleButton({ label = "Nadaljuj z Googlom" }: { label?: string 
   );
 }
 
-function GoogleLogo() {
+// Namesto Google gumba: navodilo + na Androidu povezava, ki stran odpre v Chromu.
+function InAppNotice() {
+  const { host, pathname, search } = window.location;
+  const chromeUrl = `intent://${host}${pathname}${search}#Intent;scheme=https;package=com.android.chrome;end`;
   return (
-    <svg className="h-5 w-5" viewBox="0 0 24 24" aria-hidden="true">
+    <div className="rounded-2xl bg-white/60 px-4 py-3 text-center text-sm leading-relaxed text-slate-600 ring-1 ring-white/80">
+      <p>
+        <GoogleLogo className="mr-1.5 inline h-4 w-4 align-[-3px]" />
+        Prijava z Googlom v tem brskalniku ne deluje. Uporabi <strong className="text-slate-800">email in geslo</strong>{" "}
+        zgoraj{isAndroid() ? " ali odpri stran v Chromu." : " ali odpri stran v Safariju (meni ⋯ → Odpri v brskalniku)."}
+      </p>
+      {isAndroid() && (
+        <a
+          href={chromeUrl}
+          className="mt-2.5 inline-flex items-center justify-center rounded-full bg-white px-4 py-2 font-semibold text-slate-700 ring-1 ring-slate-200 transition hover:bg-slate-50"
+        >
+          Odpri v Chromu
+        </a>
+      )}
+    </div>
+  );
+}
+
+function GoogleLogo({ className = "h-5 w-5" }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" aria-hidden="true">
       <path
         fill="#4285F4"
         d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.76h3.56c2.08-1.92 3.28-4.74 3.28-8.09z"
