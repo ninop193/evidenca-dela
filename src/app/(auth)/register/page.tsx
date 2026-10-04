@@ -57,11 +57,8 @@ export default function RegisterPage() {
     setLoading(false);
 
     if (err) {
-      setError(
-        err.message.toLowerCase().includes("already")
-          ? "Ta email je že registriran. Poskusi se prijaviti."
-          : "Registracija ni uspela. Poskusi znova.",
-      );
+      console.error("signUp error", err.status, err.code, err.message);
+      setError(signUpErrorMessage(err.code, err.message));
       return;
     }
     // Email obstaja in je že potrjen → Supabase vrne uporabnika brez identitet.
@@ -186,6 +183,25 @@ export default function RegisterPage() {
       </div>
     </main>
   );
+}
+
+// Supabase napake → razumljivo sporočilo. Neznane napake dobijo kodo v oklepaju,
+// da jo stranka lahko sporoči in vidimo pravi razlog.
+function signUpErrorMessage(code: string | undefined, message: string): string {
+  const m = message.toLowerCase();
+  if (code === "user_already_exists" || code === "email_exists" || m.includes("already"))
+    return "Ta email je že registriran. Poskusi se prijaviti.";
+  if (code === "email_address_invalid" || m.includes("invalid format"))
+    return "Email naslov ni veljaven. Preveri, da je pravilno vpisan.";
+  if (code === "weak_password" || m.includes("password"))
+    return "Geslo je prešibko. Uporabi vsaj 8 znakov, mešanico črk in številk.";
+  if (code === "over_email_send_rate_limit" || code === "over_request_rate_limit" || m.includes("rate limit"))
+    return "Trenutno je preveč poskusov. Počakaj nekaj minut ali se registriraj z Googlom.";
+  if (code?.startsWith("captcha") || m.includes("captcha"))
+    return "Preverjanje, da nisi robot, ni uspelo. Osveži stran in poskusi znova.";
+  if (m.includes("sending") && m.includes("email"))
+    return "Potrditvenega emaila nismo mogli poslati. Poskusi z Googlom ali nam piši.";
+  return `Registracija ni uspela. Poskusi znova ali uporabi Google. (${code ?? message})`;
 }
 
 function L({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
