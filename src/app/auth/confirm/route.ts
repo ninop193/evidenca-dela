@@ -9,9 +9,17 @@ import { isFreeAccessEmail, grantFreeAccess } from "@/lib/comp";
 export async function GET(req: NextRequest) {
   const { searchParams, origin } = req.nextUrl;
   const code = searchParams.get("code");
+  const tokenHash = searchParams.get("token_hash");
 
   const supabase = await createClient();
-  if (code) {
+  if (tokenHash) {
+    // Povezava iz emaila (token_hash) deluje v kateremkoli brskalniku/napravi,
+    // ne le v tistem, kjer je bila narejena registracija.
+    const { error } = await supabase.auth.verifyOtp({ token_hash: tokenHash, type: "email" });
+    if (error) {
+      return NextResponse.redirect(`${origin}/login?error=confirm`);
+    }
+  } else if (code) {
     const { error } = await supabase.auth.exchangeCodeForSession(code);
     if (error) {
       return NextResponse.redirect(`${origin}/login?error=confirm`);

@@ -12,9 +12,9 @@ import { Captcha, CAPTCHA_SITE_KEY, CAPTCHA_MISSING, type CaptchaHandle } from "
 const fieldCls =
   "w-full rounded-xl bg-white/70 px-3.5 py-2.5 text-[15px] text-slate-900 ring-1 ring-white/80 shadow-[inset_0_1px_2px_rgba(120,130,200,0.08)] placeholder:text-slate-400 outline-none transition focus:ring-2 focus:ring-brand-500";
 
-export default function LoginForm() {
+export default function LoginForm({ initialError = null }: { initialError?: string | null }) {
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(initialError);
   const [savedEmail, setSavedEmail] = useState("");
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const captcha = useRef<CaptchaHandle>(null);
