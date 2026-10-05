@@ -19,6 +19,7 @@ import { Faq, type FaqItem } from "@/components/Faq";
 import { Footer } from "@/components/Footer";
 import { Pricing } from "@/components/Pricing";
 import { LandingNav } from "@/components/LandingNav";
+import { Testimonials } from "@/components/Testimonials";
 import { SITE, orgJsonLd, websiteJsonLd } from "@/lib/seo";
 import { YandexMetrika } from "@/components/YandexMetrika";
 import { MetaPixel } from "@/components/MetaPixel";
@@ -150,6 +151,9 @@ export default function Home() {
           <PhoneMock />
         </div>
       </section>
+
+      {/* MNENJA STRANK */}
+      <Testimonials />
 
       {/* STATISTIKE, nujnost */}
       <section className="mx-auto max-w-5xl px-5 py-8">
