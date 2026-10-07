@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowRight } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import { readAttribution } from "@/lib/attribution";
 import { Aurora } from "@/components/Aurora";
 import { Wordmark } from "@/components/ui";
 import { finishGoogleOnboarding } from "./actions";
@@ -60,6 +61,11 @@ export default function DobrodosliPage() {
       setError("Napaka pri ustvarjanju podjetja. Poskusi znova.");
       setLoading(false);
       return;
+    }
+    // Vir obiska (oglas) shrani k računu — Google registracija ga drugače nima.
+    const attribution = readAttribution();
+    if (attribution) {
+      await supabase.auth.updateUser({ data: { attribution } }).catch(() => {});
     }
     // Promo dostop + dobrodošlica.
     // Ne sme blokirati preusmeritve, če slučajno spodleti.

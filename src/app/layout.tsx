@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Plus_Jakarta_Sans, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import RegisterSW from "./register-sw";
+import CaptureAttribution from "./capture-attribution";
 import { SITE } from "@/lib/seo";
 
 const jakarta = Plus_Jakarta_Sans({
@@ -82,6 +83,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col">
         {children}
         <RegisterSW />
+        <CaptureAttribution />
       </body>
     </html>
   );

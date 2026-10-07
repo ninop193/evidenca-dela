@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import Link from "next/link";
 import { ArrowRight, MailCheck } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import { readAttribution } from "@/lib/attribution";
 import { Aurora } from "@/components/Aurora";
 import { Wordmark } from "@/components/ui";
 import { GoogleButton } from "@/components/GoogleButton";
@@ -48,7 +49,12 @@ export default function RegisterPage() {
       email,
       password,
       options: {
-        data: { company_name: companyName, full_name: fullName, tax_id: taxId || null },
+        data: {
+          company_name: companyName,
+          full_name: fullName,
+          tax_id: taxId || null,
+          attribution: readAttribution(),
+        },
         emailRedirectTo: `${window.location.origin}/auth/confirm`,
         captchaToken: captchaToken ?? undefined,
       },
