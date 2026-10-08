@@ -21,12 +21,17 @@ export default function AppNav({
   companyName,
   pendingCount = 0,
   leavePendingCount = 0,
+  selfEnrolled = false,
 }: {
   companyName: string;
   pendingCount?: number;
   leavePendingCount?: number;
+  selfEnrolled?: boolean;
 }) {
   const pathname = usePathname();
+  const items = selfEnrolled
+    ? [...ITEMS, { href: "/zigosanje", label: "Žigosanje", exact: true }]
+    : ITEMS;
   const [open, setOpen] = useState(false);
 
   const isActive = (href: string, exact?: boolean) =>
@@ -48,16 +53,16 @@ export default function AppNav({
     <header className="sticky top-0 z-30 px-3 pt-3">
       <div className="glass iris-edge mx-auto flex max-w-6xl items-center justify-between rounded-full px-4 py-2.5">
         <div className="flex items-center gap-6">
-          <Link href="/dashboard">
+          <Link href="/dashboard" className="shrink-0">
             <Wordmark />
           </Link>
-          <nav className="hidden items-center gap-1 md:flex">
-            {ITEMS.map((it) => (
+          <nav className="hidden items-center gap-1 xl:flex">
+            {items.map((it) => (
               <Link
                 key={it.href}
                 href={it.href}
                 className={cn(
-                  "inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium transition",
+                  "inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-1.5 text-sm font-medium transition",
                   isActive(it.href, it.exact)
                     ? "bg-brand-600 text-white shadow-[0_6px_16px_-6px_rgba(29,78,216,0.7)]"
                     : "text-slate-600 hover:bg-white/60 hover:text-slate-900",
@@ -82,7 +87,7 @@ export default function AppNav({
           >
             <CreditCard className="h-4 w-4" /> Naročnina
           </Link>
-          <span className="hidden max-w-[140px] truncate text-sm font-medium text-slate-500 lg:block">
+          <span className="hidden max-w-[140px] truncate text-sm font-medium text-slate-500 2xl:block">
             {companyName}
           </span>
           <ChangePassword variant="icon" />
@@ -93,7 +98,7 @@ export default function AppNav({
           </form>
           <button
             onClick={() => setOpen((v) => !v)}
-            className="relative rounded-full bg-white/60 p-2 text-slate-600 ring-1 ring-white/70 md:hidden"
+            className="relative rounded-full bg-white/60 p-2 text-slate-600 ring-1 ring-white/70 xl:hidden"
             aria-label="Meni"
           >
             <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -109,8 +114,8 @@ export default function AppNav({
 
       {/* Mobilni meni */}
       {open && (
-        <nav className="glass iris-edge mx-auto mt-2 max-w-6xl rounded-2xl p-2 md:hidden">
-          {ITEMS.map((it) => (
+        <nav className="glass iris-edge mx-auto mt-2 max-w-6xl rounded-2xl p-2 xl:hidden">
+          {items.map((it) => (
             <Link
               key={it.href}
               href={it.href}

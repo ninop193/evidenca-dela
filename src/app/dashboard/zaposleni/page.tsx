@@ -2,11 +2,13 @@ import Link from "next/link";
 import { Users, UserPlus } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { getProfile } from "@/lib/auth";
 import { Badge, Card, buttonClasses } from "@/components/ui";
 import { EmployeeRowActions } from "./EmployeeRowActions";
 
 export default async function EmployeesPage() {
-  const supabase = await createClient();
+  const [supabase, profile] = await Promise.all([createClient(), getProfile()]);
+  const isSelf = (e: { user_id: string | null }) => !!profile && e.user_id === profile.id;
   const { data: employees } = await supabase
     .from("employees")
     .select("id, user_id, full_name, job_title, emso, tax_id, is_management, worker_type, active")
@@ -72,6 +74,11 @@ export default async function EmployeesPage() {
                     <tr key={e.id} className="transition hover:bg-white/45">
                       <td className="px-4 py-3.5 font-medium text-slate-900">
                         {e.full_name}
+                        {isSelf(e) && (
+                          <Badge tone="slate" className="ml-2">
+                            ti
+                          </Badge>
+                        )}
                         {e.worker_type === "student" && (
                           <Badge tone="brand" className="ml-2">
                             Študent
@@ -97,7 +104,7 @@ export default async function EmployeesPage() {
                         )}
                       </td>
                       <td className="px-4 py-3.5 text-right">
-                        <EmployeeRowActions employeeId={e.id} fullName={e.full_name} active={!!e.active} />
+                        <EmployeeRowActions employeeId={e.id} fullName={e.full_name} active={!!e.active} isSelf={isSelf(e)} />
                       </td>
                     </tr>
                   ))}
@@ -112,6 +119,7 @@ export default async function EmployeesPage() {
                   <div className="flex items-start justify-between gap-3">
                     <p className="font-semibold text-slate-900">
                       {e.full_name}
+                      {isSelf(e) && <Badge tone="slate" className="ml-2">ti</Badge>}
                       {e.worker_type === "student" && (
                         <Badge tone="brand" className="ml-2">Študent</Badge>
                       )}
@@ -126,7 +134,7 @@ export default async function EmployeesPage() {
                       <Badge tone={e.active ? "green" : "slate"}>
                         {e.active ? "Aktiven" : "Neaktiven"}
                       </Badge>
-                      <EmployeeRowActions employeeId={e.id} fullName={e.full_name} active={!!e.active} />
+                      <EmployeeRowActions employeeId={e.id} fullName={e.full_name} active={!!e.active} isSelf={isSelf(e)} />
                     </div>
                   </div>
                   <dl className="mt-2 grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-sm">

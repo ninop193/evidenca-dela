@@ -108,7 +108,8 @@ export async function GET(req: NextRequest) {
         );
       }
       const boss = await companyAdmin(e.company_id);
-      if (boss) {
+      // Delodajalec, ki žigosa sam, je že dobil opomnik zgoraj — brez podvojenega maila.
+      if (boss && boss.email !== empEmail) {
         await sendEmail(
           boss.email,
           shiftLimitEmployerEmail({

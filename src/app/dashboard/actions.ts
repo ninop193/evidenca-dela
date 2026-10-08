@@ -69,7 +69,7 @@ async function ownedEmployee(employeeId: string) {
   if (!emp || emp.company_id !== profile.company_id) {
     return { error: "Zaposleni ni najden." as string };
   }
-  return { admin, emp };
+  return { admin, emp, isSelf: emp.user_id === profile.id };
 }
 
 // Deaktiviraj / ponovno aktiviraj zaposlenega (ohrani evidenco ur).
@@ -93,7 +93,7 @@ export async function setEmployeeActive(
 export async function deleteEmployee(employeeId: string): Promise<ActionResult> {
   const res = await ownedEmployee(employeeId);
   if ("error" in res) return { error: res.error };
-  const { admin, emp } = res;
+  const { admin, emp, isSelf } = res;
 
   const [{ count: entries }, { count: absences }] = await Promise.all([
     admin.from("time_entries").select("id", { count: "exact", head: true }).eq("employee_id", employeeId),
@@ -109,7 +109,8 @@ export async function deleteEmployee(employeeId: string): Promise<ActionResult> 
   // Izbriši zapis zaposlenega, nato še njegovo prijavo (auth → kaskadno pobriše users).
   const { error: delErr } = await admin.from("employees").delete().eq("id", employeeId);
   if (delErr) return { error: "Brisanje ni uspelo." };
-  if (emp.user_id) await admin.auth.admin.deleteUser(emp.user_id).catch(() => {});
+  // Delodajalčev lasten zapis: prijava je njegov admin račun — ta mora ostati.
+  if (emp.user_id && !isSelf) await admin.auth.admin.deleteUser(emp.user_id).catch(() => {});
 
   revalidatePath("/dashboard/zaposleni");
   return { ok: true };
@@ -235,12 +236,53 @@ export async function createEmployee(
   return { email, inviteSent };
 }
 
+// Delodajalec, ki dela tudi sam, se vpiše v evidenco zaposlenih (brez novega
+// računa: zapis se poveže z njegovo obstoječo prijavo) in lahko žigosa.
+// Ostale podatke (delovno mesto, EMŠO …) dopolni kot pri vsakem zaposlenem.
+export async function addSelfAsEmployee(): Promise<ActionResult> {
+  const profile = await getProfile();
+  if (!profile || profile.role !== "admin") {
+    return { error: "Samo delodajalec se lahko vpiše v evidenco." };
+  }
+  const admin = createAdminClient();
+
+  const { data: existing } = await admin
+    .from("employees")
+    .select("id")
+    .eq("user_id", profile.id)
+    .maybeSingle();
+  if (existing) return { ok: true };
+
+  const limit = employeeLimitFor(profile.company_id);
+  const { count } = await admin
+    .from("employees")
+    .select("id", { count: "exact", head: true })
+    .eq("company_id", profile.company_id);
+  if ((count ?? 0) >= limit) {
+    return {
+      error: `Paket Delovit dopušča do ${PLAN.maxEmployees} zaposlenih. Za več pošlji povpraševanje na info@delovit.si.`,
+    };
+  }
+
+  const { error } = await admin.from("employees").insert({
+    company_id: profile.company_id,
+    user_id: profile.id,
+    full_name: profile.full_name?.trim() || profile.email || "Delodajalec",
+    worker_type: "zaposlen",
+  });
+  if (error) return { error: "Vpis v evidenco ni uspel." };
+
+  revalidatePath("/dashboard", "layout");
+  return { ok: true };
+}
+
 // Ponovno pošlji povabilo (npr. povezava potekla ali email ni prispel).
 export async function resendEmployeeInvite(employeeId: string): Promise<ActionResult> {
   const res = await ownedEmployee(employeeId);
   if ("error" in res) return { error: res.error };
-  const { admin, emp } = res;
+  const { admin, emp, isSelf } = res;
   if (!emp.user_id) return { error: "Ta zaposleni nima prijavnega računa." };
+  if (isSelf) return { error: "To si ti — prijavljen si že s svojim računom." };
   if (!(await inviteAllowed(emp.company_id))) return { error: INVITE_LIMIT_ERROR };
 
   const [{ data: u }, { data: company }, { data: empRow }] = await Promise.all([

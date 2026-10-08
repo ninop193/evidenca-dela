@@ -10,10 +10,12 @@ export function EmployeeRowActions({
   employeeId,
   fullName,
   active,
+  isSelf = false,
 }: {
   employeeId: string;
   fullName: string;
   active: boolean;
+  isSelf?: boolean;
 }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -85,14 +87,17 @@ export function EmployeeRowActions({
             <Pencil className="h-4 w-4 text-slate-500" />
             Uredi
           </Link>
-          <button
-            onClick={doResendInvite}
-            disabled={loading}
-            className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-left font-medium text-slate-700 transition hover:bg-white/70 disabled:opacity-50"
-          >
-            {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Mail className="h-4 w-4 text-brand-600" />}
-            {inviteOk ? "Povabilo poslano ✓" : "Pošlji povabilo znova"}
-          </button>
+          {/* Delodajalec sam se prijavlja s svojim računom — povabila ne potrebuje. */}
+          {!isSelf && (
+            <button
+              onClick={doResendInvite}
+              disabled={loading}
+              className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-left font-medium text-slate-700 transition hover:bg-white/70 disabled:opacity-50"
+            >
+              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Mail className="h-4 w-4 text-brand-600" />}
+              {inviteOk ? "Povabilo poslano ✓" : "Pošlji povabilo znova"}
+            </button>
+          )}
           <button
             onClick={toggleActive}
             disabled={loading}

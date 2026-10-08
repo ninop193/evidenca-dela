@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, LayoutDashboard } from "lucide-react";
 import { getProfile } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { getAccess } from "@/lib/billing";
@@ -86,6 +86,17 @@ export default async function ZigosanjePage() {
           <div className="flex items-center gap-2.5">
             <Wordmark className="text-sm" />
           </div>
+          {/* Delodajalec, ki žigosa tudi sam: hitra pot nazaj na nadzorno ploščo. */}
+          {profile.role === "admin" && (
+            <Link
+              href="/dashboard"
+              aria-label="Nadzorna plošča"
+              className="inline-flex items-center gap-1.5 rounded-full bg-brand-600 px-3 py-1.5 text-sm font-semibold text-white transition hover:bg-brand-500"
+            >
+              <LayoutDashboard className="h-4 w-4" />
+              <span className="hidden min-[400px]:inline">Plošča</span>
+            </Link>
+          )}
           <div className="flex items-center gap-3">
             <span className="hidden text-sm font-medium text-slate-500 xs:block">
               {profile.full_name?.split(" ")[0] ?? "Zaposleni"}
@@ -110,7 +121,17 @@ export default async function ZigosanjePage() {
           </div>
         ) : !employee ? (
           <p className="mt-10 text-center text-sm text-slate-500">
-            Tvoj račun še ni povezan z evidenco zaposlenih. Obrni se na delodajalca.
+            {profile.role === "admin" ? (
+              <>
+                Še nisi vpisan v evidenco zaposlenih.{" "}
+                <Link href="/dashboard" className="font-semibold text-brand-700">
+                  Na nadzorni plošči
+                </Link>{" "}
+                klikni »Žigosaj tudi ti«.
+              </>
+            ) : (
+              "Tvoj račun še ni povezan z evidenco zaposlenih. Obrni se na delodajalca."
+            )}
           </p>
         ) : (
           <>

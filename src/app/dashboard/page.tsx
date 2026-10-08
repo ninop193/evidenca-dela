@@ -8,6 +8,7 @@ import {
   CheckCircle2,
   ChevronRight,
   Sun,
+  Fingerprint,
 } from "lucide-react";
 import { getProfile } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
@@ -17,6 +18,7 @@ import { metaUserData, sendMetaEvent } from "@/lib/metaCapi";
 import { PLAN } from "@/lib/billing";
 import { todayLjubljana, monthEnd, dayLabel, timeLabel } from "@/lib/tzdate";
 import { ApproveButton } from "./ure/ApproveButton";
+import { SelfClockButton } from "./SelfClockButton";
 
 type PendingRow = {
   id: string;
@@ -71,6 +73,7 @@ export default async function DashboardPage({
     { data: pendingData, count: pendingCount },
     { data: onDuty },
     { count: leavePendingCount },
+    { data: selfEmployee },
   ] = await Promise.all([
     supabase.from("employees").select("id", { count: "exact", head: true }),
     supabase
@@ -101,13 +104,17 @@ export default async function DashboardPage({
       .from("leave_requests")
       .select("id", { count: "exact", head: true })
       .eq("status", "pending"),
+    // Je delodajalec vpisan v evidenco tudi sam (žigosa)?
+    supabase.from("employees").select("id").eq("user_id", profile?.id ?? "").maybeSingle(),
   ]);
 
   const leavePending = leavePendingCount ?? 0;
   const monthHours = (entries ?? []).reduce((a, e) => a + (Number(e.total_worked_hours) || 0), 0);
   const pending = (pendingData ?? []) as unknown as PendingRow[];
   const pendingTotal = pendingCount ?? pending.length;
-  const noEmployees = (employeeCount ?? 0) === 0;
+  const selfEnrolled = !!selfEmployee;
+  // Kartico "prvi korak" kažemo, dokler ni dodan nihče RAZEN delodajalca samega.
+  const noEmployees = (employeeCount ?? 0) - (selfEnrolled ? 1 : 0) <= 0;
   const onDutyRows = (onDuty ?? []) as unknown as { id: string; clock_in: string | null; employees: { full_name: string } | null }[];
 
   return (
@@ -140,7 +147,7 @@ export default async function DashboardPage({
 
       {/* ── Kaj čaka nate ─────────────────────────────────────────────── */}
       {noEmployees ? (
-        <FirstEmployeeCard />
+        <FirstEmployeeCard selfEnrolled={selfEnrolled} />
       ) : pendingTotal > 0 ? (
         <section className="mt-6 overflow-hidden rounded-2xl bg-amber-50/80 ring-1 ring-amber-200/80 backdrop-blur">
           <div className="flex items-start gap-3 px-5 pb-3 pt-4">
@@ -247,7 +254,14 @@ export default async function DashboardPage({
       <h2 className="mt-10 text-sm font-semibold uppercase tracking-wide text-slate-500">
         Hitra dejanja
       </h2>
-      <div className="mt-3 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mt-3 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+        {selfEnrolled ? (
+          <Action href="/zigosanje" icon={<Fingerprint className="h-5 w-5" />} title="Moje žigosanje" text="Tvoj prihod in odhod" />
+        ) : (
+          <SelfClockButton className={actionClasses + " w-full text-left disabled:opacity-60"}>
+            <ActionBody icon={<Fingerprint className="h-5 w-5" />} title="Žigosaj tudi ti" text="Če delaš tudi sam" />
+          </SelfClockButton>
+        )}
         <Action href="/dashboard/zaposleni/nov" icon={<UserPlus className="h-5 w-5" />} title="Dodaj zaposlenega" text="Nov delavec in dostop" />
         <Action href="/dashboard/ure/nov" icon={<Clock className="h-5 w-5" />} title="Ročni vnos ur" text="Vnesi ure za nazaj" />
         <Action href="/dashboard/pregled" icon={<BarChart3 className="h-5 w-5" />} title="Mesečni pregled" text="Seštevki, potrditev, izvoz" />
@@ -259,7 +273,7 @@ export default async function DashboardPage({
 
 // Novo podjetje brez zaposlenih: brez njih evidenca ostane prazna, zato je to
 // edini korak, ki ga pokažemo na vrhu (namesto "vse urejeno").
-function FirstEmployeeCard() {
+function FirstEmployeeCard({ selfEnrolled }: { selfEnrolled: boolean }) {
   const steps = [
     ["Vpišeš ime in email", "Traja manj kot minuto."],
     ["Zaposleni dobi povabilo", "Po emailu si sam nastavi geslo."],
@@ -272,7 +286,9 @@ function FirstEmployeeCard() {
         Dodaj prvega zaposlenega
       </h2>
       <p className="mt-1.5 max-w-xl text-sm text-slate-600">
-        Dokler nimaš zaposlenih, evidenca ostane prazna. Vpišeš ime in email, ostalo uredi Delovit.
+        {selfEnrolled
+          ? "Ti že žigosaš. Dodaj še zaposlene, da evidenca zajame vse. Vpišeš ime in email, ostalo uredi Delovit."
+          : "Dokler nimaš zaposlenih, evidenca ostane prazna. Vpišeš ime in email, ostalo uredi Delovit."}
       </p>
       <ol className="mt-5 grid gap-3 sm:grid-cols-3">
         {steps.map(([title, text], i) => (
@@ -293,6 +309,24 @@ function FirstEmployeeCard() {
       >
         <UserPlus className="h-5 w-5" /> Dodaj zaposlenega
       </Link>
+      {/* Delodajalec, ki dela tudi sam, lahko evidenco preizkusi takoj — brez drugega človeka. */}
+      <div className="mt-5 border-t border-slate-200/70 pt-4 text-sm text-slate-600">
+        {selfEnrolled ? (
+          <>
+            V evidenci si že tudi ti.{" "}
+            <Link href="/zigosanje" className="font-semibold text-brand-700 hover:text-brand-800">
+              Odpri svoje žigosanje →
+            </Link>
+          </>
+        ) : (
+          <>
+            <span className="block sm:inline">Delaš tudi ti? Vpiši se v evidenco in žigosaj svoj prvi prihod.</span>{" "}
+            <SelfClockButton pendingLabel="Odpiram žigosanje…" className="mt-1 font-semibold text-brand-700 hover:text-brand-800 disabled:opacity-60 sm:mt-0">
+              Najprej preizkusi sam →
+            </SelfClockButton>
+          </>
+        )}
+      </div>
     </section>
   );
 }
@@ -319,17 +353,25 @@ function Stat({
   );
 }
 
+const actionClasses =
+  "glass-strong iris-edge sheen group rounded-2xl p-5 transition duration-300 hover:-translate-y-1";
+
 function Action({ href, icon, title, text }: { href: string; icon: React.ReactNode; title: string; text: string }) {
   return (
-    <Link
-      href={href}
-      className="glass-strong iris-edge sheen group rounded-2xl p-5 transition duration-300 hover:-translate-y-1"
-    >
+    <Link href={href} className={actionClasses}>
+      <ActionBody icon={icon} title={title} text={text} />
+    </Link>
+  );
+}
+
+function ActionBody({ icon, title, text }: { icon: React.ReactNode; title: string; text: string }) {
+  return (
+    <>
       <div className="grid h-11 w-11 place-items-center rounded-xl bg-gradient-to-br from-brand-500 to-brand-700 text-white shadow-[0_8px_22px_-6px_rgba(29,78,216,0.6)]">
         {icon}
       </div>
       <h3 className="mt-3 font-semibold text-slate-900 group-hover:text-brand-700">{title}</h3>
       <p className="mt-0.5 text-sm text-slate-500">{text}</p>
-    </Link>
+    </>
   );
 }
