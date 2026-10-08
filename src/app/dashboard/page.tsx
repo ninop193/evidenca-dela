@@ -31,9 +31,11 @@ type PendingRow = {
 export default async function DashboardPage({
   searchParams,
 }: {
-  searchParams: Promise<{ narocnina?: string; paket?: string; cs?: string }>;
+  searchParams: Promise<{ narocnina?: string; paket?: string; cs?: string; welcome?: string }>;
 }) {
   const sp = await searchParams;
+  // ?welcome=1 = podjetje je pravkar ustvarjeno (email ali Google) → registracija.
+  const welcome = sp.welcome === "1";
   // Vrnitev iz Stripe Checkouta (success_url) → Meta Pixel "Subscribe", enkrat na sejo.
   const checkoutId = sp.narocnina === "ok" && sp.cs && /^cs_\w+$/.test(sp.cs) ? sp.cs : null;
   const profile = await getProfile();
@@ -49,6 +51,14 @@ export default async function DashboardPage({
       path: "/dashboard?narocnina=ok",
       userData: metaUser,
       customData: subscribeValue,
+    });
+  }
+  if (welcome && metaUser && profile) {
+    await sendMetaEvent({
+      event: "CompleteRegistration",
+      eventId: `reg_${profile.company_id}`,
+      path: "/dashboard?welcome=1",
+      userData: metaUser,
     });
   }
   const supabase = await createClient();
@@ -97,6 +107,7 @@ export default async function DashboardPage({
   const monthHours = (entries ?? []).reduce((a, e) => a + (Number(e.total_worked_hours) || 0), 0);
   const pending = (pendingData ?? []) as unknown as PendingRow[];
   const pendingTotal = pendingCount ?? pending.length;
+  const noEmployees = (employeeCount ?? 0) === 0;
   const onDutyRows = (onDuty ?? []) as unknown as { id: string; clock_in: string | null; employees: { full_name: string } | null }[];
 
   return (
@@ -109,15 +120,28 @@ export default async function DashboardPage({
           userData={metaUser}
         />
       )}
+      {welcome && profile && (
+        <MetaPixelEvent
+          event="CompleteRegistration"
+          eventId={`reg_${profile.company_id}`}
+          userData={metaUser}
+        />
+      )}
       <div>
         <h1 className="text-2xl font-bold tracking-tight text-slate-900">
-          Pozdravljen, {profile?.full_name?.split(" ")[0] ?? "delodajalec"} 👋
+          {welcome
+            ? "Dobrodošel v Delovit 🎉"
+            : `Pozdravljen, ${profile?.full_name?.split(" ")[0] ?? "delodajalec"} 👋`}
         </h1>
-        <p className="mt-1 text-sm text-slate-500">Hiter pregled tvojega podjetja.</p>
+        <p className="mt-1 text-sm text-slate-500">
+          {noEmployees ? "Račun je pripravljen. Še en korak in evidenca teče." : "Hiter pregled tvojega podjetja."}
+        </p>
       </div>
 
       {/* ── Kaj čaka nate ─────────────────────────────────────────────── */}
-      {pendingTotal > 0 ? (
+      {noEmployees ? (
+        <FirstEmployeeCard />
+      ) : pendingTotal > 0 ? (
         <section className="mt-6 overflow-hidden rounded-2xl bg-amber-50/80 ring-1 ring-amber-200/80 backdrop-blur">
           <div className="flex items-start gap-3 px-5 pb-3 pt-4">
             <span className="mt-0.5 grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-amber-500 text-white shadow-[0_8px_20px_-6px_rgba(245,158,11,0.7)]">
@@ -230,6 +254,46 @@ export default async function DashboardPage({
         <Action href="/dashboard/odsotnosti/nov" icon={<Palmtree className="h-5 w-5" />} title="Vnesi odsotnost" text="Dopust, bolniška" />
       </div>
     </main>
+  );
+}
+
+// Novo podjetje brez zaposlenih: brez njih evidenca ostane prazna, zato je to
+// edini korak, ki ga pokažemo na vrhu (namesto "vse urejeno").
+function FirstEmployeeCard() {
+  const steps = [
+    ["Vpišeš ime in email", "Traja manj kot minuto."],
+    ["Zaposleni dobi povabilo", "Po emailu si sam nastavi geslo."],
+    ["Žigosa s telefonom", "Prihod in odhod z enim klikom, ti vidiš ure tukaj."],
+  ];
+  return (
+    <section className="glass-strong iris-edge mt-6 rounded-3xl p-6 sm:p-8">
+      <p className="text-xs font-semibold uppercase tracking-wide text-brand-600">Prvi korak</p>
+      <h2 className="mt-1 text-xl font-bold tracking-tight text-slate-900 sm:text-2xl">
+        Dodaj prvega zaposlenega
+      </h2>
+      <p className="mt-1.5 max-w-xl text-sm text-slate-600">
+        Dokler nimaš zaposlenih, evidenca ostane prazna. Vpišeš ime in email, ostalo uredi Delovit.
+      </p>
+      <ol className="mt-5 grid gap-3 sm:grid-cols-3">
+        {steps.map(([title, text], i) => (
+          <li key={title} className="flex gap-3 rounded-2xl bg-white/60 p-4 ring-1 ring-white/80">
+            <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-brand-50 text-sm font-bold text-brand-700">
+              {i + 1}
+            </span>
+            <span>
+              <span className="block text-sm font-semibold text-slate-900">{title}</span>
+              <span className="mt-0.5 block text-sm text-slate-500">{text}</span>
+            </span>
+          </li>
+        ))}
+      </ol>
+      <Link
+        href="/dashboard/zaposleni/nov"
+        className="mt-6 flex w-full items-center justify-center gap-2 rounded-full bg-brand-600 px-7 py-3.5 text-base font-semibold text-white shadow-[0_10px_30px_-8px_rgba(29,78,216,0.6)] transition hover:bg-brand-500 sm:inline-flex sm:w-auto"
+      >
+        <UserPlus className="h-5 w-5" /> Dodaj zaposlenega
+      </Link>
+    </section>
   );
 }
 

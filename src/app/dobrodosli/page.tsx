@@ -76,7 +76,7 @@ export default function DobrodosliPage() {
     }
     // Trda preusmeritev (polno nalaganje), da se zanesljivo prevzame sveža
     // seja po prijavi. Mehka navigacija (router.push) lahko tu obtiči.
-    window.location.assign("/narocnina?welcome=1");
+    window.location.assign("/dashboard?welcome=1");
   }
 
   return (

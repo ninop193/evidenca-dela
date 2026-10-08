@@ -9,7 +9,8 @@ import { Wordmark, Card } from "@/components/ui";
 import { signOut } from "../(auth)/actions";
 import { todayLjubljana, shiftDays } from "@/lib/tzdate";
 import { ExportCsvButton, type CsvRow } from "./ExportCsvButton";
-import { TestWinbackButton } from "./TestWinbackButton";
+import { TestEmailButton } from "./TestEmailButton";
+import { sendTestWinback, sendTestActivationNudge } from "./actions";
 import { WinbackPanel, type WinbackCandidate } from "./WinbackPanel";
 import { NadzorTable, type Row, type EmpRow } from "./NadzorTable";
 
@@ -256,7 +257,8 @@ export default async function NadzorPage() {
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
-            <TestWinbackButton />
+            <TestEmailButton send={sendTestActivationNudge} label="Testni opomnik (brez zaposlenih)" />
+            <TestEmailButton send={sendTestWinback} label="Testni win-back mail" />
             <ExportCsvButton rows={csvRows} />
           </div>
         </div>

@@ -11,11 +11,18 @@ function client() {
   return new Resend(key);
 }
 
+// Isti naslov pošiljatelja, a z drugim prikazanim imenom (npr. "Nino iz Delovita"),
+// da oseben mail ne izgleda kot obvestilo sistema.
+function fromWithName(name: string) {
+  const address = FROM.match(/<([^>]+)>/)?.[1] ?? FROM;
+  return `${name} <${address}>`;
+}
+
 // Pošlji en mail. Nikoli ne vrže — napako le zabeleži (mail ne sme podreti webhooka/akcije).
 export async function sendEmail(
   to: string,
   email: RenderedEmail,
-  opts?: { replyTo?: string },
+  opts?: { replyTo?: string; fromName?: string },
 ): Promise<boolean> {
   const resend = client();
   if (!resend) {
@@ -24,10 +31,11 @@ export async function sendEmail(
   }
   try {
     const { error } = await resend.emails.send({
-      from: FROM,
+      from: opts?.fromName ? fromWithName(opts.fromName) : FROM,
       to,
       subject: email.subject,
       html: email.html,
+      ...(email.text ? { text: email.text } : {}),
       ...(opts?.replyTo ? { replyTo: opts.replyTo } : {}),
     });
     if (error) {

@@ -6,8 +6,6 @@ import { createClient } from "@/lib/supabase/server";
 import { getAccess, PLAN, eur } from "@/lib/billing";
 import { Aurora } from "@/components/Aurora";
 import { Wordmark } from "@/components/ui";
-import { MetaPixelEvent } from "@/components/MetaPixel";
-import { metaUserData, sendMetaEvent } from "@/lib/metaCapi";
 import { signOut } from "../(auth)/actions";
 import { SubscribeButtons } from "./SubscribeButtons";
 import { ManageButton } from "./ManageButton";
@@ -17,26 +15,10 @@ const fmtDate = (d: string) =>
     new Date(d),
   );
 
-export default async function NarocninaPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ welcome?: string }>;
-}) {
+export default async function NarocninaPage() {
   const profile = await getProfile();
   if (!profile) redirect("/login");
   if (profile.role !== "admin") redirect("/zigosanje");
-
-  const sp = await searchParams;
-  const welcome = sp.welcome === "1";
-  const metaUser = metaUserData(profile);
-  if (welcome) {
-    await sendMetaEvent({
-      event: "CompleteRegistration",
-      eventId: `reg_${profile.company_id}`,
-      path: "/narocnina?welcome=1",
-      userData: metaUser,
-    });
-  }
 
   const supabase = await createClient();
   const { data: company } = await supabase
@@ -53,9 +35,7 @@ export default async function NarocninaPage({
       : access.state === "past_due"
         ? "Plačilo ni uspelo"
         : access.state === "trialing"
-          ? welcome
-            ? "Dobrodošel v Delovit 🎉"
-            : `Še ${access.trialDaysLeft} dni brezplačnega preizkusa`
+          ? `Še ${access.trialDaysLeft} dni brezplačnega preizkusa`
           : access.state === "trial_expired"
             ? "Tvoj brezplačni preizkus je potekel"
             : "Aktiviraj naročnino";
@@ -66,22 +46,12 @@ export default async function NarocninaPage({
       : access.state === "past_due"
         ? "Zadnje plačilo ni uspelo. Posodobi plačilno sredstvo, da ohraniš dostop."
         : access.state === "trialing"
-          ? welcome
-            ? `Tvoj 14-dnevni brezplačni preizkus je aktiven. Nadaljuj brezplačno ali se naroči že zdaj, kakor ti ustreza.`
-            : "Med preizkusom imaš poln dostop. Naroči se že zdaj in nadaljuj brez prekinitve."
+          ? "Med preizkusom imaš poln dostop. Naroči se že zdaj in nadaljuj brez prekinitve."
           : "Za nadaljevanje izberi paket. Tvoji podatki so shranjeni in spet dostopni takoj po plačilu.";
 
   return (
     <main className="relative min-h-screen text-slate-800">
       <Aurora />
-      {/* ?welcome=1 = podjetje je pravkar ustvarjeno (email ali Google) → registracija. */}
-      {welcome && (
-        <MetaPixelEvent
-          event="CompleteRegistration"
-          eventId={`reg_${profile.company_id}`}
-          userData={metaUser}
-        />
-      )}
 
       <header className="sticky top-0 z-20 px-3 pt-3">
         <div className="glass iris-edge mx-auto flex max-w-3xl items-center justify-between rounded-full px-4 py-2.5">

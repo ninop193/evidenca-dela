@@ -1,7 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { sendEmail, companyAdmin } from "@/lib/email/send";
-import { trialEndingEmail, trialWinbackEmail } from "@/lib/email/templates";
+import {
+  trialEndingEmail,
+  trialWinbackEmail,
+  firstEmployeeNudgeEmail,
+  ACTIVATION_NUDGE_FROM_NAME,
+} from "@/lib/email/templates";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -13,9 +18,15 @@ const DAY = 86_400_000;
 const WINBACK_MIN_DAYS = 1;
 const WINBACK_MAX_DAYS = 60;
 
-// Dnevni cron (Vercel, glej vercel.json). Dve nalogi:
+// Opomnik "dodajte prvega zaposlenega": najprej naslednje jutro po registraciji
+// (vsaj 12 h), največ 7 dni po njej (starejših ne nadlegujemo).
+const NUDGE_MIN_HOURS = 12;
+const NUDGE_MAX_DAYS = 7;
+
+// Dnevni cron (Vercel, glej vercel.json). Tri naloge:
 //  1) Opomnik PRED iztekom preizkusa (~2 dni prej).
-//  2) Win-back PO izteku: podjetja, ki so Delovit v preizkusu dejansko
+//  2) Opomnik podjetjem, ki po registraciji niso dodala nobenega zaposlenega. Samo enkrat.
+//  3) Win-back PO izteku: podjetja, ki so Delovit v preizkusu dejansko
 //     uporabljala (imajo vnose ur), a paketa niso kupila. Samo enkrat.
 export async function GET(req: NextRequest) {
   // Zaščita: Vercel Cron pošlje "Authorization: Bearer <CRON_SECRET>".
@@ -67,13 +78,17 @@ export async function GET(req: NextRequest) {
     }
   }
 
-  // ── 2) Win-back po izteku preizkusa ──────────────────────────────────────
+  // ── 2) Še brez zaposlenih ────────────────────────────────────────────────
+  const nudge = await sendActivationNudges(admin, now);
+
+  // ── 3) Win-back po izteku preizkusa ──────────────────────────────────────
   // VARNOSTNO STIKALO: dokler WINBACK_ENABLED ni "1", se strankam ne pošlje nič.
   // (Testni gumb na /nadzor deluje ne glede na to nastavitev.)
   if (process.env.WINBACK_ENABLED !== "1") {
     return NextResponse.json({
       checked: companies?.length ?? 0,
       sent,
+      nudge,
       winbackDisabled: true,
     });
   }
@@ -92,7 +107,7 @@ export async function GET(req: NextRequest) {
   if (expErr) {
     console.error("Cron win-back poizvedba napaka:", expErr);
     return NextResponse.json(
-      { checked: companies?.length ?? 0, sent, winbackError: true },
+      { checked: companies?.length ?? 0, sent, nudge, winbackError: true },
       { status: 200 },
     );
   }
@@ -147,8 +162,59 @@ export async function GET(req: NextRequest) {
   return NextResponse.json({
     checked: companies?.length ?? 0,
     sent,
+    nudge,
     winbackChecked: expired?.length ?? 0,
     winbackSent,
     winbackSkipped,
   });
+}
+
+// Podjetja v preizkusu, registrirana pred 12 h do 7 dni, ki še nimajo nobenega
+// zaposlenega → en oseben opomnik adminu. Napaka tu ne sme podreti ostalih nalog.
+async function sendActivationNudges(
+  admin: ReturnType<typeof createAdminClient>,
+  now: number,
+) {
+  // VARNOSTNO STIKALO: dokler ACTIVATION_NUDGE_ENABLED ni "1", se strankam ne pošlje nič.
+  // (Testni gumb na /nadzor deluje ne glede na to nastavitev.)
+  if (process.env.ACTIVATION_NUDGE_ENABLED !== "1") return { disabled: true };
+
+  const { data: fresh, error } = await admin
+    .from("companies")
+    .select("id, name")
+    .eq("subscription_status", "trialing")
+    .is("activation_nudge_sent_at", null)
+    .gte("created_at", new Date(now - NUDGE_MAX_DAYS * DAY).toISOString())
+    .lte("created_at", new Date(now - NUDGE_MIN_HOURS * 3_600_000).toISOString());
+
+  if (error) {
+    console.error("Cron opomnik (brez zaposlenih) poizvedba napaka:", error);
+    return { error: true };
+  }
+
+  let sent = 0;
+  for (const c of fresh ?? []) {
+    const { count } = await admin
+      .from("employees")
+      .select("id", { count: "exact", head: true })
+      .eq("company_id", c.id);
+    if ((count ?? 0) > 0) continue;
+
+    const person = await companyAdmin(c.id);
+    if (!person) continue;
+
+    const ok = await sendEmail(
+      person.email,
+      firstEmployeeNudgeEmail({ fullName: person.fullName, companyName: c.name }),
+      { fromName: ACTIVATION_NUDGE_FROM_NAME },
+    );
+    if (ok) {
+      await admin
+        .from("companies")
+        .update({ activation_nudge_sent_at: new Date().toISOString() })
+        .eq("id", c.id);
+      sent++;
+    }
+  }
+  return { checked: fresh?.length ?? 0, sent };
 }

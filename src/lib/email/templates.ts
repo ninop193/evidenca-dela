@@ -1,7 +1,7 @@
 import { renderEmail, infoBox, p, EMAIL_BASE } from "./render";
 import { PLAN, eur } from "@/lib/billing";
 
-export type RenderedEmail = { subject: string; html: string };
+export type RenderedEmail = { subject: string; html: string; text?: string };
 
 const firstName = (full?: string | null) =>
   (full?.trim().split(/\s+/)[0] || "").slice(0, 40);
@@ -422,5 +422,49 @@ export function trialWinbackEmail(opts: {
       footnote:
         "To je enkratno obvestilo, drugega opomnika ne bomo pošiljali. Če Delovit ne potrebujete več, ga mirno prezrite. Če vas je kaj ustavilo pri odločitvi, odgovorite na ta email in vam pomagamo.",
     }),
+  };
+}
+
+// 7) Opomnik delodajalcu, ki se je registriral, a še ni dodal nobenega zaposlenega.
+//    Pošlje se SAMO ENKRAT (companies.activation_nudge_sent_at).
+//    Namenoma izgleda kot oseben mail (brez logotipa, gumba, slik in emojijev,
+//    ena sama povezava, poziv k odgovoru) — tak mail Gmail uvrsti v "Primarno",
+//    oblikovan "newsletter" pa v "Promocije".
+export const ACTIVATION_NUDGE_FROM_NAME = "Nino iz Delovita";
+
+export function firstEmployeeNudgeEmail(opts: {
+  fullName?: string | null;
+  companyName?: string | null;
+}): RenderedEmail {
+  const name = firstName(opts.fullName);
+  const link = `${EMAIL_BASE}/dashboard/zaposleni/nov`;
+  const paragraphs = [
+    `Pozdravljeni${name ? `, ${name}` : ""},`,
+    `ustvarili ste račun Delovit${
+      opts.companyName ? ` za ${opts.companyName}` : ""
+    }, zaposlenih pa še niste dodali. Dokler jih ni, evidenca ostane prazna.`,
+    "Dodajanje traja približno minuto: vpišete ime in email zaposlenega, ta dobi povabilo in nato prihod in odhod žigosa kar s telefonom.",
+    `Prvega zaposlenega dodate tukaj:\n${link}`,
+    "Če se je kje zataknilo ali vas kaj zanima, mi preprosto odgovorite na ta email. Odgovorim osebno.",
+    "Lep pozdrav,\nNino\nDelovit",
+  ];
+
+  const esc = (t: string) =>
+    t.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  const html = `<div style="font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:1.55;color:#222;">${paragraphs
+    .map(
+      (para) =>
+        `<p style="margin:0 0 14px;">${esc(para)
+          .replace(esc(link), `<a href="${link}">${link}</a>`)
+          .replace(/\n/g, "<br>")}</p>`,
+    )
+    .join("")}</div>`;
+
+  return {
+    subject: name
+      ? `${name}, ste že dodali prvega zaposlenega?`
+      : "Ste že dodali prvega zaposlenega?",
+    html,
+    text: paragraphs.join("\n\n"),
   };
 }

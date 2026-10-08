@@ -73,7 +73,7 @@ export async function GET(req: NextRequest) {
           }),
         );
       }
-      return NextResponse.redirect(`${origin}/narocnina?welcome=1`);
+      return NextResponse.redirect(`${origin}/dashboard?welcome=1`);
     }
   }
 

@@ -5,7 +5,11 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { isSuperadmin } from "@/lib/superadmin";
 import { sendEmail, companyAdmin } from "@/lib/email/send";
-import { trialWinbackEmail } from "@/lib/email/templates";
+import {
+  trialWinbackEmail,
+  firstEmployeeNudgeEmail,
+  ACTIVATION_NUDGE_FROM_NAME,
+} from "@/lib/email/templates";
 
 export type ActionResult = { ok: boolean; message: string };
 
@@ -34,6 +38,22 @@ export async function sendTestWinback(): Promise<ActionResult> {
       employees: 3,
       expiredDaysAgo: 4,
     }),
+  );
+
+  return ok
+    ? { ok: true, message: `Testni mail poslan na ${email}.` }
+    : { ok: false, message: "Pošiljanje ni uspelo (preveri RESEND_API_KEY in log)." };
+}
+
+// Pošlje TESTNI opomnik "dodajte prvega zaposlenega" — samo na email prijavljenega superadmina.
+export async function sendTestActivationNudge(): Promise<ActionResult> {
+  const email = await requireSuperadmin();
+  if (!email) return { ok: false, message: "Nedovoljeno." };
+
+  const ok = await sendEmail(
+    email,
+    firstEmployeeNudgeEmail({ fullName: "Nino Pavalec", companyName: "Primer d.o.o." }),
+    { fromName: ACTIVATION_NUDGE_FROM_NAME },
   );
 
   return ok
