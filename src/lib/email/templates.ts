@@ -435,14 +435,20 @@ export const ACTIVATION_NUDGE_FROM_NAME = "Nino iz Delovita";
 export function firstEmployeeNudgeEmail(opts: {
   fullName?: string | null;
   companyName?: string | null;
+  trialDaysLeft?: number | null;
 }): RenderedEmail {
   const name = firstName(opts.fullName);
+  const d = opts.trialDaysLeft;
+  const left = d == null || d < 1 ? null : d === 1 ? "še 1 dan" : d === 2 ? "še 2 dneva" : `še ${d} dni`;
   const link = `${EMAIL_BASE}/dashboard/zaposleni/nov`;
   const paragraphs = [
     `Pozdravljeni${name ? `, ${name}` : ""},`,
     `ustvarili ste račun Delovit${
       opts.companyName ? ` za ${opts.companyName}` : ""
     }, zaposlenih pa še niste dodali. Dokler jih ni, evidenca ostane prazna.`,
+    `Vaš 14-dnevni brezplačni preizkus${
+      left ? ` traja ${left}` : " že teče"
+    }, brez kartice in brez obveznosti. Najbolje ga izkoristite, če Delovit preizkusite skupaj z zaposlenimi.`,
     "Dodajanje traja približno minuto: vpišete ime in email zaposlenega, ta dobi povabilo in nato prihod in odhod žigosa kar s telefonom.",
     `Prvega zaposlenega dodate tukaj:\n${link}`,
     "Če se je kje zataknilo ali vas kaj zanima, mi preprosto odgovorite na ta email. Odgovorim osebno.",

@@ -181,7 +181,7 @@ async function sendActivationNudges(
 
   const { data: fresh, error } = await admin
     .from("companies")
-    .select("id, name")
+    .select("id, name, trial_ends_at")
     .eq("subscription_status", "trialing")
     .is("activation_nudge_sent_at", null)
     .gte("created_at", new Date(now - NUDGE_MAX_DAYS * DAY).toISOString())
@@ -205,7 +205,13 @@ async function sendActivationNudges(
 
     const ok = await sendEmail(
       person.email,
-      firstEmployeeNudgeEmail({ fullName: person.fullName, companyName: c.name }),
+      firstEmployeeNudgeEmail({
+        fullName: person.fullName,
+        companyName: c.name,
+        trialDaysLeft: c.trial_ends_at
+          ? Math.ceil((new Date(c.trial_ends_at).getTime() - now) / DAY)
+          : null,
+      }),
       { fromName: ACTIVATION_NUDGE_FROM_NAME },
     );
     if (ok) {

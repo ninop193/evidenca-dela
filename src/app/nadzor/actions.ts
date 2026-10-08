@@ -52,7 +52,11 @@ export async function sendTestActivationNudge(): Promise<ActionResult> {
 
   const ok = await sendEmail(
     email,
-    firstEmployeeNudgeEmail({ fullName: "Nino Pavalec", companyName: "Primer d.o.o." }),
+    firstEmployeeNudgeEmail({
+      fullName: "Nino Pavalec",
+      companyName: "Primer d.o.o.",
+      trialDaysLeft: 13,
+    }),
     { fromName: ACTIVATION_NUDGE_FROM_NAME },
   );
 
