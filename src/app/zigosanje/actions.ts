@@ -4,13 +4,9 @@ import { getProfile } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getAccess } from "@/lib/billing";
-import {
-  workerCategory,
-  autostopHoursFor,
-  autoCapNote,
-  ABSOLUTE_CEILING_HOURS,
-} from "@/lib/workLimits";
+import { ABSOLUTE_CEILING_HOURS } from "@/lib/workLimits";
 import { combineLjubljana, shiftDays } from "@/lib/tzdate";
+import { clockInEmployee, clockOutEmployee } from "@/lib/clock";
 
 const TZ = "Europe/Ljubljana";
 
@@ -53,105 +49,19 @@ export async function clockIn(): Promise<ActionResult> {
   if (!employee) return { error: "Ni najdenega zaposlenega." };
   if (!employee.active) return { error: "Vaš račun je deaktiviran. Obrnite se na delodajalca." };
 
-  const today = todayLjubljana();
-
-  // Poišči vse odprte vnose (brez odhoda).
-  const { data: openEntries } = await supabase
-    .from("time_entries")
-    .select("id, date, clock_in")
-    .eq("employee_id", employee.id)
-    .is("clock_out", null);
-
-  // Že odprt vnos za DANES → prepreči dvojni prihod.
-  if ((openEntries ?? []).some((e) => e.date === today)) {
-    return { error: "Prihod je že zabeležen." };
-  }
-
-  // Pozabljen odhod iz prejšnjega dne → predlagaj odhod ob dnevni meji (auto-stop)
-  // in OZNAČI za pregled. Ure se ne odrežejo tiho; delodajalec/delavec popravi.
-  const stale = (openEntries ?? []).filter((e) => e.date !== today);
-  if (stale.length) {
-    const capH = autostopHoursFor(workerCategory(employee.worker_type, employee.birth_date));
-    for (const s of stale) {
-      const start = new Date(s.clock_in as string);
-      const capOut = new Date(start.getTime() + capH * 3_600_000);
-      await supabase
-        .from("time_entries")
-        .update({
-          clock_out: capOut.toISOString(),
-          hours_count: capH,
-          total_worked_hours: capH,
-          needs_review: true,
-          notes: autoCapNote(),
-        })
-        .eq("id", s.id)
-        .eq("employee_id", employee.id)
-        .eq("confirmed", false);
-    }
-  }
-
-  const { error } = await supabase.from("time_entries").insert({
-    company_id: employee.company_id,
-    employee_id: employee.id,
-    date: today,
-    clock_in: new Date().toISOString(),
-  });
-  if (error) return { error: "Napaka pri beleženju prihoda." };
-  return {};
+  const { error } = await clockInEmployee(supabase, employee);
+  return error ? { error } : {};
 }
 
-// ODHOD — zaključi odprt vnos in izračuna opravljene ure.
-// breakMinutes: neobvezna zabeležka odmora (18. člen ZEPDSV). Odmor se po
-// ZDR-1 všteva v delovni čas, zato UR NE odšteva — je samo evidenčni podatek.
+// ODHOD — zaključi odprt vnos in izračuna opravljene ure (glej lib/clock.ts).
 export async function clockOut(breakMinutes?: number): Promise<ActionResult> {
   const { supabase, employee, hasAccess } = await getEmployee();
   if (!hasAccess) return { error: "Naročnina podjetja je potekla." };
   if (!employee) return { error: "Ni najdenega zaposlenega." };
   if (!employee.active) return { error: "Vaš račun je deaktiviran. Obrnite se na delodajalca." };
 
-  const { data: open } = await supabase
-    .from("time_entries")
-    .select("id, clock_in")
-    .eq("employee_id", employee.id)
-    .is("clock_out", null)
-    .order("clock_in", { ascending: false })
-    .limit(1)
-    .single();
-  if (!open) return { error: "Ni odprtega prihoda." };
-
-  const now = new Date();
-  const start = new Date(open.clock_in as string);
-
-  // Če razpon presega dnevno mejo (auto-stop), gre skoraj zagotovo za pozabljen
-  // odhod (npr. klik naslednje jutro). Predlagamo odhod ob meji in OZNAČIMO za
-  // pregled — ura se ne odreže tiho, delodajalec/delavec vpiše dejanski čas.
-  const capH = autostopHoursFor(workerCategory(employee.worker_type, employee.birth_date));
-  const rawMs = Math.max(0, now.getTime() - start.getTime());
-  const overCap = rawMs > capH * 3_600_000;
-  const clockOutAt = overCap ? new Date(start.getTime() + capH * 3_600_000) : now;
-  const hours = overCap
-    ? capH
-    : Math.round((rawMs / 3_600_000) * 100) / 100;
-
-  const brk = Number.isFinite(breakMinutes)
-    ? Math.min(480, Math.max(0, Math.round(breakMinutes as number)))
-    : 0;
-
-  const { error } = await supabase
-    .from("time_entries")
-    .update({
-      clock_out: clockOutAt.toISOString(),
-      hours_count: hours,
-      total_worked_hours: hours,
-      sunday_hours: isSunday(start) ? hours : 0,
-      break_minutes: brk,
-      ...(overCap ? { needs_review: true, notes: autoCapNote() } : {}),
-    })
-    .eq("id", open.id)
-    .eq("employee_id", employee.id)
-    .eq("confirmed", false);
-  if (error) return { error: "Napaka pri beleženju odhoda." };
-  return { capped: overCap };
+  const { error, capped } = await clockOutEmployee(supabase, employee, breakMinutes);
+  return error ? { error } : { capped };
 }
 
 // =============================================================================

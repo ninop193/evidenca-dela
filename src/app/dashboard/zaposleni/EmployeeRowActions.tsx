@@ -11,11 +11,13 @@ export function EmployeeRowActions({
   fullName,
   active,
   isSelf = false,
+  hasLogin = true,
 }: {
   employeeId: string;
   fullName: string;
   active: boolean;
   isSelf?: boolean;
+  hasLogin?: boolean;
 }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -87,8 +89,9 @@ export function EmployeeRowActions({
             <Pencil className="h-4 w-4 text-slate-500" />
             Uredi
           </Link>
-          {/* Delodajalec sam se prijavlja s svojim računom — povabila ne potrebuje. */}
-          {!isSelf && (
+          {/* Delodajalec sam se prijavlja s svojim računom — povabila ne potrebuje.
+              Zaposleni brez emaila (samo tablica) prijavnega računa nima. */}
+          {!isSelf && hasLogin && (
             <button
               onClick={doResendInvite}
               disabled={loading}

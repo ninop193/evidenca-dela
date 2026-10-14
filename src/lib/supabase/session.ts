@@ -55,7 +55,9 @@ export async function updateSession(request: NextRequest) {
 
   if (!user && isProtected) {
     const url = request.nextUrl.clone();
-    url.pathname = "/login";
+    // Povezana skupna tablica (piškotek delovit_tablica): ikona na domačem zaslonu
+    // odpre /zigosanje — namesto prijave pokažemo zaslon tablice.
+    url.pathname = path === "/zigosanje" && request.cookies.has("delovit_tablica") ? "/tablica" : "/login";
     return NextResponse.redirect(url);
   }
 

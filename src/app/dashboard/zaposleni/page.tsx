@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Users, UserPlus } from "lucide-react";
+import { Users, UserPlus, TabletSmartphone } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getProfile } from "@/lib/auth";
@@ -37,9 +37,16 @@ export default async function EmployeesPage() {
           <h1 className="text-2xl font-bold tracking-tight text-slate-900">Zaposleni</h1>
           <p className="mt-1 text-sm text-slate-500">Upravljaj delavce in njihove podatke.</p>
         </div>
-        <Link href="/dashboard/zaposleni/nov" className={buttonClasses("primary")}>
-          <UserPlus className="h-4 w-4" /> Dodaj zaposlenega
-        </Link>
+        <div className="flex items-center gap-2">
+          {/* Neobvezna možnost: žigosanje na skupni tablici na delovnem mestu */}
+          <Link href="/dashboard/tablica" className={buttonClasses("ghost")} title="Žigosanje na skupni tablici">
+            <TabletSmartphone className="h-4 w-4" />
+            <span className="hidden sm:inline">Skupna tablica</span>
+          </Link>
+          <Link href="/dashboard/zaposleni/nov" className={buttonClasses("primary")}>
+            <UserPlus className="h-4 w-4" /> Dodaj zaposlenega
+          </Link>
+        </div>
       </div>
 
       <div className="mt-6">
@@ -102,9 +109,14 @@ export default async function EmployeesPage() {
                             čaka na prijavo
                           </Badge>
                         )}
+                        {!e.user_id && (
+                          <Badge tone="slate" className="ml-1.5">
+                            samo tablica
+                          </Badge>
+                        )}
                       </td>
                       <td className="px-4 py-3.5 text-right">
-                        <EmployeeRowActions employeeId={e.id} fullName={e.full_name} active={!!e.active} isSelf={isSelf(e)} />
+                        <EmployeeRowActions employeeId={e.id} fullName={e.full_name} active={!!e.active} isSelf={isSelf(e)} hasLogin={!!e.user_id} />
                       </td>
                     </tr>
                   ))}
@@ -131,10 +143,11 @@ export default async function EmployeesPage() {
                       {neverSignedIn.has(e.id) && (
                         <Badge tone="amber">čaka na prijavo</Badge>
                       )}
+                      {!e.user_id && <Badge tone="slate">samo tablica</Badge>}
                       <Badge tone={e.active ? "green" : "slate"}>
                         {e.active ? "Aktiven" : "Neaktiven"}
                       </Badge>
-                      <EmployeeRowActions employeeId={e.id} fullName={e.full_name} active={!!e.active} isSelf={isSelf(e)} />
+                      <EmployeeRowActions employeeId={e.id} fullName={e.full_name} active={!!e.active} isSelf={isSelf(e)} hasLogin={!!e.user_id} />
                     </div>
                   </div>
                   <dl className="mt-2 grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-sm">

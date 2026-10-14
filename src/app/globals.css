@@ -211,3 +211,16 @@ body {
     -webkit-backdrop-filter: blur(6px) saturate(135%);
   }
 }
+
+/* Skupna tablica: tresljaj pik ob napačni kodi + odštevanje do vrnitve na seznam */
+@keyframes kioskShake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-10px); }
+  40%, 80% { transform: translateX(10px); }
+}
+.kiosk-shake { animation: kioskShake 0.4s ease-in-out; }
+@keyframes kioskCountdown { from { width: 100%; } to { width: 0%; } }
+.kiosk-countdown { animation: kioskCountdown 5s linear forwards; }
+@media (prefers-reduced-motion: reduce) {
+  .kiosk-shake { animation: none; }
+}
