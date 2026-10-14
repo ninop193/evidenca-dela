@@ -44,11 +44,10 @@ function SharedDeviceInfo({ onClose }: { onClose: () => void }) {
     return () => document.removeEventListener("keydown", onKey);
   }, [onClose]);
 
-  const points = [
-    "Zaposleni pritisne svoje ime in vpiše osebno 4-mestno kodo.",
-    "Na skupni napravi se zaposlenim ni treba prijavljati z geslom.",
-    "Žigosanje s telefonom deluje naprej. Uporabljate lahko oboje.",
-    "Po 5 napačnih kodah se vnos zaklene, napravo pa lahko kadarkoli odklopiš.",
+  // Namen okna: delodajalec v nekaj sekundah ve, ali to rabi ali ne.
+  const fits = [
+    "zaposleni med delom nimajo telefona pri sebi (lokal, salon, trgovina, delavnica),",
+    "kdo nima pametnega telefona ali aplikacije noče imeti na svojem.",
   ];
 
   return (
@@ -76,23 +75,33 @@ function SharedDeviceInfo({ onClose }: { onClose: () => void }) {
             Kaj je skupna naprava?
           </h2>
           <p className="mt-2 text-[15px] leading-relaxed text-slate-600">
-            Ena tablica ali star telefon na delovnem mestu, na katerem se vsi zaposleni evidentirajo ob prihodu in
-            odhodu. Brez prijave, samo z osebno kodo.
+            Ena tablica ali telefon na delovnem mestu, na katerem žigosajo vsi: zaposleni pritisne svoje ime in vpiše
+            osebno 4-mestno kodo.
           </p>
 
           <Preview />
 
-          <ul className="mt-6 space-y-2.5">
-            {points.map((p) => (
-              <li key={p} className="flex items-start gap-2.5 text-sm text-slate-700">
-                <span className="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full bg-emerald-100 text-emerald-700">
-                  <Check className="h-3.5 w-3.5" strokeWidth={3} />
-                </span>
-                {p}
-              </li>
-            ))}
-          </ul>
-          <p className="mt-4 text-sm text-slate-500">Primerno za lokale, salone, trgovine in delavnice.</p>
+          <div className="mt-6 rounded-2xl bg-emerald-50/70 p-4 ring-1 ring-emerald-100">
+            <p className="text-sm font-semibold text-emerald-900">Pride prav, če:</p>
+            <ul className="mt-2 space-y-1.5">
+              {fits.map((p) => (
+                <li key={p} className="flex items-start gap-2 text-sm text-emerald-900/90">
+                  <Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" strokeWidth={3} />
+                  {p}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="mt-3 rounded-2xl bg-slate-50 p-4 ring-1 ring-slate-200/70">
+            <p className="text-sm font-semibold text-slate-900">Ne potrebuješ je, če vsak žigosa na svojem telefonu.</p>
+            <p className="mt-1 text-sm text-slate-600">To deluje že zdaj, nastaviti ti ni treba ničesar.</p>
+          </div>
+
+          <p className="mt-4 text-xs leading-relaxed text-slate-500">
+            Neobvezna je in privzeto izklopljena. Če jo vklopiš, žigosanje s telefonom deluje naprej, napravo pa lahko
+            kadarkoli odklopiš.
+          </p>
 
           <div className="mt-7 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
             <button onClick={onClose} className={buttonClasses("ghost")}>
