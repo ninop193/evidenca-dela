@@ -65,7 +65,7 @@ function KioskHeader({ companyName }: { companyName?: string }) {
             ? new Intl.DateTimeFormat("sl-SI", { timeZone: "Europe/Ljubljana", hour: "2-digit", minute: "2-digit" }).format(now)
             : " "}
         </p>
-        <p className="text-sm capitalize text-slate-500">
+        <p className="text-sm text-slate-500 first-letter:uppercase">
           {now
             ? new Intl.DateTimeFormat("sl-SI", {
                 timeZone: "Europe/Ljubljana",
@@ -85,7 +85,7 @@ function Avatar({ name, size = "md" }: { name: string; size?: "md" | "lg" }) {
     <span
       className={cn(
         "grid shrink-0 place-items-center rounded-full bg-gradient-to-br from-brand-500 to-brand-700 font-bold text-white shadow-[0_8px_20px_-8px_rgba(29,78,216,0.7)]",
-        size === "lg" ? "h-20 w-20 text-2xl" : "h-14 w-14 text-lg",
+        size === "lg" ? "h-14 w-14 text-lg sm:h-20 sm:w-20 sm:text-2xl" : "h-14 w-14 text-lg",
       )}
     >
       {initials(name)}
@@ -119,7 +119,7 @@ export function KioskScreen({ companyName, employees }: { companyName: string; e
   return (
     <div className="flex min-h-screen flex-col" onPointerDown={() => setLastTouch(Date.now())}>
       <KioskHeader companyName={companyName} />
-      <main className="flex flex-1 flex-col px-5 pb-8 pt-6 sm:px-8">
+      <main className="flex flex-1 flex-col px-5 pb-6 pt-3 sm:px-8 sm:pb-8 sm:pt-6">
         {screen.kind === "home" && (
           <NamePicker employees={employees} onPick={(emp) => setScreen({ kind: "pin", emp })} />
         )}
@@ -158,9 +158,9 @@ function NamePicker({ employees, onPick }: { employees: Employee[]; onPick: (e: 
     <div className="mx-auto w-full max-w-5xl">
       <h1 className="text-center text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">Kdo žigosa?</h1>
       <p className="mt-2 text-center text-lg text-slate-500">Pritisni svoje ime</p>
-      <ul className="mt-8 grid grid-cols-1 gap-3 min-[480px]:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+      <ul className="mt-8 flex flex-wrap justify-center gap-3">
         {employees.map((e) => (
-          <li key={e.id}>
+          <li key={e.id} className="w-full min-[480px]:w-[calc(50%-0.375rem)] md:w-[calc(33.333%-0.5rem)] lg:w-[calc(25%-0.5625rem)]">
             <button
               onClick={() => {
                 buzz();
@@ -236,11 +236,11 @@ function PinPad({
       </div>
       <div className="mt-2 flex flex-col items-center text-center">
         <Avatar name={emp.name} size="lg" />
-        <p className="mt-3 text-2xl font-bold text-slate-900">{emp.name}</p>
+        <p className="mt-2 text-2xl font-bold text-slate-900 sm:mt-3">{emp.name}</p>
         <p className="mt-1 text-slate-500">Vpiši svojo kodo</p>
       </div>
 
-      <div key={shake} className={cn("mt-6 flex justify-center gap-4", shake > 0 && "kiosk-shake")}>
+      <div key={shake} className={cn("mt-4 flex justify-center gap-4 sm:mt-6", shake > 0 && "kiosk-shake")}>
         {[0, 1, 2, 3].map((i) => (
           <span
             key={i}
@@ -252,7 +252,7 @@ function PinPad({
           />
         ))}
       </div>
-      <p className={cn("mt-3 min-h-6 text-center text-sm font-medium", error ? "text-rose-600" : "text-transparent")}>
+      <p className={cn("mt-3 min-h-10 text-center text-sm font-medium", error ? "text-rose-600" : "text-transparent")}>
         {error ?? "."}
       </p>
 
@@ -291,7 +291,7 @@ function KeyButton({
     <button
       type="button"
       className={cn(
-        "grid h-[4.5rem] place-items-center rounded-2xl text-3xl font-semibold text-slate-900 transition active:scale-[0.94] disabled:opacity-40",
+        "grid h-14 place-items-center rounded-2xl text-3xl sm:h-[4.5rem] font-semibold text-slate-900 transition active:scale-[0.94] disabled:opacity-40",
         subtle ? "text-slate-500" : "glass-strong iris-edge",
         className,
       )}
@@ -451,7 +451,7 @@ function Done({ screen, onClose }: { screen: Extract<Screen, { kind: "done" }>; 
       {screen.time && <p className="mt-2 font-mono text-5xl font-bold tabular-nums text-slate-900">{screen.time}</p>}
       <p className="mt-3 text-lg text-slate-500">
         {screen.name}
-        {!isIn && screen.hours != null && ` · danes ${fmtHours(screen.hours)}`}
+        {!isIn && screen.hours != null && ` · opravljeno ${fmtHours(screen.hours)}`}
       </p>
       {screen.capped && (
         <p className="mt-5 rounded-2xl bg-amber-50/90 px-4 py-3 text-sm text-amber-800 ring-1 ring-amber-200">
