@@ -9,6 +9,7 @@ import {
   ChevronRight,
   Sun,
   Fingerprint,
+  TabletSmartphone,
 } from "lucide-react";
 import { getProfile } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
@@ -254,7 +255,7 @@ export default async function DashboardPage({
       <h2 className="mt-10 text-sm font-semibold uppercase tracking-wide text-slate-500">
         Hitra dejanja
       </h2>
-      <div className="mt-3 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+      <div className="mt-3 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {selfEnrolled ? (
           <Action href="/zigosanje" icon={<Fingerprint className="h-5 w-5" />} title="Moje žigosanje" text="Tvoj prihod in odhod" />
         ) : (
@@ -266,6 +267,8 @@ export default async function DashboardPage({
         <Action href="/dashboard/ure/nov" icon={<Clock className="h-5 w-5" />} title="Ročni vnos ur" text="Vnesi ure za nazaj" />
         <Action href="/dashboard/pregled" icon={<BarChart3 className="h-5 w-5" />} title="Mesečni pregled" text="Seštevki, potrditev, izvoz" />
         <Action href="/dashboard/odsotnosti/nov" icon={<Palmtree className="h-5 w-5" />} title="Vnesi odsotnost" text="Dopust, bolniška" />
+        {/* Neobvezno: žigosanje na skupni tablici na delovnem mestu */}
+        <Action href="/dashboard/tablica" icon={<TabletSmartphone className="h-5 w-5" />} title="Skupna tablica" text="Vsi žigosajo na eni napravi" />
       </div>
     </main>
   );
