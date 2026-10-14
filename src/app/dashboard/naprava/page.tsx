@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { getProfile } from "@/lib/auth";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { ensurePins } from "@/lib/kiosk";
+import { Badge } from "@/components/ui";
 import { KioskSettings } from "./KioskSettings";
 
 // Nastavitve skupne naprave (neobvezna možnost; privzeto izklopljena).
@@ -18,7 +19,7 @@ export default async function NapravaSettingsPage() {
   const enabled = !!company?.kiosk_enabled;
 
   let employees: { id: string; name: string; pin: string | null }[] = [];
-  let devices: { id: string; createdAt: string; lastUsedAt: string | null }[] = [];
+  let devices: { id: string; name: string | null; createdAt: string; lastUsedAt: string | null }[] = [];
   if (enabled) {
     const pins = await ensurePins(db, companyId);
     const [{ data: emps }, { data: devs }] = await Promise.all([
@@ -30,13 +31,13 @@ export default async function NapravaSettingsPage() {
         .order("full_name", { ascending: true }),
       db
         .from("kiosk_devices")
-        .select("id, created_at, last_used_at")
+        .select("id, name, created_at, last_used_at")
         .eq("company_id", companyId)
         .is("revoked_at", null)
         .order("created_at", { ascending: true }),
     ]);
     employees = (emps ?? []).map((e) => ({ id: e.id, name: e.full_name, pin: pins.get(e.id) ?? null }));
-    devices = (devs ?? []).map((d) => ({ id: d.id, createdAt: d.created_at, lastUsedAt: d.last_used_at }));
+    devices = (devs ?? []).map((d) => ({ id: d.id, name: d.name, createdAt: d.created_at, lastUsedAt: d.last_used_at }));
   }
 
   return (
@@ -44,7 +45,10 @@ export default async function NapravaSettingsPage() {
       <Link href="/dashboard/zaposleni" className="text-sm text-slate-500 hover:text-slate-900">
         ← Zaposleni
       </Link>
-      <h1 className="mt-3 text-2xl font-bold tracking-tight text-slate-900">Skupna naprava</h1>
+      <div className="mt-3 flex flex-wrap items-center gap-2.5">
+        <h1 className="text-2xl font-bold tracking-tight text-slate-900">Skupna naprava</h1>
+        {enabled && <Badge tone="green">Vklopljeno</Badge>}
+      </div>
       <p className="mt-1 text-sm text-slate-500">
         Zaposleni žigosajo na eni napravi na delovnem mestu: pritisnejo svoje ime in vpišejo osebno kodo.
         Žigosanje s telefonom deluje naprej kot doslej.

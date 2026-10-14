@@ -93,6 +93,22 @@ export async function disconnectDevice(deviceId: string): Promise<Result> {
   return { ok: true };
 }
 
+// Ime naprave (npr. "Telefon v lokalu"); prazno ime → privzeto "Naprava N".
+export async function renameDevice(deviceId: string, rawName: string): Promise<Result> {
+  const ctx = await adminContext();
+  if (!ctx) return NOT_ADMIN;
+  const name = rawName.trim().replace(/\s+/g, " ").slice(0, 40) || null;
+  const { error } = await ctx.db
+    .from("kiosk_devices")
+    .update({ name })
+    .eq("id", deviceId)
+    .eq("company_id", ctx.profile.company_id)
+    .is("revoked_at", null);
+  if (error) return { error: "Imena ni bilo mogoče shraniti." };
+  revalidatePath("/dashboard/naprava");
+  return { ok: true };
+}
+
 // Nova PIN koda za zaposlenega (npr. če jo je izvedel sodelavec).
 export async function regeneratePin(employeeId: string): Promise<Result & { pin?: string }> {
   const ctx = await adminContext();
