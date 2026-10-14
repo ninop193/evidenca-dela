@@ -89,7 +89,7 @@ function TurnOn() {
         ))}
       </ol>
       <p className="mt-6 text-sm text-slate-500">
-        Kode za vse zaposlene ustvarimo samodejno. Zaposleni za skupno napravo ne potrebujejo emaila ali gesla.
+        Kode za vse zaposlene ustvarimo samodejno. Žigosanje s telefonom deluje naprej, zaposleni lahko uporabljajo oboje.
       </p>
       {error && <p className="mt-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
       <Button size="lg" className="mt-6" onClick={turnOn} disabled={loading}>

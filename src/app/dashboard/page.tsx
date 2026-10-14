@@ -20,6 +20,7 @@ import { todayLjubljana, monthEnd, dayLabel, timeLabel } from "@/lib/tzdate";
 import { ApproveButton } from "./ure/ApproveButton";
 import { SelfClockButton } from "./SelfClockButton";
 import { SharedDeviceTile } from "./SharedDeviceTile";
+import { LiveRefresh } from "@/components/LiveRefresh";
 
 type PendingRow = {
   id: string;
@@ -120,6 +121,10 @@ export default async function DashboardPage({
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-8">
+      {/* "Na delu zdaj" in čakajoči vnosi se uskladijo z žigi s telefonov/skupne naprave.
+          NE ob obisku po registraciji/plačilu: osvežitev bi znova izvedla pošiljanje
+          dogodkov Meti (sendMetaEvent zgoraj). */}
+      {!welcome && !checkoutId && <LiveRefresh />}
       {checkoutId && (
         <MetaPixelEvent
           event="Subscribe"

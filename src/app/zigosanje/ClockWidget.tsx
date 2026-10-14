@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Play, Square, Loader2 } from "lucide-react";
 import { clockIn, clockOut } from "./actions";
+import { LiveRefresh } from "@/components/LiveRefresh";
 
 type Entry = {
   id: string;
@@ -47,6 +48,7 @@ export default function ClockWidget({
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [info, setInfo] = useState<string | null>(null); // obvestilo, ne napaka
   const [confirmOut, setConfirmOut] = useState(false);
   const [breakMin, setBreakMin] = useState(0);
   const [now, setNow] = useState(() => Date.now());
@@ -78,6 +80,7 @@ export default function ClockWidget({
   async function submit(action: "in" | "out") {
     if (loading) return;
     setError(null);
+    setInfo(null);
     setLoading(true);
     // Taktilni odziv na mobilnih napravah (Apple-style press feedback).
     try {
@@ -86,6 +89,16 @@ export default function ClockWidget({
     const res = action === "out" ? await clockOut(breakMin) : await clockIn();
     setLoading(false);
     setConfirmOut(false);
+    // Žig je bil medtem narejen drugje (npr. na skupni napravi) → pokaži pravo stanje.
+    if (res.stale) {
+      setInfo(
+        action === "in"
+          ? "Prihod je že zabeležen (morda na skupni napravi). Prikaz je posodobljen."
+          : "Odhod je že zabeležen (morda na skupni napravi). Prikaz je posodobljen.",
+      );
+      router.refresh();
+      return;
+    }
     if (res.error) {
       setError(res.error);
       return;
@@ -119,6 +132,8 @@ export default function ClockWidget({
 
   return (
     <div className="flex w-full flex-col items-center">
+      {/* Stanje se uskladi, če je bil žig narejen drugje (skupna naprava, drug telefon). */}
+      <LiveRefresh />
       {/* Status */}
       <div className="mb-8 text-center">
         {activeOpen ? (
@@ -311,6 +326,11 @@ export default function ClockWidget({
       {error && (
         <p className="glass mt-6 rounded-xl px-3.5 py-2 text-sm font-medium text-rose-600">
           {error}
+        </p>
+      )}
+      {info && (
+        <p className="glass mt-6 rounded-xl px-3.5 py-2 text-center text-sm font-medium text-slate-700">
+          {info}
         </p>
       )}
 

@@ -46,7 +46,7 @@ function SharedDeviceInfo({ onClose }: { onClose: () => void }) {
 
   const points = [
     "Zaposleni pritisne svoje ime in vpiše osebno 4-mestno kodo.",
-    "Zaposleni ne potrebujejo emaila, gesla ali aplikacije.",
+    "Na skupni napravi se zaposlenim ni treba prijavljati z geslom.",
     "Žigosanje s telefonom deluje naprej. Uporabljate lahko oboje.",
     "Po 5 napačnih kodah se vnos zaklene, napravo pa lahko kadarkoli odklopiš.",
   ];
@@ -77,7 +77,7 @@ function SharedDeviceInfo({ onClose }: { onClose: () => void }) {
           </h2>
           <p className="mt-2 text-[15px] leading-relaxed text-slate-600">
             Ena tablica ali star telefon na delovnem mestu, na katerem se vsi zaposleni evidentirajo ob prihodu in
-            odhodu, brez lastnega uporabniškega računa.
+            odhodu. Brez prijave, samo z osebno kodo.
           </p>
 
           <Preview />

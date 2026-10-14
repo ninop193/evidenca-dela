@@ -109,14 +109,9 @@ export default async function EmployeesPage() {
                             čaka na prijavo
                           </Badge>
                         )}
-                        {!e.user_id && (
-                          <Badge tone="slate" className="ml-1.5">
-                            samo skupna naprava
-                          </Badge>
-                        )}
                       </td>
                       <td className="px-4 py-3.5 text-right">
-                        <EmployeeRowActions employeeId={e.id} fullName={e.full_name} active={!!e.active} isSelf={isSelf(e)} hasLogin={!!e.user_id} />
+                        <EmployeeRowActions employeeId={e.id} fullName={e.full_name} active={!!e.active} isSelf={isSelf(e)} />
                       </td>
                     </tr>
                   ))}
@@ -143,11 +138,10 @@ export default async function EmployeesPage() {
                       {neverSignedIn.has(e.id) && (
                         <Badge tone="amber">čaka na prijavo</Badge>
                       )}
-                      {!e.user_id && <Badge tone="slate">samo skupna naprava</Badge>}
                       <Badge tone={e.active ? "green" : "slate"}>
                         {e.active ? "Aktiven" : "Neaktiven"}
                       </Badge>
-                      <EmployeeRowActions employeeId={e.id} fullName={e.full_name} active={!!e.active} isSelf={isSelf(e)} hasLogin={!!e.user_id} />
+                      <EmployeeRowActions employeeId={e.id} fullName={e.full_name} active={!!e.active} isSelf={isSelf(e)} />
                     </div>
                   </div>
                   <dl className="mt-2 grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-sm">

@@ -23,7 +23,7 @@ function isSunday(d: Date): boolean {
   );
 }
 
-type ActionResult = { error?: string; capped?: boolean };
+type ActionResult = { error?: string; stale?: boolean; capped?: boolean };
 
 // Poišče zapis zaposlenega + preveri dostop (preizkus/naročnina) podjetja.
 // Identiteto preverimo z uporabnikovo sejo (RLS); zapisi pa gredo prek strežniškega
@@ -49,8 +49,8 @@ export async function clockIn(): Promise<ActionResult> {
   if (!employee) return { error: "Ni najdenega zaposlenega." };
   if (!employee.active) return { error: "Vaš račun je deaktiviran. Obrnite se na delodajalca." };
 
-  const { error } = await clockInEmployee(supabase, employee);
-  return error ? { error } : {};
+  const { error, stale } = await clockInEmployee(supabase, employee);
+  return error ? { error, stale } : {};
 }
 
 // ODHOD — zaključi odprt vnos in izračuna opravljene ure (glej lib/clock.ts).
@@ -60,8 +60,8 @@ export async function clockOut(breakMinutes?: number): Promise<ActionResult> {
   if (!employee) return { error: "Ni najdenega zaposlenega." };
   if (!employee.active) return { error: "Vaš račun je deaktiviran. Obrnite se na delodajalca." };
 
-  const { error, capped } = await clockOutEmployee(supabase, employee, breakMinutes);
-  return error ? { error } : { capped };
+  const { error, stale, capped } = await clockOutEmployee(supabase, employee, breakMinutes);
+  return error ? { error, stale } : { capped };
 }
 
 // =============================================================================

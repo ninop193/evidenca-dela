@@ -30,7 +30,9 @@ export type ClockEmployee = {
   birth_date: string | null;
 };
 
-export type ClockResult = { error?: string; capped?: boolean; at?: string; hours?: number };
+// stale: prikazano stanje je bilo zastarelo (žig je bil medtem narejen drugje,
+// npr. na skupni napravi) → klicatelj osveži prikaz.
+export type ClockResult = { error?: string; stale?: boolean; capped?: boolean; at?: string; hours?: number };
 
 // PRIHOD — odpre nov vnos delovnega časa za danes.
 export async function clockInEmployee(
@@ -49,7 +51,7 @@ export async function clockInEmployee(
 
   // Že odprt vnos za DANES → prepreči dvojni prihod.
   if ((openEntries ?? []).some((e) => e.date === today)) {
-    return { error: "Prihod je že zabeležen." };
+    return { error: "Prihod je že zabeležen.", stale: true };
   }
 
   // Pozabljen odhod iz prejšnjega dne → predlagaj odhod ob dnevni meji (auto-stop)
@@ -103,7 +105,7 @@ export async function clockOutEmployee(
     .order("clock_in", { ascending: false })
     .limit(1)
     .single();
-  if (!open) return { error: "Ni odprtega prihoda." };
+  if (!open) return { error: "Ni odprtega prihoda.", stale: true };
 
   const now = new Date();
   const start = new Date(open.clock_in as string);

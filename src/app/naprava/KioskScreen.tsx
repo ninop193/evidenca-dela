@@ -136,6 +136,7 @@ export function KioskScreen({ companyName, employees }: { companyName: string; e
             openSince={screen.openSince}
             pin={screen.pin}
             onBack={goHome}
+            onStateChanged={(openSince) => setScreen({ ...screen, openSince })}
             onDone={(r) => setScreen({ kind: "done", name: screen.emp.name, ...r })}
           />
         )}
@@ -307,12 +308,14 @@ function ClockAction({
   openSince,
   pin,
   onBack,
+  onStateChanged,
   onDone,
 }: {
   emp: Employee;
   openSince: string | null;
   pin: string;
   onBack: () => void;
+  onStateChanged: (openSince: string | null) => void;
   onDone: (r: { action: "in" | "out"; time?: string; hours?: number; capped?: boolean }) => void;
 }) {
   const router = useRouter();
@@ -320,16 +323,25 @@ function ClockAction({
   const [breakMin, setBreakMin] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [info, setInfo] = useState<string | null>(null); // obvestilo, ne napaka
 
   async function submit() {
     if (loading) return;
     buzz();
     setLoading(true);
     setError(null);
+    setInfo(null);
     const action = isOut ? "out" : "in";
     const res = await kioskClock(emp.id, pin, action, isOut ? breakMin : undefined);
     setLoading(false);
     if (res.disconnected) return router.refresh();
+    // Medtem žigosano drugje (npr. s telefonom) → preberi pravo stanje in ga pokaži.
+    if (res.stale) {
+      const now = await checkPin(emp.id, pin);
+      if (!now.error) onStateChanged(now.openSince ?? null);
+      setInfo("Stanje se je medtem spremenilo (npr. žig s telefonom). Prikaz je posodobljen.");
+      return;
+    }
     if (res.error) {
       setError(res.error);
       return;
@@ -426,6 +438,9 @@ function ClockAction({
 
       {error && (
         <p className="glass mx-auto mt-6 rounded-xl px-4 py-2.5 text-center text-sm font-medium text-rose-600">{error}</p>
+      )}
+      {info && (
+        <p className="glass mx-auto mt-6 rounded-xl px-4 py-2.5 text-center text-sm font-medium text-slate-700">{info}</p>
       )}
     </div>
   );

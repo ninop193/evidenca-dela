@@ -127,7 +127,7 @@ export async function checkPin(employeeId: string, pin: string): Promise<KioskSt
   return { name: v.employee.full_name, openSince: open?.clock_in ?? null };
 }
 
-export type KioskClockResult = { error?: string; wrongPin?: boolean; disconnected?: boolean; time?: string; hours?: number; capped?: boolean };
+export type KioskClockResult = { error?: string; stale?: boolean; wrongPin?: boolean; disconnected?: boolean; time?: string; hours?: number; capped?: boolean };
 
 export async function kioskClock(
   employeeId: string,
@@ -143,7 +143,7 @@ export async function kioskClock(
     action === "in"
       ? await clockInEmployee(ctx.db, employee, "naprava")
       : await clockOutEmployee(ctx.db, employee, breakMinutes);
-  if (res.error) return { error: res.error };
+  if (res.error) return { error: res.error, stale: res.stale };
 
   // Naprava je v uporabi: zabeleži in podaljšaj piškotek (sicer bi po ~letu potekel).
   await ctx.db.from("kiosk_devices").update({ last_used_at: new Date().toISOString() }).eq("id", ctx.deviceId);

@@ -119,7 +119,7 @@ export async function deleteEmployee(employeeId: string): Promise<ActionResult> 
 
 export type CreateEmployeeInput = {
   fullName: string;
-  email?: string;
+  email: string;
   jobTitle?: string;
   emso?: string;
   taxId?: string;
@@ -142,8 +142,7 @@ export type CreateEmployeeResult = { error?: string; email?: string; inviteSent?
 
 // Admin doda zaposlenega: ustvari mu prijavo + zapis v evidenco o zaposlenih (13. člen).
 // Gesla NE nastavlja delodajalec — zaposleni ga nastavi sam prek povabila v mailu.
-// Če ima podjetje vklopljeno skupno napravo, je email neobvezen: zaposleni brez
-// emaila nima prijave in žigosa samo na napravi (s PIN kodo).
+// Če podjetje uporablja skupno napravo, zaposleni dobi tudi PIN kodo zanjo.
 export async function createEmployee(
   input: CreateEmployeeInput,
 ): Promise<CreateEmployeeResult> {
@@ -152,20 +151,15 @@ export async function createEmployee(
     return { error: "Samo delodajalec lahko dodaja zaposlene." };
   }
 
-  const admin = createAdminClient();
-  const { data: company } = await admin
-    .from("companies")
-    .select("name, kiosk_enabled")
-    .eq("id", profile.company_id)
-    .maybeSingle();
-  const kiosk = !!company?.kiosk_enabled;
-
   const email = input.email?.trim().toLowerCase();
   const fullName = input.fullName?.trim();
-  if (!fullName) return { error: "Ime in priimek sta obvezna." };
-  if (!email && !kiosk) return { error: "Ime in email sta obvezna." };
+  if (!fullName || !email) {
+    return { error: "Ime in email sta obvezna." };
+  }
 
-  if (email && !(await inviteAllowed(profile.company_id))) return { error: INVITE_LIMIT_ERROR };
+  if (!(await inviteAllowed(profile.company_id))) return { error: INVITE_LIMIT_ERROR };
+
+  const admin = createAdminClient();
 
   // Omejitev paketa: privzeto do 10 zaposlenih (nekatera podjetja imajo dvig — glej plan-overrides).
   const limit = employeeLimitFor(profile.company_id);
@@ -179,34 +173,31 @@ export async function createEmployee(
     };
   }
 
-  let userId: string | null = null;
-  if (email) {
-    // 1) Ustvari prijavo zaposlenega (takoj potrjeno, BREZ gesla —
-    //    zaposleni si ga nastavi sam prek povabila)
-    const { data: created, error: createErr } = await admin.auth.admin.createUser({
-      email,
-      email_confirm: true,
-    });
-    if (createErr || !created.user) {
-      if (createErr?.message?.toLowerCase().includes("already")) {
-        return { error: "Ta email je že v uporabi." };
-      }
-      return { error: createErr?.message ?? "Dodajanje ni uspelo." };
+  // 1) Ustvari prijavo zaposlenega (takoj potrjeno, BREZ gesla —
+  //    zaposleni si ga nastavi sam prek povabila)
+  const { data: created, error: createErr } = await admin.auth.admin.createUser({
+    email,
+    email_confirm: true,
+  });
+  if (createErr || !created.user) {
+    if (createErr?.message?.toLowerCase().includes("already")) {
+      return { error: "Ta email je že v uporabi." };
     }
-    userId = created.user.id;
+    return { error: createErr?.message ?? "Dodajanje ni uspelo." };
+  }
+  const userId = created.user.id;
 
-    // 2) Profil uporabnika (vloga: employee, isto podjetje)
-    const { error: userErr } = await admin.from("users").insert({
-      id: userId,
-      company_id: profile.company_id,
-      role: "employee",
-      email,
-      full_name: fullName,
-    });
-    if (userErr) {
-      await admin.auth.admin.deleteUser(userId);
-      return { error: "Napaka pri ustvarjanju računa zaposlenega." };
-    }
+  // 2) Profil uporabnika (vloga: employee, isto podjetje)
+  const { error: userErr } = await admin.from("users").insert({
+    id: userId,
+    company_id: profile.company_id,
+    role: "employee",
+    email,
+    full_name: fullName,
+  });
+  if (userErr) {
+    await admin.auth.admin.deleteUser(userId);
+    return { error: "Napaka pri ustvarjanju računa zaposlenega." };
   }
 
   // 3) Zapis v evidenco o zaposlenih (13. člen)
@@ -229,20 +220,24 @@ export async function createEmployee(
     .select("id")
     .single();
   if (empErr || !emp) {
-    if (userId) {
-      await admin.from("users").delete().eq("id", userId);
-      await admin.auth.admin.deleteUser(userId);
-    }
+    await admin.from("users").delete().eq("id", userId);
+    await admin.auth.admin.deleteUser(userId);
     return { error: "Napaka pri zapisu v evidenco zaposlenih." };
   }
 
-  // Koda za skupno napravo (le če jo podjetje uporablja).
-  const pin = kiosk ? (await assignPin(admin, profile.company_id, emp.id)) ?? undefined : undefined;
-
-  if (!email) return { pin };
-
   // Povabilo s povezavo za nastavitev gesla (ne sme podreti dodajanja, če spodleti;
   // delodajalec ga lahko pošlje znova iz seznama zaposlenih).
+  const { data: company } = await admin
+    .from("companies")
+    .select("name, kiosk_enabled")
+    .eq("id", profile.company_id)
+    .maybeSingle();
+
+  // Koda za skupno napravo (le če jo podjetje uporablja).
+  const pin = company?.kiosk_enabled
+    ? (await assignPin(admin, profile.company_id, emp.id)) ?? undefined
+    : undefined;
+
   const inviteSent = await sendInvite({
     admin,
     email,
