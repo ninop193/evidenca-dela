@@ -14,19 +14,19 @@ import {
   type KioskContext,
 } from "@/lib/kiosk";
 
-// Dejanja skupne tablice. Tablica ni prijavljen uporabnik: vsako dejanje najprej
+// Dejanja skupne naprave. Naprava ni prijavljen uporabnik: vsako dejanje najprej
 // preveri piškotek naprave (getKioskDevice), nato PIN kode izbranega zaposlenega.
 
-const NOT_CONNECTED = "Tablica ni več povezana. Delodajalec jo lahko poveže znova.";
+const NOT_CONNECTED = "Naprava ni več povezana. Delodajalec jo lahko poveže znova.";
 const LOCKED =
   "Preveč napačnih poskusov. Poskusi znova čez nekaj minut ali se obrni na delodajalca.";
 
-// Napačne PIN kode: največ 5 na zaposlenega in 20 na tablico v 15 minutah.
+// Napačne PIN kode: največ 5 na zaposlenega in 20 na napravo v 15 minutah.
 const PIN_MAX_PER_EMPLOYEE = 5;
 const PIN_MAX_PER_DEVICE = 20;
 const PIN_WINDOW_S = 15 * 60;
 
-// --- Povezava tablice s kodo ------------------------------------------------------
+// --- Povezava naprave s kodo ------------------------------------------------------
 
 export async function pairWithCode(rawCode: string): Promise<{ error?: string }> {
   const code = rawCode.replace(/\D/g, "");
@@ -53,7 +53,7 @@ export async function pairWithCode(rawCode: string): Promise<{ error?: string }>
     .select("kiosk_enabled")
     .eq("id", row.company_id)
     .maybeSingle();
-  if (!company?.kiosk_enabled) return { error: "Žigosanje na tablici v podjetju ni vklopljeno." };
+  if (!company?.kiosk_enabled) return { error: "Skupna naprava v podjetju ni vklopljena." };
 
   // Koda je enkratna.
   await db.from("kiosk_pair_codes").delete().eq("company_id", row.company_id);
@@ -72,7 +72,7 @@ type Verified =
       employee: { id: string; company_id: string; full_name: string; worker_type: string | null; birth_date: string | null };
     };
 
-// Preveri tablico, naročnino in PIN izbranega zaposlenega.
+// Preveri napravo, naročnino in PIN izbranega zaposlenega.
 async function verify(employeeId: string, pin: string): Promise<Verified> {
   const ctx = await getKioskDevice();
   if (!ctx) return { error: NOT_CONNECTED, disconnected: true };
@@ -141,11 +141,11 @@ export async function kioskClock(
 
   const res =
     action === "in"
-      ? await clockInEmployee(ctx.db, employee, "tablica")
+      ? await clockInEmployee(ctx.db, employee, "naprava")
       : await clockOutEmployee(ctx.db, employee, breakMinutes);
   if (res.error) return { error: res.error };
 
-  // Tablica je v uporabi: zabeleži in podaljšaj piškotek (sicer bi po ~letu potekel).
+  // Naprava je v uporabi: zabeleži in podaljšaj piškotek (sicer bi po ~letu potekel).
   await ctx.db.from("kiosk_devices").update({ last_used_at: new Date().toISOString() }).eq("id", ctx.deviceId);
   await setKioskCookie(ctx.token);
 

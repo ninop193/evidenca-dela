@@ -4,7 +4,7 @@ import { NewEmployeeForm } from "./NewEmployeeForm";
 
 export default async function NewEmployeePage() {
   const [supabase, profile] = await Promise.all([createClient(), getProfile()]);
-  // Z vklopljeno skupno tablico je email neobvezen (zaposleni žigosa s PIN kodo).
+  // Z vklopljeno skupno napravo je email neobvezen (zaposleni žigosa s PIN kodo).
   const { data: company } = profile
     ? await supabase.from("companies").select("kiosk_enabled").eq("id", profile.company_id).maybeSingle()
     : { data: null };

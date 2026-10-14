@@ -38,10 +38,10 @@ export default async function EmployeesPage() {
           <p className="mt-1 text-sm text-slate-500">Upravljaj delavce in njihove podatke.</p>
         </div>
         <div className="flex items-center gap-2">
-          {/* Neobvezna možnost: žigosanje na skupni tablici na delovnem mestu */}
-          <Link href="/dashboard/tablica" className={buttonClasses("ghost")} title="Žigosanje na skupni tablici">
+          {/* Neobvezna možnost: žigosanje na skupni napravi na delovnem mestu */}
+          <Link href="/dashboard/naprava" className={buttonClasses("ghost")} title="Žigosanje na skupni napravi">
             <TabletSmartphone className="h-4 w-4" />
-            <span className="hidden sm:inline">Skupna tablica</span>
+            <span className="hidden sm:inline">Skupna naprava</span>
           </Link>
           <Link href="/dashboard/zaposleni/nov" className={buttonClasses("primary")}>
             <UserPlus className="h-4 w-4" /> Dodaj zaposlenega
@@ -111,7 +111,7 @@ export default async function EmployeesPage() {
                         )}
                         {!e.user_id && (
                           <Badge tone="slate" className="ml-1.5">
-                            samo tablica
+                            samo skupna naprava
                           </Badge>
                         )}
                       </td>
@@ -143,7 +143,7 @@ export default async function EmployeesPage() {
                       {neverSignedIn.has(e.id) && (
                         <Badge tone="amber">čaka na prijavo</Badge>
                       )}
-                      {!e.user_id && <Badge tone="slate">samo tablica</Badge>}
+                      {!e.user_id && <Badge tone="slate">samo skupna naprava</Badge>}
                       <Badge tone={e.active ? "green" : "slate"}>
                         {e.active ? "Aktiven" : "Neaktiven"}
                       </Badge>

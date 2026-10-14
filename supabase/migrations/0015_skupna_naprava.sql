@@ -1,7 +1,7 @@
 -- =============================================================================
--- 0015: Žigosanje na skupni tablici (neobvezna možnost, privzeto IZKLOPLJENA)
+-- 0015: Žigosanje na skupni napravi (neobvezna možnost, privzeto IZKLOPLJENA)
 -- =============================================================================
--- Podjetje lahko vklopi skupno napravo (tablico) na delovnem mestu: zaposleni
+-- Podjetje lahko vklopi skupno napravo (npr. tablico) na delovnem mestu: zaposleni
 -- izbere svoje ime, vpiše 4-mestno PIN kodo in žigosa prihod/odhod — brez
 -- lastnega uporabniškega računa.
 --
@@ -15,11 +15,11 @@
 alter table public.companies
   add column if not exists kiosk_enabled boolean not null default false;
 
--- 2) Vir vnosa: 'tablica' = žigosano na skupni tablici (null = telefon/ročni vnos).
+-- 2) Vir vnosa: 'naprava' = žigosano na skupni napravi (null = telefon/ročni vnos).
 alter table public.time_entries
   add column if not exists source text;
 
--- 3) Povezane tablice. Piškotek na napravi hrani naključen žeton, baza samo njegov hash.
+-- 3) Povezane skupne naprave. Piškotek na napravi hrani naključen žeton, baza samo njegov hash.
 create table if not exists public.kiosk_devices (
   id            uuid primary key default gen_random_uuid(),
   company_id    uuid not null references public.companies(id) on delete cascade,
@@ -39,7 +39,7 @@ create table if not exists public.kiosk_pins (
   unique (company_id, pin)
 );
 
--- 5) Enkratne kode za povezavo nove tablice (veljajo 10 minut).
+-- 5) Enkratne kode za povezavo nove skupne naprave (veljajo 10 minut).
 create table if not exists public.kiosk_pair_codes (
   company_id  uuid primary key references public.companies(id) on delete cascade,
   code_hash   text not null unique,

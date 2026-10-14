@@ -71,8 +71,8 @@ function TurnOn() {
   }
 
   const steps = [
-    { icon: TabletSmartphone, text: "Tablico na delovnem mestu povežeš s kodo — enkrat." },
-    { icon: UserRound, text: "Zaposleni na tablici pritisne svoje ime." },
+    { icon: TabletSmartphone, text: "Tablico ali telefon na delovnem mestu enkrat povežeš s kodo." },
+    { icon: UserRound, text: "Zaposleni na napravi pritisne svoje ime." },
     { icon: KeyRound, text: "Vpiše svojo 4-mestno kodo in pritisne Prihod ali Odhod." },
   ];
 
@@ -89,25 +89,25 @@ function TurnOn() {
         ))}
       </ol>
       <p className="mt-6 text-sm text-slate-500">
-        Kode za vse zaposlene ustvarimo samodejno. Zaposleni za tablico ne potrebujejo emaila ali gesla.
+        Kode za vse zaposlene ustvarimo samodejno. Zaposleni za skupno napravo ne potrebujejo emaila ali gesla.
       </p>
       {error && <p className="mt-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
       <Button size="lg" className="mt-6" onClick={turnOn} disabled={loading}>
         {loading && <Loader2 className="h-4 w-4 animate-spin" />}
-        Vklopi skupno tablico
+        Vklopi skupno napravo
       </Button>
     </Card>
   );
 }
 
-// --- Povezane tablice -------------------------------------------------------------
+// --- Povezane naprave -------------------------------------------------------------
 
 function Devices({ devices }: { devices: Device[] }) {
   const router = useRouter();
   const [pairing, setPairing] = useState(devices.length === 0);
   const [justPaired, setJustPaired] = useState(false);
 
-  // Med povezovanjem preverjaj, ali se je nova tablica že povezala → zapri navodila.
+  // Med povezovanjem preverjaj, ali se je nova naprava že povezala → zapri navodila.
   const [countAtOpen, setCountAtOpen] = useState(devices.length);
   useEffect(() => {
     if (!pairing) return;
@@ -123,7 +123,7 @@ function Devices({ devices }: { devices: Device[] }) {
   return (
     <Card className="p-6">
       <div className="flex items-center justify-between gap-3">
-        <h2 className="text-lg font-semibold text-slate-900">Tablice</h2>
+        <h2 className="text-lg font-semibold text-slate-900">Povezane naprave</h2>
         {!pairing && (
           <Button
             variant="secondary"
@@ -134,14 +134,14 @@ function Devices({ devices }: { devices: Device[] }) {
               setPairing(true);
             }}
           >
-            <TabletSmartphone className="h-4 w-4" /> Poveži tablico
+            <TabletSmartphone className="h-4 w-4" /> Poveži napravo
           </Button>
         )}
       </div>
 
       {justPaired && (
         <p className="mt-3 flex items-center gap-2 rounded-xl bg-emerald-50/90 px-3 py-2.5 text-sm font-medium text-emerald-800 ring-1 ring-emerald-200">
-          <CheckCircle2 className="h-4 w-4" /> Tablica je povezana. Zaposleni lahko začnejo žigosati.
+          <CheckCircle2 className="h-4 w-4" /> Naprava je povezana. Zaposleni lahko začnejo žigosati.
         </p>
       )}
 
@@ -181,7 +181,7 @@ function DeviceRow({ device, index }: { device: Device; index: number }) {
           <TabletSmartphone className="h-5 w-5" />
         </span>
         <div>
-          <p className="font-medium text-slate-900">Tablica {index}</p>
+          <p className="font-medium text-slate-900">Naprava {index}</p>
           <p className="text-sm text-slate-500">
             Povezana {fmtDate(device.createdAt)}
             {device.lastUsedAt && ` · zadnje žigosanje ${fmtDateTime(device.lastUsedAt)}`}
@@ -244,7 +244,7 @@ function PairPanel({ canCancel, onCancel }: { canCancel: boolean; onCancel: () =
       setError(res.error);
       return;
     }
-    window.location.assign("/tablica");
+    window.location.assign("/naprava");
   }
 
   return (
@@ -258,12 +258,12 @@ function PairPanel({ canCancel, onCancel }: { canCancel: boolean; onCancel: () =
           <X className="h-4 w-4" />
         </button>
       )}
-      <p className="text-sm font-semibold text-slate-900">Poveži tablico</p>
+      <p className="text-sm font-semibold text-slate-900">Poveži napravo</p>
       <ol className="mt-3 space-y-3 text-[15px] text-slate-700">
         <li>
-          <span className="text-slate-400">1.</span> Na tablici odpri{" "}
+          <span className="text-slate-400">1.</span> Na skupni napravi odpri{" "}
           <strong className="rounded-md bg-white px-1.5 py-0.5 font-mono text-slate-900 ring-1 ring-slate-200">
-            {KIOSK_HOST}/tablica
+            {KIOSK_HOST}/naprava
           </strong>
         </li>
         <li className="flex flex-wrap items-center gap-x-3 gap-y-2">
@@ -285,7 +285,7 @@ function PairPanel({ canCancel, onCancel }: { canCancel: boolean; onCancel: () =
       <p className="mt-2 text-xs text-slate-400">Koda velja 10 minut in jo lahko uporabiš enkrat.</p>
 
       <div className="mt-5 flex flex-wrap items-center gap-3 border-t border-slate-200/70 pt-4">
-        <span className="text-sm text-slate-600">Si zdaj na tablici?</span>
+        <span className="text-sm text-slate-600">Odpiraš to stran na skupni napravi?</span>
         <Button variant="secondary" size="sm" onClick={useThis} disabled={usingThis}>
           {usingThis && <Loader2 className="h-4 w-4 animate-spin" />}
           Uporabi to napravo
@@ -376,7 +376,7 @@ function TurnOff() {
     <div className="px-1 text-sm">
       {confirm ? (
         <div className="flex flex-wrap items-center gap-3">
-          <span className="text-slate-600">Izklopim? Vse tablice se odklopijo, žigosanje s telefonom ostane.</span>
+          <span className="text-slate-600">Izklopim? Vse naprave se odklopijo, žigosanje s telefonom ostane.</span>
           <Button variant="ghost" size="sm" onClick={() => setConfirm(false)} disabled={loading}>
             Prekliči
           </Button>
@@ -387,7 +387,7 @@ function TurnOff() {
         </div>
       ) : (
         <button onClick={() => setConfirm(true)} className="text-slate-500 underline-offset-4 hover:text-slate-900 hover:underline">
-          Izklopi skupno tablico
+          Izklopi skupno napravo
         </button>
       )}
     </div>

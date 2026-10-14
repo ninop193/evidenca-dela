@@ -106,7 +106,7 @@ async function seed(companyId, empId) {
     }).select("id").single(),
     "leave_requests",
   ).id;
-  // Skupna tablica: PIN koda zaposlenega, povezana naprava in koda za povezavo.
+  // Skupna naprava: PIN koda zaposlenega, povezana naprava in koda za povezavo.
   must(await svc.from("kiosk_pins").upsert({ employee_id: empId, company_id: companyId, pin: String(5000 + seedCount++) }), "kiosk_pins");
   must(await svc.from("kiosk_devices").insert({ company_id: companyId, token_hash: `rlstest-${stamp}-${empId}` }), "kiosk_devices");
   must(await svc.from("kiosk_pair_codes").upsert({ company_id: companyId, code_hash: `rlstest-${stamp}-${companyId}`, expires_at: "2099-01-01T00:00:00Z" }), "kiosk_pair_codes");
@@ -251,18 +251,18 @@ async function run() {
   await expectError("Zaposleni ne more postati admin novega podjetja s svojim računom",
     empA.c.rpc("create_company_and_admin", { p_company_name: "Moje", p_full_name: "x" }));
 
-  console.log("\n— Skupna tablica: PIN kode in naprave bere samo strežnik —");
+  console.log("\n— Skupna naprava: PIN kode in naprave bere samo strežnik —");
   for (const t of ["kiosk_pins", "kiosk_devices", "kiosk_pair_codes"]) {
     await expectNoRows(`Admin A ne bere ${t} neposredno (samo prek strežnika)`, A.c.from(t).select("*"));
     await expectNoRows(`Zaposleni A ne vidi ${t}`, empA.c.from(t).select("*"));
   }
   await expectBlocked("Zaposleni si ne more nastaviti PIN kode",
     empA.c.from("kiosk_pins").upsert({ employee_id: empA.empId, company_id: A.companyId, pin: "4826" }).select());
-  await expectBlocked("Admin B ne more povezati tablice s podjetjem A",
+  await expectBlocked("Admin B ne more povezati skupne naprave s podjetjem A",
     B.c.from("kiosk_devices").insert({ company_id: A.companyId, token_hash: `vdor-${stamp}` }).select());
-  await expectBlocked("Admin A ne more mimo aplikacije povezati tablice",
+  await expectBlocked("Admin A ne more mimo aplikacije povezati skupne naprave",
     A.c.from("kiosk_devices").insert({ company_id: A.companyId, token_hash: `mimo-${stamp}` }).select());
-  await expectBlocked("Admin A ne more mimo aplikacije vklopiti tablice",
+  await expectBlocked("Admin A ne more mimo aplikacije vklopiti skupne naprave",
     A.c.from("companies").update({ kiosk_enabled: true }).eq("id", A.companyId).select());
 
   console.log("\n— Neprijavljen obiskovalec z javnim ključem —");
@@ -270,7 +270,7 @@ async function run() {
   for (const t of ["companies", ...TABLES, "leads", "rate_events"]) {
     await expectNoRows(`Ne vidi tabele ${t}`, anon.from(t).select("*").limit(1));
   }
-  await expectBlocked("Ne more povezati tablice", anon.from("kiosk_devices").insert({ company_id: A.companyId, token_hash: `anon-${stamp}` }).select());
+  await expectBlocked("Ne more povezati skupne naprave", anon.from("kiosk_devices").insert({ company_id: A.companyId, token_hash: `anon-${stamp}` }).select());
   await expectBlocked("Ne more vpisati ur", anon.from("time_entries").insert({ company_id: A.companyId, employee_id: empA.empId, date: "2026-10-04" }).select());
   await expectError("Ne more registrirati podjetja brez prijave", anon.rpc("create_company_and_admin", { p_company_name: "x", p_full_name: "x" }));
 

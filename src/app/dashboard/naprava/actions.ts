@@ -9,14 +9,14 @@ import { assignPin, connectThisDevice, ensurePins, sha256, PAIR_CODE_MINUTES } f
 
 type Result = { error?: string; ok?: boolean };
 
-// Vse spremembe nastavitev tablice sme narediti samo delodajalec svojega podjetja.
+// Vse spremembe nastavitev naprave sme narediti samo delodajalec svojega podjetja.
 async function adminContext() {
   const profile = await getProfile();
   if (!profile || profile.role !== "admin") return null;
   return { profile, db: createAdminClient() };
 }
 
-const NOT_ADMIN = { error: "Samo delodajalec lahko ureja skupno tablico." };
+const NOT_ADMIN = { error: "Samo delodajalec lahko ureja skupno napravo." };
 
 // Vklop: podjetju vklopi možnost in vsem aktivnim zaposlenim dodeli PIN kode.
 export async function enableKiosk(): Promise<Result> {
@@ -29,7 +29,7 @@ export async function enableKiosk(): Promise<Result> {
   return { ok: true };
 }
 
-// Izklop: odklopi vse tablice (PIN kode ostanejo za morebitni ponovni vklop).
+// Izklop: odklopi vse naprave (PIN kode ostanejo za morebitni ponovni vklop).
 export async function disableKiosk(): Promise<Result> {
   const ctx = await adminContext();
   if (!ctx) return NOT_ADMIN;
@@ -45,7 +45,7 @@ export async function disableKiosk(): Promise<Result> {
   return { ok: true };
 }
 
-// Enkratna 6-mestna koda za povezavo tablice (velja 10 minut, nadomesti prejšnjo).
+// Enkratna 6-mestna koda za povezavo naprave (velja 10 minut, nadomesti prejšnjo).
 export async function createPairCode(): Promise<Result & { code?: string }> {
   const ctx = await adminContext();
   if (!ctx) return NOT_ADMIN;
@@ -62,8 +62,8 @@ export async function createPairCode(): Promise<Result & { code?: string }> {
   return { error: "Kode ni bilo mogoče ustvariti. Poskusi znova." };
 }
 
-// "Ta naprava naj bo tablica": poveže napravo, na kateri je delodajalec, in ga
-// na njej odjavi — zaposleni na tablici tako ne pridejo do nadzorne plošče.
+// "Uporabi to napravo": poveže napravo, na kateri je delodajalec, in ga
+// na njej odjavi — zaposleni na napravi tako ne pridejo do nadzorne plošče.
 export async function connectAsKiosk(): Promise<Result> {
   const ctx = await adminContext();
   if (!ctx) return NOT_ADMIN;
@@ -72,7 +72,7 @@ export async function connectAsKiosk(): Promise<Result> {
     .select("kiosk_enabled")
     .eq("id", ctx.profile.company_id)
     .maybeSingle();
-  if (!company?.kiosk_enabled) return { error: "Žigosanje na tablici ni vklopljeno." };
+  if (!company?.kiosk_enabled) return { error: "Skupna naprava ni vklopljena." };
   if (!(await connectThisDevice(ctx.db, ctx.profile.company_id))) {
     return { error: "Povezava ni uspela. Poskusi znova." };
   }
@@ -89,7 +89,7 @@ export async function disconnectDevice(deviceId: string): Promise<Result> {
     .eq("id", deviceId)
     .eq("company_id", ctx.profile.company_id);
   if (error) return { error: "Odklop ni uspel." };
-  revalidatePath("/dashboard/tablica");
+  revalidatePath("/dashboard/naprava");
   return { ok: true };
 }
 
@@ -106,6 +106,6 @@ export async function regeneratePin(employeeId: string): Promise<Result & { pin?
   if (!emp) return { error: "Zaposleni ni najden." };
   const pin = await assignPin(ctx.db, ctx.profile.company_id, emp.id);
   if (!pin) return { error: "Nove kode ni bilo mogoče ustvariti." };
-  revalidatePath("/dashboard/tablica");
+  revalidatePath("/dashboard/naprava");
   return { ok: true, pin };
 }

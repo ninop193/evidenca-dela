@@ -5,12 +5,12 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { ensurePins } from "@/lib/kiosk";
 import { KioskSettings } from "./KioskSettings";
 
-// Nastavitve skupne tablice (neobvezna možnost; privzeto izklopljena).
-export default async function TablicaSettingsPage() {
+// Nastavitve skupne naprave (neobvezna možnost; privzeto izklopljena).
+export default async function NapravaSettingsPage() {
   const profile = await getProfile();
   if (!profile || profile.role !== "admin") redirect("/login");
 
-  // PIN kode in tablice so v tabelah, ki jih bere samo strežnik — zato admin odjemalec,
+  // PIN kode in naprave so v tabelah, ki jih bere samo strežnik — zato admin odjemalec,
   // VEDNO filtriran po podjetju prijavljenega delodajalca.
   const db = createAdminClient();
   const companyId = profile.company_id;
@@ -44,7 +44,7 @@ export default async function TablicaSettingsPage() {
       <Link href="/dashboard/zaposleni" className="text-sm text-slate-500 hover:text-slate-900">
         ← Zaposleni
       </Link>
-      <h1 className="mt-3 text-2xl font-bold tracking-tight text-slate-900">Skupna tablica</h1>
+      <h1 className="mt-3 text-2xl font-bold tracking-tight text-slate-900">Skupna naprava</h1>
       <p className="mt-1 text-sm text-slate-500">
         Zaposleni žigosajo na eni napravi na delovnem mestu: pritisnejo svoje ime in vpišejo osebno kodo.
         Žigosanje s telefonom deluje naprej kot doslej.

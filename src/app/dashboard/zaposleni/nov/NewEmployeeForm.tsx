@@ -50,7 +50,7 @@ export function NewEmployeeForm({ kioskEnabled }: { kioskEnabled: boolean }) {
           <h1 className="mt-3 text-xl font-bold text-slate-900">Zaposleni dodan</h1>
           {!done.email ? (
             <p className="mt-1.5 text-sm text-slate-500">
-              Zaposleni žigosa na skupni tablici: pritisne svoje ime in vpiše kodo.
+              Zaposleni žigosa na skupni napravi: pritisne svoje ime in vpiše kodo.
             </p>
           ) : done.inviteSent ? (
             <p className="mt-1.5 text-sm text-slate-500">
@@ -65,9 +65,9 @@ export function NewEmployeeForm({ kioskEnabled }: { kioskEnabled: boolean }) {
           )}
           {done.pin && (
             <div className="mt-5 rounded-2xl bg-white/70 px-4 py-3 ring-1 ring-slate-200/70">
-              <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">Koda za tablico</p>
+              <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">Koda za skupno napravo</p>
               <p className="mt-1 font-mono text-3xl font-bold tracking-[0.25em] text-slate-900">{done.pin}</p>
-              <p className="mt-1 text-xs text-slate-500">Povej mu jo osebno. Vse kode najdeš pod »Skupna tablica«.</p>
+              <p className="mt-1 text-xs text-slate-500">Povej mu jo osebno. Vse kode najdeš pod »Skupna naprava«.</p>
             </div>
           )}
           <div className="mt-6 flex flex-col gap-2">
@@ -91,7 +91,7 @@ export function NewEmployeeForm({ kioskEnabled }: { kioskEnabled: boolean }) {
       <h1 className="mt-3 text-2xl font-bold tracking-tight text-slate-900">Dodaj zaposlenega</h1>
       <p className="mt-1 text-sm text-slate-500">
         {kioskEnabled
-          ? "Z emailom lahko zaposleni žigosa tudi na svojem telefonu. Brez emaila žigosa samo na skupni tablici."
+          ? "Z emailom lahko zaposleni žigosa tudi na svojem telefonu. Brez emaila žigosa samo na skupni napravi."
           : "Na ta email bo zaposleni prejel povabilo, prek katerega si sam nastavi geslo."}
       </p>
 

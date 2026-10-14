@@ -5,7 +5,7 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: "*",
       allow: "/",
-      disallow: ["/dashboard", "/zigosanje", "/dobrodosli", "/auth", "/tablica"],
+      disallow: ["/dashboard", "/zigosanje", "/dobrodosli", "/auth", "/naprava"],
     },
     sitemap: "https://www.delovit.si/sitemap.xml",
   };

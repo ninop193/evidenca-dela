@@ -212,7 +212,7 @@ body {
   }
 }
 
-/* Skupna tablica: tresljaj pik ob napačni kodi + odštevanje do vrnitve na seznam */
+/* Skupna naprava: tresljaj pik ob napačni kodi + odštevanje do vrnitve na seznam */
 @keyframes kioskShake {
   0%, 100% { transform: translateX(0); }
   20%, 60% { transform: translateX(-10px); }

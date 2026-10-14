@@ -142,8 +142,8 @@ export type CreateEmployeeResult = { error?: string; email?: string; inviteSent?
 
 // Admin doda zaposlenega: ustvari mu prijavo + zapis v evidenco o zaposlenih (13. člen).
 // Gesla NE nastavlja delodajalec — zaposleni ga nastavi sam prek povabila v mailu.
-// Če ima podjetje vklopljeno skupno tablico, je email neobvezen: zaposleni brez
-// emaila nima prijave in žigosa samo na tablici (s PIN kodo).
+// Če ima podjetje vklopljeno skupno napravo, je email neobvezen: zaposleni brez
+// emaila nima prijave in žigosa samo na napravi (s PIN kodo).
 export async function createEmployee(
   input: CreateEmployeeInput,
 ): Promise<CreateEmployeeResult> {
@@ -236,7 +236,7 @@ export async function createEmployee(
     return { error: "Napaka pri zapisu v evidenco zaposlenih." };
   }
 
-  // Koda za skupno tablico (le če jo podjetje uporablja).
+  // Koda za skupno napravo (le če jo podjetje uporablja).
   const pin = kiosk ? (await assignPin(admin, profile.company_id, emp.id)) ?? undefined : undefined;
 
   if (!email) return { pin };

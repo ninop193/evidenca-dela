@@ -7,9 +7,9 @@ import {
 } from "@/lib/workLimits";
 import { todayLjubljana } from "@/lib/tzdate";
 
-// Skupna logika žigosanja (telefon zaposlenega + skupna tablica).
+// Skupna logika žigosanja (telefon zaposlenega + skupna naprava).
 // NI "use server" datoteka: funkcij brskalnik ne more klicati neposredno —
-// klicatelj mora prej sam preveriti, KDO žigosa (prijava ali PIN na tablici).
+// klicatelj mora prej sam preveriti, KDO žigosa (prijava ali PIN na napravi).
 
 const TZ = "Europe/Ljubljana";
 

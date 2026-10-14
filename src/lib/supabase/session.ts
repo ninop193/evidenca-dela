@@ -55,9 +55,9 @@ export async function updateSession(request: NextRequest) {
 
   if (!user && isProtected) {
     const url = request.nextUrl.clone();
-    // Povezana skupna tablica (piškotek delovit_tablica): ikona na domačem zaslonu
-    // odpre /zigosanje — namesto prijave pokažemo zaslon tablice.
-    url.pathname = path === "/zigosanje" && request.cookies.has("delovit_tablica") ? "/tablica" : "/login";
+    // Povezana skupna naprava (piškotek delovit_naprava): ikona na domačem zaslonu
+    // odpre /zigosanje — namesto prijave pokažemo zaslon naprave.
+    url.pathname = path === "/zigosanje" && request.cookies.has("delovit_naprava") ? "/naprava" : "/login";
     return NextResponse.redirect(url);
   }
 

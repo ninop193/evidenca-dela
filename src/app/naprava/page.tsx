@@ -5,13 +5,13 @@ import { ensurePins, getKioskDevice } from "@/lib/kiosk";
 import { KioskScreen, PairScreen, KioskMessage } from "./KioskScreen";
 
 export const metadata: Metadata = {
-  title: "Žigosanje na tablici",
+  title: "Skupna naprava",
   robots: { index: false, follow: false },
 };
 
-// Skupna tablica na delovnem mestu. Nepovezana naprava vidi samo vnos kode za
+// Skupna naprava na delovnem mestu. Nepovezan brskalnik vidi samo vnos kode za
 // povezavo; povezana pa seznam imen zaposlenih (brez ur in drugih podatkov).
-export default async function TablicaPage() {
+export default async function NapravaPage() {
   const ctx = await getKioskDevice();
 
   return (

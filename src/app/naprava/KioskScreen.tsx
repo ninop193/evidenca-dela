@@ -93,7 +93,7 @@ function Avatar({ name, size = "md" }: { name: string; size?: "md" | "lg" }) {
   );
 }
 
-// --- Glavni zaslon tablice ----------------------------------------------------------
+// --- Glavni zaslon naprave ----------------------------------------------------------
 
 export function KioskScreen({ companyName, employees }: { companyName: string; employees: Employee[] }) {
   const router = useRouter();
@@ -497,10 +497,10 @@ export function PairScreen() {
           <span className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-gradient-to-br from-brand-500 to-brand-700 text-white">
             <TabletSmartphone className="h-7 w-7" />
           </span>
-          <h1 className="mt-4 text-2xl font-bold tracking-tight text-slate-900">Poveži tablico</h1>
+          <h1 className="mt-4 text-2xl font-bold tracking-tight text-slate-900">Poveži napravo</h1>
           <p className="mt-2 text-slate-600">
-            Na računalniku v Delovitu odpri <strong>Zaposleni → Skupna tablica</strong> in klikni{" "}
-            <strong>Poveži tablico</strong>. Tukaj vpiši kodo, ki se prikaže.
+            Na računalniku v Delovitu na domači strani odpri <strong>Skupna naprava</strong> in klikni{" "}
+            <strong>Poveži napravo</strong>. Tukaj vpiši kodo, ki se prikaže.
           </p>
           <form onSubmit={submit} className="mt-6">
             <input

@@ -43,8 +43,8 @@ export default async function EditEntryPage({
         ← Nazaj na pregled
       </Link>
       <h1 className="mt-3 text-2xl font-bold tracking-tight text-slate-900">Uredi vnos</h1>
-      {entry.source === "tablica" && (
-        <p className="mt-1 text-sm text-slate-500">Prihod žigosan na skupni tablici.</p>
+      {entry.source === "naprava" && (
+        <p className="mt-1 text-sm text-slate-500">Prihod žigosan na skupni napravi.</p>
       )}
 
       <Card className="mt-6 p-6">

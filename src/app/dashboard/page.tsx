@@ -9,7 +9,6 @@ import {
   ChevronRight,
   Sun,
   Fingerprint,
-  TabletSmartphone,
 } from "lucide-react";
 import { getProfile } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
@@ -20,6 +19,7 @@ import { PLAN } from "@/lib/billing";
 import { todayLjubljana, monthEnd, dayLabel, timeLabel } from "@/lib/tzdate";
 import { ApproveButton } from "./ure/ApproveButton";
 import { SelfClockButton } from "./SelfClockButton";
+import { SharedDeviceTile } from "./SharedDeviceTile";
 
 type PendingRow = {
   id: string;
@@ -267,8 +267,8 @@ export default async function DashboardPage({
         <Action href="/dashboard/ure/nov" icon={<Clock className="h-5 w-5" />} title="Ročni vnos ur" text="Vnesi ure za nazaj" />
         <Action href="/dashboard/pregled" icon={<BarChart3 className="h-5 w-5" />} title="Mesečni pregled" text="Seštevki, potrditev, izvoz" />
         <Action href="/dashboard/odsotnosti/nov" icon={<Palmtree className="h-5 w-5" />} title="Vnesi odsotnost" text="Dopust, bolniška" />
-        {/* Neobvezno: žigosanje na skupni tablici na delovnem mestu */}
-        <Action href="/dashboard/tablica" icon={<TabletSmartphone className="h-5 w-5" />} title="Skupna tablica" text="Vsi žigosajo na eni napravi" />
+        {/* Neobvezno: žigosanje na skupni napravi na delovnem mestu (+ "?" z razlago) */}
+        <SharedDeviceTile className={actionClasses} />
       </div>
     </main>
   );

@@ -90,7 +90,7 @@ export function EmployeeRowActions({
             Uredi
           </Link>
           {/* Delodajalec sam se prijavlja s svojim računom — povabila ne potrebuje.
-              Zaposleni brez emaila (samo tablica) prijavnega računa nima. */}
+              Zaposleni brez emaila (samo naprava) prijavnega računa nima. */}
           {!isSelf && hasLogin && (
             <button
               onClick={doResendInvite}
