@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { CheckCircle2, Info, KeyRound, Loader2, Pencil, Plus, RefreshCw, TabletSmartphone, UserRound, X } from "lucide-react";
+import { CheckCircle2, Info, KeyRound, Loader2, Pencil, Plus, RefreshCw, Smartphone, TabletSmartphone, UserRound, X } from "lucide-react";
 import { Button, Card, Input, cn } from "@/components/ui";
 import {
   createPairCode,
@@ -107,6 +107,22 @@ function Devices({ devices }: { devices: Device[] }) {
   const router = useRouter();
   const [pairing, setPairing] = useState(devices.length === 0);
   const [infoOpen, setInfoOpen] = useState(false);
+  const headerRef = useRef<HTMLDivElement>(null);
+
+  // Oblaček zapre klik drugam ali tipka Escape.
+  useEffect(() => {
+    if (!infoOpen) return;
+    const onDown = (e: PointerEvent) => {
+      if (!headerRef.current?.contains(e.target as Node)) setInfoOpen(false);
+    };
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setInfoOpen(false);
+    document.addEventListener("pointerdown", onDown);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("pointerdown", onDown);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [infoOpen]);
   // Pravkar povezana naprava → takoj ponudi, da jo poimenuje.
   const [justPairedId, setJustPairedId] = useState<string | null>(null);
 
@@ -124,8 +140,9 @@ function Devices({ devices }: { devices: Device[] }) {
   }
 
   return (
-    <Card className="p-5 sm:p-6">
-      <div className="flex flex-wrap items-start justify-between gap-3">
+    // Odprt oblaček mora ležati NAD naslednjo kartico (vsaka steklena kartica je svoja plast).
+    <Card className={cn("p-5 sm:p-6", infoOpen && "z-20")}>
+      <div ref={headerRef} className="relative flex flex-wrap items-start justify-between gap-3">
         <div>
           <h2 className="text-lg font-semibold text-slate-900">Naprave za žigosanje</h2>
           <p className="mt-0.5 text-sm text-slate-500">Telefon ali tablica, ki ostane na delovnem mestu.</p>
@@ -160,9 +177,8 @@ function Devices({ devices }: { devices: Device[] }) {
             <Info className="h-4 w-4" />
           </button>
         </div>
+        {infoOpen && <PairInfo onClose={() => setInfoOpen(false)} />}
       </div>
-
-      {infoOpen && <PairInfo onClose={() => setInfoOpen(false)} />}
 
       {devices.length > 0 && (
         <ul className="mt-4 divide-y divide-slate-100">
@@ -177,36 +193,57 @@ function Devices({ devices }: { devices: Device[] }) {
   );
 }
 
-// Razlaga ob "i": kaj pomeni dodati napravo (in da svojega telefona ne povezuješ).
+// Razlaga ob "i": steklen oblaček pod gumbom (desno poravnan). Pove, kaj pomeni
+// dodati napravo — in da svojega telefona ne povezuješ.
 function PairInfo({ onClose }: { onClose: () => void }) {
+  const num = "grid h-6 w-6 shrink-0 place-items-center rounded-full bg-brand-600 text-xs font-bold text-white";
   return (
-    <div className="relative mt-4 rounded-2xl bg-brand-50/70 p-4 pr-10 text-sm text-slate-700 ring-1 ring-brand-100">
-      <button
-        type="button"
-        onClick={onClose}
-        className="absolute right-2 top-2 grid h-7 w-7 place-items-center rounded-full text-slate-400 hover:bg-white hover:text-slate-700"
-        aria-label="Zapri razlago"
-      >
-        <X className="h-4 w-4" />
-      </button>
-      <p className="font-semibold text-slate-900">Kaj pomeni »Dodaj napravo«?</p>
-      <p className="mt-1.5">
-        Napravo, na kateri bodo žigosali vsi zaposleni (npr. telefon na pultu ali tablico pri vhodu), povežeš samo
-        enkrat:
-      </p>
-      <ol className="mt-2 space-y-1">
-        <li>
-          <span className="font-semibold text-brand-700">1.</span> Tukaj klikneš »Dodaj napravo« in dobiš 6-mestno kodo.
-        </li>
-        <li>
-          <span className="font-semibold text-brand-700">2.</span> Na tisti napravi odpreš{" "}
-          <strong className="font-mono text-slate-900">{KIOSK_HOST}/naprava</strong> in vpišeš kodo.
-        </li>
-      </ol>
-      <p className="mt-2 text-slate-600">
-        Svojega telefona ti ni treba povezovati. Ti in zaposleni se na svojih telefonih še naprej prijavljate kot
-        doslej.
-      </p>
+    <div
+      role="dialog"
+      aria-label="Kaj pomeni »Dodaj napravo«?"
+      className="absolute right-0 top-full z-30 mt-3 w-full origin-top-right animate-[popIn_160ms_ease-out] sm:w-[23rem]"
+    >
+      {/* sij za oblačkom */}
+      <div
+        aria-hidden
+        className="absolute -inset-3 rounded-[1.75rem] bg-gradient-to-br from-fuchsia-300/45 via-sky-300/40 to-emerald-300/40 blur-2xl"
+      />
+      <div className="relative rounded-2xl bg-white/90 p-5 text-sm text-slate-700 shadow-[0_24px_60px_-20px_rgba(30,41,99,0.45)] ring-1 ring-white backdrop-blur-xl">
+        {/* puščica proti gumbu "i" (na telefonu je gumb drugje → brez puščice) */}
+        <span
+          aria-hidden
+          className="absolute -top-1.5 right-3 hidden h-3 w-3 rotate-45 border-l border-t border-white bg-white/90 sm:block"
+        />
+        <button
+          type="button"
+          onClick={onClose}
+          className="absolute right-2.5 top-2.5 grid h-7 w-7 place-items-center rounded-full text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
+          aria-label="Zapri"
+        >
+          <X className="h-4 w-4" />
+        </button>
+        <p className="pr-8 font-semibold text-slate-900">Kaj pomeni »Dodaj napravo«?</p>
+        <p className="mt-1.5 leading-relaxed">
+          Telefon ali tablico, na kateri bodo žigosali vsi zaposleni (npr. na pultu ali pri vhodu), povežeš samo enkrat:
+        </p>
+        <ol className="mt-3 space-y-2.5">
+          <li className="flex gap-2.5">
+            <span className={num}>1</span>
+            <span className="pt-0.5">Tukaj klikneš »Dodaj napravo« in dobiš 6-mestno kodo.</span>
+          </li>
+          <li className="flex gap-2.5">
+            <span className={num}>2</span>
+            <span className="pt-0.5">
+              Na tisti napravi odpreš <strong className="font-mono text-slate-900">{KIOSK_HOST}/naprava</strong> in
+              vpišeš kodo.
+            </span>
+          </li>
+        </ol>
+        <p className="mt-4 flex gap-2.5 rounded-xl bg-slate-50 px-3 py-2.5 text-slate-600 ring-1 ring-slate-100">
+          <Smartphone className="mt-0.5 h-4 w-4 shrink-0 text-slate-400" />
+          <span>Svojega telefona ti ni treba povezovati. Ti in zaposleni se na svojih telefonih prijavljate kot doslej.</span>
+        </p>
+      </div>
     </div>
   );
 }

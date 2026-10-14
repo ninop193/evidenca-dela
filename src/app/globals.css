@@ -213,6 +213,10 @@ body {
 }
 
 /* Skupna naprava: tresljaj pik ob napačni kodi + odštevanje do vrnitve na seznam */
+@keyframes popIn {
+  from { opacity: 0; transform: translateY(-4px) scale(0.97); }
+  to { opacity: 1; transform: none; }
+}
 @keyframes kioskShake {
   0%, 100% { transform: translateX(0); }
   20%, 60% { transform: translateX(-10px); }
