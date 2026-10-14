@@ -303,7 +303,7 @@ function Pins({ employees }: { employees: Employee[] }) {
   return (
     <Card className="p-6">
       <h2 className="text-lg font-semibold text-slate-900">Kode zaposlenih</h2>
-      <p className="mt-1 text-sm text-slate-500">Vsakemu zaposlenemu povej njegovo kodo. Kode vidiš samo ti.</p>
+      <p className="mt-1 text-sm text-slate-500">Vsak zaposleni vidi svojo kodo v aplikaciji, ko se prijavi. Lahko mu jo poveš tudi ti.</p>
       {employees.length === 0 ? (
         <p className="mt-4 text-sm text-slate-500">Še nimaš aktivnih zaposlenih.</p>
       ) : (

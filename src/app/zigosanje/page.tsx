@@ -12,6 +12,9 @@ import { workerCategory, reminderHoursFor } from "@/lib/workLimits";
 import { todayLjubljana, weekStart } from "@/lib/tzdate";
 import ClockWidget from "./ClockWidget";
 import { SelfEntry } from "./SelfEntryDialog";
+import { DevicePinCard } from "./DevicePinCard";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { assignPin } from "@/lib/kiosk";
 
 export default async function ZigosanjePage() {
   const profile = await getProfile();
@@ -20,16 +23,30 @@ export default async function ZigosanjePage() {
   const supabase = await createClient();
   const { data: company } = await supabase
     .from("companies")
-    .select("subscription_status, trial_ends_at, current_period_end")
+    .select("subscription_status, trial_ends_at, current_period_end, kiosk_enabled")
     .eq("id", profile.company_id)
     .single();
   const access = getAccess(company ?? {});
 
   const { data: employee } = await supabase
     .from("employees")
-    .select("id, worker_type, birth_date")
+    .select("id, worker_type, birth_date, active")
     .eq("user_id", profile.id)
     .single();
+
+  // Koda za skupno napravo (le če jo podjetje uporablja). Kode bere samo strežnik,
+  // zato admin odjemalec — VEDNO samo za zaposlenega, ki je prijavljen (RLS zgoraj).
+  let devicePin: string | null = null;
+  if (company?.kiosk_enabled && employee?.active) {
+    const db = createAdminClient();
+    const { data: row } = await db
+      .from("kiosk_pins")
+      .select("pin")
+      .eq("employee_id", employee.id)
+      .eq("company_id", profile.company_id)
+      .maybeSingle();
+    devicePin = row?.pin ?? (await assignPin(db, profile.company_id, employee.id));
+  }
 
   // Zakonska dnevna meja za opomnik ("Ne pozabi žigosati odhoda").
   const reminderHours = employee
@@ -173,6 +190,8 @@ export default async function ZigosanjePage() {
                 <ChevronRight className="h-4 w-4" />
               </span>
             </Link>
+
+            {devicePin && <DevicePinCard pin={devicePin} />}
 
             {/* Pozabljeno žigosanje — zaposleni predlaga, delodajalec potrdi */}
             <div className="mt-5 flex flex-col items-center gap-2">
