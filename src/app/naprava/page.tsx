@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
 import { Aurora } from "@/components/Aurora";
 import { getAccess } from "@/lib/billing";
-import { ensurePins, getKioskDevice } from "@/lib/kiosk";
+import { cookies } from "next/headers";
+import { ensurePins, getKioskDevice, KIOSK_COOKIE } from "@/lib/kiosk";
 import { KioskScreen, PairScreen, KioskMessage } from "./KioskScreen";
 
 export const metadata: Metadata = {
   title: "Skupna naprava",
   robots: { index: false, follow: false },
+  manifest: "/naprava/manifest.webmanifest",
 };
 
 // Skupna naprava na delovnem mestu. Nepovezan brskalnik vidi samo vnos kode za
@@ -18,7 +20,7 @@ export default async function NapravaPage() {
     <div className="relative min-h-screen text-slate-800">
       <Aurora />
       {!ctx ? (
-        <PairScreen />
+        <PairScreen wasConnected={(await cookies()).has(KIOSK_COOKIE)} />
       ) : !getAccess(ctx.company).hasAccess ? (
         <KioskMessage
           companyName={ctx.company.name}

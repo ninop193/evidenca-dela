@@ -18,6 +18,7 @@ type Screen =
 const IDLE_MS = 30_000; // brez dotika → nazaj na seznam imen
 const DONE_MS = 5_000; // potrdilo je vidno 5 sekund
 const REFRESH_MS = 5 * 60_000; // seznam imen se osveži (novi zaposleni)
+const RELOAD_MS = 6 * 60 * 60_000; // po 6 urah na začetnem zaslonu: nova verzija aplikacije
 
 const fmtTime = (iso: string) =>
   new Intl.DateTimeFormat("sl-SI", { timeZone: "Europe/Ljubljana", hour: "2-digit", minute: "2-digit" }).format(
@@ -33,6 +34,17 @@ const initials = (name: string) =>
     .slice(0, 2)
     .map((p) => p[0]?.toUpperCase())
     .join("");
+
+// Klic na strežnik je spodletel (ni interneta ali pa je bila medtem objavljena nova
+// verzija aplikacije, ki je odprta naprava še ne pozna). Brez interneta: sporočilo.
+// Z internetom: sporočilo + osvežitev strani, ki naloži novo verzijo.
+const OFFLINE_MSG = "Ni internetne povezave. Preveri Wi-Fi in poskusi znova.";
+const RELOAD_MSG = "Povezava ni uspela. Naprava se osvežuje …";
+function failureMessage(): string {
+  if (typeof navigator !== "undefined" && navigator.onLine === false) return OFFLINE_MSG;
+  setTimeout(() => window.location.reload(), 2500);
+  return RELOAD_MSG;
+}
 
 const buzz = () => {
   try {
@@ -109,12 +121,24 @@ export function KioskScreen({ companyName, employees }: { companyName: string; e
     return () => clearTimeout(t);
   }, [screen, lastTouch, goHome]);
 
-  // Na začetnem zaslonu občasno osveži seznam (delodajalec je dodal zaposlenega).
+  // Na začetnem zaslonu občasno osveži seznam (delodajalec je dodal zaposlenega) —
+  // tudi takoj, ko se zaslon naprave spet prižge. Enkrat na nekaj ur pa stran naloži
+  // na novo, da naprava, ki je odprta več dni, dobi novo verzijo aplikacije.
+  const [loadedAt] = useState(() => Date.now());
   useEffect(() => {
     if (screen.kind !== "home") return;
-    const t = setInterval(() => router.refresh(), REFRESH_MS);
-    return () => clearInterval(t);
-  }, [screen.kind, router]);
+    const tick = () => {
+      if (document.visibilityState !== "visible") return;
+      if (Date.now() - loadedAt > RELOAD_MS) window.location.reload();
+      else router.refresh();
+    };
+    const t = setInterval(tick, REFRESH_MS);
+    document.addEventListener("visibilitychange", tick);
+    return () => {
+      clearInterval(t);
+      document.removeEventListener("visibilitychange", tick);
+    };
+  }, [screen.kind, router, loadedAt]);
 
   return (
     <div className="flex min-h-screen flex-col" onPointerDown={() => setLastTouch(Date.now())}>
@@ -209,7 +233,15 @@ function PinPad({
 
   async function submit(code: string) {
     setLoading(true);
-    const res = await checkPin(emp.id, code);
+    let res;
+    try {
+      res = await checkPin(emp.id, code);
+    } catch {
+      setLoading(false);
+      setPin("");
+      setError(failureMessage());
+      return;
+    }
     setLoading(false);
     if (res.disconnected) return router.refresh();
     if (res.error) {
@@ -332,13 +364,20 @@ function ClockAction({
     setError(null);
     setInfo(null);
     const action = isOut ? "out" : "in";
-    const res = await kioskClock(emp.id, pin, action, isOut ? breakMin : undefined);
+    let res;
+    try {
+      res = await kioskClock(emp.id, pin, action, isOut ? breakMin : undefined);
+    } catch {
+      setLoading(false);
+      setError(failureMessage());
+      return;
+    }
     setLoading(false);
     if (res.disconnected) return router.refresh();
     // Medtem žigosano drugje (npr. s telefonom) → preberi pravo stanje in ga pokaži.
     if (res.stale) {
-      const now = await checkPin(emp.id, pin);
-      if (!now.error) onStateChanged(now.openSince ?? null);
+      const now = await checkPin(emp.id, pin).catch(() => null);
+      if (now && !now.error) onStateChanged(now.openSince ?? null);
       setInfo("Stanje se je medtem spremenilo (npr. žig s telefonom). Prikaz je posodobljen.");
       return;
     }
@@ -484,7 +523,10 @@ function Done({ screen, onClose }: { screen: Extract<Screen, { kind: "done" }>; 
 
 // --- Nepovezana naprava ------------------------------------------------------------
 
-export function PairScreen() {
+// wasConnected: naprava je bila povezana, a jo je delodajalec odklopil ali izklopil
+// skupno napravo → zaposlenim najprej povej, kaj naj naredijo (navodila za povezavo
+// so namenjena delodajalcu).
+export function PairScreen({ wasConnected = false }: { wasConnected?: boolean }) {
   const router = useRouter();
   const [code, setCode] = useState("");
   const [loading, setLoading] = useState(false);
@@ -495,7 +537,14 @@ export function PairScreen() {
     if (loading) return;
     setLoading(true);
     setError(null);
-    const res = await pairWithCode(code);
+    let res;
+    try {
+      res = await pairWithCode(code);
+    } catch {
+      setLoading(false);
+      setError(failureMessage());
+      return;
+    }
     setLoading(false);
     if (res.error) {
       setError(res.error);
@@ -512,11 +561,26 @@ export function PairScreen() {
           <span className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-gradient-to-br from-brand-500 to-brand-700 text-white">
             <TabletSmartphone className="h-7 w-7" />
           </span>
-          <h1 className="mt-4 text-2xl font-bold tracking-tight text-slate-900">Poveži napravo</h1>
-          <p className="mt-2 text-slate-600">
-            Na računalniku v Delovitu na domači strani odpri <strong>Skupna naprava</strong> in klikni{" "}
-            <strong>Poveži napravo</strong>. Tukaj vpiši kodo, ki se prikaže.
-          </p>
+          {wasConnected ? (
+            <>
+              <h1 className="mt-4 text-2xl font-bold tracking-tight text-slate-900">Naprava ni več povezana</h1>
+              <p className="mt-2 text-slate-600">
+                Na tej napravi trenutno ni mogoče žigosati. Žigosaj s svojim telefonom ali se obrni na delodajalca.
+              </p>
+              <p className="mt-6 border-t border-slate-200/70 pt-5 text-sm text-slate-500">
+                <strong className="text-slate-700">Za delodajalca:</strong> v Delovitu odpri{" "}
+                <strong>Skupna naprava</strong>, klikni <strong>Dodaj napravo</strong> in tukaj vpiši kodo.
+              </p>
+            </>
+          ) : (
+            <>
+              <h1 className="mt-4 text-2xl font-bold tracking-tight text-slate-900">Poveži napravo</h1>
+              <p className="mt-2 text-slate-600">
+                V Delovitu odpri <strong>Skupna naprava</strong> in klikni <strong>Dodaj napravo</strong>. Tukaj vpiši
+                kodo, ki se prikaže.
+              </p>
+            </>
+          )}
           <form onSubmit={submit} className="mt-6">
             <input
               value={code}

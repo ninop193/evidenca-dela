@@ -3,8 +3,9 @@
 import { getAccess } from "@/lib/billing";
 import { clientIp, rateBlocked, rateRecord } from "@/lib/rateLimit";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { createClient } from "@/lib/supabase/server";
 import { clockInEmployee, clockOutEmployee } from "@/lib/clock";
-import { todayLjubljana } from "@/lib/tzdate";
+import { autostopHoursFor, isShiftRunning, workerCategory } from "@/lib/workLimits";
 import {
   connectThisDevice,
   fmtTimeLj,
@@ -60,6 +61,9 @@ export async function pairWithCode(rawCode: string): Promise<{ error?: string }>
   if (!(await connectThisDevice(db, row.company_id))) {
     return { error: "Povezava ni uspela. Poskusi znova." };
   }
+  // Na skupni napravi ne sme ostati nihče prijavljen (npr. delodajalec, ki je
+  // kodo vpisal v svojem brskalniku) — sicer bi zaposleni odprli nadzorno ploščo.
+  await (await createClient()).auth.signOut();
   return {};
 }
 
@@ -117,14 +121,16 @@ export type KioskStatus = { error?: string; wrongPin?: boolean; disconnected?: b
 export async function checkPin(employeeId: string, pin: string): Promise<KioskStatus> {
   const v = await verify(employeeId, pin);
   if ("error" in v) return v;
+  // Izmena v teku = odprt vnos, mlajši od dnevne meje (tudi čez polnoč).
   const { data: open } = await v.ctx.db
     .from("time_entries")
     .select("clock_in")
     .eq("employee_id", v.employee.id)
-    .eq("date", todayLjubljana())
     .is("clock_out", null)
-    .maybeSingle();
-  return { name: v.employee.full_name, openSince: open?.clock_in ?? null };
+    .order("clock_in", { ascending: false });
+  const capH = autostopHoursFor(workerCategory(v.employee.worker_type, v.employee.birth_date));
+  const running = (open ?? []).find((e) => isShiftRunning(e.clock_in, capH));
+  return { name: v.employee.full_name, openSince: running?.clock_in ?? null };
 }
 
 export type KioskClockResult = { error?: string; stale?: boolean; wrongPin?: boolean; disconnected?: boolean; time?: string; hours?: number; capped?: boolean };

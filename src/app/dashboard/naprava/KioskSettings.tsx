@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { CheckCircle2, Info, KeyRound, Loader2, Pencil, Plus, RefreshCw, Smartphone, TabletSmartphone, UserRound, X } from "lucide-react";
+import { CheckCircle2, ChevronDown, Info, KeyRound, Loader2, Pencil, Plus, RefreshCw, Smartphone, TabletSmartphone, UserRound, X } from "lucide-react";
 import { Button, Card, Input, cn } from "@/components/ui";
 import {
   createPairCode,
@@ -480,6 +480,28 @@ function PairPanel({ canCancel, onCancel }: { canCancel: boolean; onCancel: () =
           </p>
         </li>
       </ol>
+
+      <details className="group mt-5 rounded-xl bg-white/60 px-4 py-3 text-sm ring-1 ring-slate-200/70">
+        <summary className="flex cursor-pointer list-none items-center justify-between gap-2 font-medium text-slate-700">
+          Nasveti za tablico ali telefon na pultu
+          <ChevronDown className="h-4 w-4 shrink-0 text-slate-400 transition group-open:rotate-180" />
+        </summary>
+        <ul className="mt-2.5 space-y-2 text-slate-600">
+          <li>
+            <strong className="text-slate-800">Ikona na začetnem zaslonu:</strong> najprej dodaj ikono (v Safariju
+            Deli → Dodaj na začetni zaslon), jo odpri in šele tam vpiši kodo. Na iPhonu in iPadu ikona ne pozna
+            povezave iz brskalnika.
+          </li>
+          <li>
+            <strong className="text-slate-800">Brez zasebnega okna:</strong> ko se zasebno okno zapre, se naprava
+            odklopi.
+          </li>
+          <li>
+            <strong className="text-slate-800">Zaklep zaslona:</strong> ugasnjen zaslon napravo ne odklopi. Če pa
+            ima tablica geslo, v nastavitvah podaljšaj čas do zaklepa, da je zaposlenim ni treba vsakič odklepati.
+          </li>
+        </ul>
+      </details>
 
       <div className="mt-5 border-t border-slate-200/70 pt-4">
         {confirmThis ? (
