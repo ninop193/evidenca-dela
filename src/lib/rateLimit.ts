@@ -44,6 +44,27 @@ export async function rateBlocked(key: string, max: number, windowSeconds: numbe
   return (count ?? 0) >= max;
 }
 
+// Čez koliko sekund se zapora sprosti (0 = ni zaklenjeno). Zapora velja, dokler je v
+// oknu vsaj `max` neuspehov; sprosti se, ko najstarejši izmed zadnjih `max` izpade iz okna.
+// Ob napaki baze vrne 0 (dovoli), kot rateBlocked.
+export async function rateRetryAfter(key: string, max: number, windowSeconds: number): Promise<number> {
+  const since = new Date(Date.now() - windowSeconds * 1000).toISOString();
+  const { data, error } = await createAdminClient()
+    .from("rate_events")
+    .select("created_at")
+    .eq("key", key)
+    .gte("created_at", since)
+    .order("created_at", { ascending: false })
+    .limit(max);
+  if (error) {
+    console.error("rateRetryAfter: branje spodletelo:", error.message);
+    return 0;
+  }
+  if (!data || data.length < max) return 0;
+  const unlockAt = new Date(data[max - 1].created_at as string).getTime() + windowSeconds * 1000;
+  return Math.max(0, Math.ceil((unlockAt - Date.now()) / 1000));
+}
+
 export async function rateRecord(key: string): Promise<void> {
   const { error } = await createAdminClient().from("rate_events").insert({ key });
   if (error) console.error("rateRecord: zapis spodletel:", error.message);

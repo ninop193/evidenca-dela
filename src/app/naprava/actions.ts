@@ -1,7 +1,7 @@
 "use server";
 
 import { getAccess } from "@/lib/billing";
-import { clientIp, rateBlocked, rateRecord } from "@/lib/rateLimit";
+import { clientIp, rateBlocked, rateRecord, rateRetryAfter } from "@/lib/rateLimit";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { clockInEmployee, clockOutEmployee } from "@/lib/clock";
@@ -19,8 +19,9 @@ import {
 // preveri piškotek naprave (getKioskDevice), nato PIN kode izbranega zaposlenega.
 
 const NOT_CONNECTED = "Naprava ni več povezana. Delodajalec jo lahko poveže znova.";
-const LOCKED =
-  "Preveč napačnih poskusov. Poskusi znova čez nekaj minut ali se obrni na delodajalca.";
+// Zaklep po preveč napačnih kodah: povej, koliko časa je treba počakati.
+const lockedMsg = (seconds: number) =>
+  `Preveč napačnih poskusov. Poskusi znova čez ${Math.max(1, Math.ceil(seconds / 60))} min.`;
 
 // Napačne PIN kode: največ 5 na zaposlenega in 20 na napravo v 15 minutah.
 const PIN_MAX_PER_EMPLOYEE = 5;
@@ -86,12 +87,13 @@ async function verify(employeeId: string, pin: string): Promise<Verified> {
 
   const empKey = `kiosk-pin:${employeeId}`;
   const devKey = `kiosk-pin-dev:${ctx.deviceId}`;
-  if (
-    (await rateBlocked(empKey, PIN_MAX_PER_EMPLOYEE, PIN_WINDOW_S)) ||
-    (await rateBlocked(devKey, PIN_MAX_PER_DEVICE, PIN_WINDOW_S))
-  ) {
-    return { error: LOCKED };
-  }
+  const lockedFor = async () =>
+    Math.max(
+      await rateRetryAfter(empKey, PIN_MAX_PER_EMPLOYEE, PIN_WINDOW_S),
+      await rateRetryAfter(devKey, PIN_MAX_PER_DEVICE, PIN_WINDOW_S),
+    );
+  const wait = await lockedFor();
+  if (wait > 0) return { error: lockedMsg(wait) };
 
   const [{ data: employee }, { data: pinRow }] = await Promise.all([
     ctx.db
@@ -110,6 +112,9 @@ async function verify(employeeId: string, pin: string): Promise<Verified> {
   if (!employee || !employee.active) return { error: "Zaposleni ni najden." };
   if (!pinRow || !/^\d{4}$/.test(pin) || pinRow.pin !== pin) {
     await Promise.all([rateRecord(empKey), rateRecord(devKey)]);
+    // Ta poskus je bil zadnji dovoljeni → takoj povej, koliko je treba počakati.
+    const waitNow = await lockedFor();
+    if (waitNow > 0) return { error: lockedMsg(waitNow), wrongPin: true };
     return { error: "Napačna osebna koda. Poskusi znova.", wrongPin: true };
   }
   return { ctx, employee };
