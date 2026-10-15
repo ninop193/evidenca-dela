@@ -72,9 +72,9 @@ function TurnOn() {
   }
 
   const steps = [
-    { icon: TabletSmartphone, text: "Tablico ali telefon na delovnem mestu enkrat povežeš s kodo." },
+    { icon: TabletSmartphone, text: "Tablico ali telefon na delovnem mestu enkrat povežeš s kodo za povezavo." },
     { icon: UserRound, text: "Zaposleni na napravi pritisne svoje ime." },
-    { icon: KeyRound, text: "Vpiše svojo 4-mestno kodo in pritisne Prihod ali Odhod." },
+    { icon: KeyRound, text: "Vpiše svojo osebno kodo (4 številke) in pritisne Prihod ali Odhod." },
   ];
 
   return (
@@ -90,7 +90,7 @@ function TurnOn() {
         ))}
       </ol>
       <p className="mt-6 text-sm text-slate-500">
-        Kode za vse zaposlene ustvarimo samodejno. Žigosanje s telefonom deluje naprej, zaposleni lahko uporabljajo oboje.
+        Osebne kode za vse zaposlene ustvarimo samodejno. Žigosanje s telefonom deluje naprej, zaposleni lahko uporabljajo oboje.
       </p>
       {error && <p className="mt-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
       <Button size="lg" className="mt-6" onClick={turnOn} disabled={loading}>
@@ -229,13 +229,13 @@ function PairInfo({ onClose }: { onClose: () => void }) {
         <ol className="mt-3 space-y-2.5">
           <li className="flex gap-2.5">
             <span className={num}>1</span>
-            <span className="pt-0.5">Tukaj klikneš »Dodaj napravo« in dobiš 6-mestno kodo.</span>
+            <span className="pt-0.5">Tukaj klikneš »Dodaj napravo« in dobiš kodo za povezavo (6 številk).</span>
           </li>
           <li className="flex gap-2.5">
             <span className={num}>2</span>
             <span className="pt-0.5">
               Na tisti napravi odpreš <strong className="font-mono text-slate-900">{KIOSK_HOST}/naprava</strong> in
-              vpišeš kodo.
+              vpišeš kodo za povezavo.
             </span>
           </li>
         </ol>
@@ -394,7 +394,7 @@ function PairPanel({ canCancel, onCancel }: { canCancel: boolean; onCancel: () =
 
   const showCode = (res: Awaited<ReturnType<typeof createPairCode>>) => {
     setLoadingCode(false);
-    if (res.error || !res.code) setError(res.error ?? "Kode ni bilo mogoče ustvariti.");
+    if (res.error || !res.code) setError(res.error ?? "Kode za povezavo ni bilo mogoče ustvariti.");
     else setCode(res.code);
   };
 
@@ -456,7 +456,7 @@ function PairPanel({ canCancel, onCancel }: { canCancel: boolean; onCancel: () =
         <li className="flex gap-3">
           <span className={step}>2</span>
           <div className="pt-0.5">
-            <p>Vpiši to kodo:</p>
+            <p>Vpiši to kodo za povezavo:</p>
             <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1">
               <span className="font-mono text-3xl font-bold tracking-[0.2em] text-slate-900" aria-live="polite">
                 {code ? `${code.slice(0, 3)} ${code.slice(3)}` : loadingCode ? "··· ···" : "—"}
@@ -489,7 +489,7 @@ function PairPanel({ canCancel, onCancel }: { canCancel: boolean; onCancel: () =
         <ul className="mt-2.5 space-y-2 text-slate-600">
           <li>
             <strong className="text-slate-800">Ikona na začetnem zaslonu:</strong> najprej dodaj ikono (v Safariju
-            Deli → Dodaj na začetni zaslon), jo odpri in šele tam vpiši kodo. Na iPhonu in iPadu ikona ne pozna
+            Deli → Dodaj na začetni zaslon), jo odpri in šele tam vpiši kodo za povezavo. Na iPhonu in iPadu ikona ne pozna
             povezave iz brskalnika.
           </li>
           <li>
@@ -544,8 +544,8 @@ function PairPanel({ canCancel, onCancel }: { canCancel: boolean; onCancel: () =
 function Pins({ employees }: { employees: Employee[] }) {
   return (
     <Card className="p-6">
-      <h2 className="text-lg font-semibold text-slate-900">Kode zaposlenih</h2>
-      <p className="mt-1 text-sm text-slate-500">Vsak zaposleni vidi svojo kodo v aplikaciji, ko se prijavi. Lahko mu jo poveš tudi ti.</p>
+      <h2 className="text-lg font-semibold text-slate-900">Osebne kode zaposlenih</h2>
+      <p className="mt-1 text-sm text-slate-500">S temi kodami zaposleni žigosajo na skupni napravi. Vsak vidi svojo osebno kodo v aplikaciji, ko se prijavi, lahko mu jo poveš tudi ti.</p>
       {employees.length === 0 ? (
         <p className="mt-4 text-sm text-slate-500">Še nimaš aktivnih zaposlenih.</p>
       ) : (
@@ -602,7 +602,7 @@ function PinRow({ employee }: { employee: Employee }) {
       {confirm && (
         <div className="mt-3 rounded-2xl bg-white/70 p-4 ring-1 ring-slate-200/70">
           <p className="text-sm text-slate-700">
-            Zaposleni dobi novo kodo, stara takoj preneha delovati. Novo kodo vidi v aplikaciji. Uporabno, če je kodo
+            Zaposleni dobi novo osebno kodo, stara takoj preneha delovati. Novo vidi v aplikaciji. Uporabno, če je kodo
             izvedel sodelavec.
           </p>
           {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
@@ -640,8 +640,8 @@ function TurnOff() {
         <div className="rounded-2xl bg-red-50/70 p-4 ring-1 ring-red-100">
           <p className="font-semibold text-slate-900">Izklopim skupno napravo?</p>
           <p className="mt-1 text-slate-600">
-            Vse naprave se odklopijo. Žigosanje s telefonom in vsi že zabeleženi žigi ostanejo. Kode zaposlenih
-            shranimo, če jo kdaj vklopiš znova.
+            Vse naprave se odklopijo. Žigosanje s telefonom in vsi že zabeleženi žigi ostanejo. Osebne kode zaposlenih
+            shranimo za morebitni ponovni vklop.
           </p>
           <div className="mt-3 flex flex-wrap justify-end gap-2">
             <Button variant="ghost" size="sm" onClick={() => setConfirm(false)} disabled={loading}>

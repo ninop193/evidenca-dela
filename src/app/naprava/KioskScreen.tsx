@@ -270,7 +270,7 @@ function PinPad({
       <div className="mt-2 flex flex-col items-center text-center">
         <Avatar name={emp.name} size="lg" />
         <p className="mt-2 text-2xl font-bold text-slate-900 sm:mt-3">{emp.name}</p>
-        <p className="mt-1 text-slate-500">Vpiši svojo kodo</p>
+        <p className="mt-1 text-slate-500">Vpiši svojo osebno kodo</p>
       </div>
 
       <div key={shake} className={cn("mt-4 flex justify-center gap-4 sm:mt-6", shake > 0 && "kiosk-shake")}>
@@ -569,7 +569,7 @@ export function PairScreen({ wasConnected = false }: { wasConnected?: boolean })
               </p>
               <p className="mt-6 border-t border-slate-200/70 pt-5 text-sm text-slate-500">
                 <strong className="text-slate-700">Za delodajalca:</strong> v Delovitu odpri{" "}
-                <strong>Skupna naprava</strong>, klikni <strong>Dodaj napravo</strong> in tukaj vpiši kodo.
+                <strong>Skupna naprava</strong>, klikni <strong>Dodaj napravo</strong> in tukaj vpiši kodo za povezavo.
               </p>
             </>
           ) : (
@@ -577,7 +577,7 @@ export function PairScreen({ wasConnected = false }: { wasConnected?: boolean })
               <h1 className="mt-4 text-2xl font-bold tracking-tight text-slate-900">Poveži napravo</h1>
               <p className="mt-2 text-slate-600">
                 V Delovitu odpri <strong>Skupna naprava</strong> in klikni <strong>Dodaj napravo</strong>. Tukaj vpiši
-                kodo, ki se prikaže.
+                kodo za povezavo, ki se prikaže.
               </p>
             </>
           )}

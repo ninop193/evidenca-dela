@@ -59,7 +59,7 @@ export async function createPairCode(): Promise<Result & { code?: string }> {
     if (!error) return { code };
     if (error.code !== "23505") break;
   }
-  return { error: "Kode ni bilo mogoče ustvariti. Poskusi znova." };
+  return { error: "Kode za povezavo ni bilo mogoče ustvariti. Poskusi znova." };
 }
 
 // "Uporabi to napravo": poveže napravo, na kateri je delodajalec, in ga
@@ -121,7 +121,7 @@ export async function regeneratePin(employeeId: string): Promise<Result & { pin?
     .maybeSingle();
   if (!emp) return { error: "Zaposleni ni najden." };
   const pin = await assignPin(ctx.db, ctx.profile.company_id, emp.id);
-  if (!pin) return { error: "Nove kode ni bilo mogoče ustvariti." };
+  if (!pin) return { error: "Nove osebne kode ni bilo mogoče ustvariti." };
   revalidatePath("/dashboard/naprava");
   return { ok: true, pin };
 }

@@ -61,9 +61,9 @@ export default function NewEmployeePage() {
           )}
           {done.pin && (
             <div className="mt-5 rounded-2xl bg-white/70 px-4 py-3 ring-1 ring-slate-200/70">
-              <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">Koda za skupno napravo</p>
+              <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">Osebna koda za skupno napravo</p>
               <p className="mt-1 font-mono text-3xl font-bold tracking-[0.25em] text-slate-900">{done.pin}</p>
-              <p className="mt-1 text-xs text-slate-500">Zaposleni jo vidi tudi v aplikaciji, ko se prvič prijavi. Vse kode najdeš pod »Skupna naprava«.</p>
+              <p className="mt-1 text-xs text-slate-500">Zaposleni jo vidi tudi v aplikaciji, ko se prvič prijavi. Vse osebne kode najdeš pod »Skupna naprava«.</p>
             </div>
           )}
           <div className="mt-6 flex flex-col gap-2">

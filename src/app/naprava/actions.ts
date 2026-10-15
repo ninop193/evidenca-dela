@@ -31,7 +31,7 @@ const PIN_WINDOW_S = 15 * 60;
 
 export async function pairWithCode(rawCode: string): Promise<{ error?: string }> {
   const code = rawCode.replace(/\D/g, "");
-  if (code.length !== 6) return { error: "Koda ima 6 številk." };
+  if (code.length !== 6) return { error: "Koda za povezavo ima 6 številk." };
 
   const ipKey = `kiosk-pair:${await clientIp()}`;
   if ((await rateBlocked(ipKey, 5, 15 * 60)) || (await rateBlocked("kiosk-pair:all", 200, 3600))) {
@@ -46,7 +46,7 @@ export async function pairWithCode(rawCode: string): Promise<{ error?: string }>
     .maybeSingle();
   if (!row || new Date(row.expires_at).getTime() < Date.now()) {
     await Promise.all([rateRecord(ipKey), rateRecord("kiosk-pair:all")]);
-    return { error: "Koda ni pravilna ali je potekla. V Delovitu ustvari novo." };
+    return { error: "Koda za povezavo ni pravilna ali je potekla. V Delovitu ustvari novo." };
   }
 
   const { data: company } = await db
@@ -110,7 +110,7 @@ async function verify(employeeId: string, pin: string): Promise<Verified> {
   if (!employee || !employee.active) return { error: "Zaposleni ni najden." };
   if (!pinRow || !/^\d{4}$/.test(pin) || pinRow.pin !== pin) {
     await Promise.all([rateRecord(empKey), rateRecord(devKey)]);
-    return { error: "Napačna koda. Poskusi znova.", wrongPin: true };
+    return { error: "Napačna osebna koda. Poskusi znova.", wrongPin: true };
   }
   return { ctx, employee };
 }

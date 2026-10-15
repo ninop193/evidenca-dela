@@ -76,7 +76,7 @@ function SharedDeviceInfo({ onClose }: { onClose: () => void }) {
           </h2>
           <p className="mt-2 text-[15px] leading-relaxed text-slate-600">
             Ena tablica ali telefon na delovnem mestu, na katerem žigosajo vsi: zaposleni pritisne svoje ime in vpiše
-            osebno 4-mestno kodo.
+            osebno kodo (4 številke).
           </p>
 
           <Preview />
@@ -138,7 +138,7 @@ function Preview() {
           </span>
         ))}
       </Screen>
-      <Screen step="2" label="Koda">
+      <Screen step="2" label="Osebna koda">
         <span className="flex gap-1">
           {[0, 1, 2, 3].map((i) => (
             <span key={i} className={cn("h-1.5 w-1.5 rounded-full", i < 3 ? "bg-brand-600" : "bg-slate-300")} />
