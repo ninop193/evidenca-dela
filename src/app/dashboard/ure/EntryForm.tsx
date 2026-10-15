@@ -109,6 +109,9 @@ export default function EntryForm({
         <Field label="Prihod (ura)" name="clockInTime" type="time" defaultValue={initial?.clockInTime} />
         <Field label="Odhod (ura)" name="clockOutTime" type="time" defaultValue={initial?.clockOutTime} />
       </div>
+      <p className="-mt-2 text-xs text-slate-400">
+        Odhod pred uro prihoda (npr. 22:00 → 06:00) se šteje v naslednji dan.
+      </p>
 
       <div className="grid grid-cols-2 gap-3">
         <Field

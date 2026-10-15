@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { getProfile } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { combineLjubljana } from "@/lib/tzdate";
+import { combineLjubljana, combineShiftEnd } from "@/lib/tzdate";
 
 const num = (v?: string): number | null =>
   v != null && v !== "" && !Number.isNaN(Number(v)) ? Number(v) : null;
@@ -33,12 +33,14 @@ export type EntryResult = { error?: string };
 
 function buildPayload(input: EntryInput, companyId: string) {
   const total = num(input.totalWorkedHours);
+  const clockIn = combineLjubljana(input.date, input.clockInTime);
   return {
     company_id: companyId,
     employee_id: input.employeeId,
     date: input.date,
-    clock_in: combineLjubljana(input.date, input.clockInTime),
-    clock_out: combineLjubljana(input.date, input.clockOutTime),
+    clock_in: clockIn,
+    // Odhod pred prihodom = naslednji dan (izmena čez polnoč).
+    clock_out: combineShiftEnd(input.date, clockIn, input.clockOutTime),
     break_minutes: Math.min(480, Math.max(0, Math.round(num(input.breakMinutes) ?? 0))),
     hours_count: total,
     total_worked_hours: total,

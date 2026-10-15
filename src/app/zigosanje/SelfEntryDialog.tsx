@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { CalendarClock, Loader2, Pencil, LogIn, LogOut } from "lucide-react";
 import { selfCreateEntry, selfFixEntry } from "./actions";
 import { todayLjubljana, shiftDays, dayLabel } from "@/lib/tzdate";
+import { isShiftRunning, MAX_AUTOSTOP_HOURS } from "@/lib/workLimits";
 
 const TZ = "Europe/Ljubljana";
 
@@ -69,8 +70,12 @@ export function SelfEntry({
   const [breakMin, setBreakMin] = useState(fix?.breakMinutes ?? 0);
   const [note, setNote] = useState("");
 
-  // Pri današnjem odprtem vnosu sme odhod ostati prazen (izmena še teče).
-  const outOptional = mode === "fix" && fix?.date === today && fix.clockOutIso == null;
+  // Pri izmeni, ki še teče (tudi čez polnoč), sme odhod ostati prazen.
+  const [outOptional] = useState(
+    () => mode === "fix" && fix?.clockOutIso == null && isShiftRunning(fix?.clockInIso ?? null, MAX_AUTOSTOP_HOURS),
+  );
+  // Odhod ob zgodnejši uri od prihoda = naslednji dan (izmena čez polnoč).
+  const overnight = !!inTime && !!outTime && outTime <= inTime;
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -198,7 +203,10 @@ export function SelfEntry({
                 />
               </div>
             </div>
-            {outOptional && (
+            {overnight && (
+              <p className="mt-1.5 text-xs font-medium text-brand-700">Odhod naslednji dan (izmena čez polnoč).</p>
+            )}
+            {outOptional && !overnight && (
               <p className="mt-1.5 text-xs text-slate-400">
                 Če si še na delu, pusti odhod prazen — popravi se samo prihod.
               </p>

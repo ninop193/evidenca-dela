@@ -72,6 +72,16 @@ export function combineLjubljana(dateStr: string, timeStr?: string): string | nu
   return new Date(asUtc.getTime() - offset * 60000).toISOString();
 }
 
+// Odhod za vnos, ki se je začel na dateStr. Odhod ob enaki ali zgodnejši uri od
+// prihoda pomeni NASLEDNJI dan (izmena čez polnoč, npr. 22:00–06:00).
+export function combineShiftEnd(dateStr: string, clockInIso: string | null, timeStr?: string): string | null {
+  const out = combineLjubljana(dateStr, timeStr);
+  if (!out || !clockInIso) return out;
+  return new Date(out).getTime() <= new Date(clockInIso).getTime()
+    ? combineLjubljana(shiftDays(dateStr, 1), timeStr)
+    : out;
+}
+
 // "07:32" iz ISO časovnega žiga.
 export function timeLabel(iso: string | null): string {
   if (!iso) return "—";

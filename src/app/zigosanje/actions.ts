@@ -4,8 +4,8 @@ import { getProfile } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getAccess } from "@/lib/billing";
-import { ABSOLUTE_CEILING_HOURS } from "@/lib/workLimits";
-import { combineLjubljana, shiftDays } from "@/lib/tzdate";
+import { ABSOLUTE_CEILING_HOURS, autostopHoursFor, isShiftRunning, workerCategory } from "@/lib/workLimits";
+import { combineLjubljana, combineShiftEnd, shiftDays } from "@/lib/tzdate";
 import { clockInEmployee, clockOutEmployee } from "@/lib/clock";
 
 const TZ = "Europe/Ljubljana";
@@ -109,7 +109,8 @@ export async function selfCreateEntry(input: SelfEntryInput): Promise<ActionResu
   }
 
   const clockIn = combineLjubljana(input.date, input.clockInTime);
-  const clockOut = combineLjubljana(input.date, input.clockOutTime);
+  // Odhod pred prihodom = naslednji dan (izmena čez polnoč, npr. 22:00–06:00).
+  const clockOut = combineShiftEnd(input.date, clockIn, input.clockOutTime);
   if (!clockIn || !clockOut) return { error: "Vpiši uro prihoda in odhoda." };
 
   const start = new Date(clockIn);
@@ -117,23 +118,29 @@ export async function selfCreateEntry(input: SelfEntryInput): Promise<ActionResu
   if (end.getTime() <= start.getTime()) {
     return { error: "Odhod mora biti kasneje od prihoda." };
   }
+  if (end.getTime() > Date.now()) {
+    return { error: "Odhod ne more biti v prihodnosti. Ko končaš, žigosaj odhod." };
+  }
   const hours = Math.round(((end.getTime() - start.getTime()) / 3_600_000) * 100) / 100;
   if (hours > ABSOLUTE_CEILING_HOURS) {
     return { error: `Vnos je daljši od ${ABSOLUTE_CEILING_HOURS} ur. Tako dolg dan vnese delodajalec.` };
   }
 
-  // Prekrivanje z obstoječimi vnosi istega dne (dvojni vnos = neveljavna evidenca).
-  const { data: sameDay } = await supabase
+  // Prekrivanje z obstoječimi vnosi (dvojni vnos = neveljavna evidenca). Gledamo
+  // tudi sosednja dneva, ker izmena čez polnoč sega v naslednji dan.
+  const { data: nearby } = await supabase
     .from("time_entries")
-    .select("id, clock_in, clock_out")
+    .select("id, date, clock_in, clock_out")
     .eq("employee_id", employee.id)
-    .eq("date", input.date);
-  for (const e of sameDay ?? []) {
-    if (e.clock_out == null) {
+    .gte("date", shiftDays(input.date, -1))
+    .lte("date", shiftDays(input.date, 1));
+  for (const e of nearby ?? []) {
+    if (e.clock_out == null && e.date === input.date) {
       return { error: "Za ta dan imaš odprt vnos. Žigosaj odhod ali popravi obstoječi vnos." };
     }
+    if (!e.clock_in) continue;
     const eIn = new Date(e.clock_in as string).getTime();
-    const eOut = new Date(e.clock_out as string).getTime();
+    const eOut = e.clock_out ? new Date(e.clock_out as string).getTime() : Date.now();
     if (start.getTime() < eOut && end.getTime() > eIn) {
       return { error: "Vnos se prekriva z že zabeleženim vnosom za ta dan." };
     }
@@ -188,14 +195,18 @@ export async function selfFixEntry(
     ? combineLjubljana(entry.date as string, input.clockInTime)
     : (entry.clock_in as string | null);
   const clockOut = input.clockOutTime
-    ? combineLjubljana(entry.date as string, input.clockOutTime)
+    ? combineShiftEnd(entry.date as string, clockIn, input.clockOutTime)
     : (entry.clock_out as string | null);
   if (!clockIn) return { error: "Vpiši uro prihoda." };
 
-  // Odhod lahko ostane prazen samo pri še odprtem današnjem vnosu (izmena v teku).
+  // Odhod lahko ostane prazen samo pri izmeni, ki je še v teku (tudi čez polnoč).
   const stillOpen = clockOut == null;
-  if (stillOpen && entry.date !== today) {
+  const capH = autostopHoursFor(workerCategory(employee.worker_type, employee.birth_date));
+  if (stillOpen && !isShiftRunning(clockIn, capH)) {
     return { error: "Vpiši uro odhoda." };
+  }
+  if (clockOut && new Date(clockOut).getTime() > Date.now()) {
+    return { error: "Odhod ne more biti v prihodnosti. Ko končaš, žigosaj odhod." };
   }
 
   let hours: number | null = null;

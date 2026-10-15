@@ -8,7 +8,7 @@ import { Aurora } from "@/components/Aurora";
 import { Wordmark } from "@/components/ui";
 import { ChangePassword } from "@/components/ChangePassword";
 import { signOut } from "../(auth)/actions";
-import { workerCategory, reminderHoursFor } from "@/lib/workLimits";
+import { workerCategory, reminderHoursFor, autostopHoursFor, isShiftRunning } from "@/lib/workLimits";
 import { todayLjubljana, weekStart } from "@/lib/tzdate";
 import ClockWidget from "./ClockWidget";
 import { SelfEntry } from "./SelfEntryDialog";
@@ -55,6 +55,7 @@ export default async function ZigosanjePage() {
 
   let isOpen = false;
   let openSince: string | null = null;
+  let openEntry: { id: string; date: string } | null = null;
   let todayEntries: {
     id: string;
     clock_in: string | null;
@@ -66,7 +67,7 @@ export default async function ZigosanjePage() {
 
   if (employee) {
     const today = todayLjubljana();
-    const [{ data: entries }, { data: monthRows }] = await Promise.all([
+    const [{ data: entries }, { data: monthRows }, { data: openRows }] = await Promise.all([
       supabase
         .from("time_entries")
         .select("id, clock_in, clock_out, total_worked_hours")
@@ -80,11 +81,20 @@ export default async function ZigosanjePage() {
         .eq("employee_id", employee.id)
         .gte("date", [`${today.slice(0, 7)}-01`, weekStart(today)].sort()[0])
         .lte("date", today),
+      // Izmena v teku je lahko začeta tudi včeraj (nočna izmena čez polnoč).
+      supabase
+        .from("time_entries")
+        .select("id, date, clock_in")
+        .eq("employee_id", employee.id)
+        .is("clock_out", null)
+        .order("clock_in", { ascending: false }),
     ]);
     todayEntries = entries ?? [];
-    const open = todayEntries.find((e) => e.clock_out == null);
+    const capH = autostopHoursFor(workerCategory(employee.worker_type, employee.birth_date));
+    const open = (openRows ?? []).find((e) => isShiftRunning(e.clock_in, capH));
     isOpen = !!open;
     openSince = open?.clock_in ?? null;
+    openEntry = open ? { id: open.id, date: open.date } : null;
 
     const wStart = weekStart(today);
     const mStart = `${today.slice(0, 7)}-01`;
@@ -195,13 +205,13 @@ export default async function ZigosanjePage() {
 
             {/* Pozabljeno žigosanje — zaposleni predlaga, delodajalec potrdi */}
             <div className="mt-5 flex flex-col items-center gap-2">
-              {isOpen && openSince && (
+              {openEntry && openSince && (
                 <SelfEntry
                   mode="fix"
                   label="Napačna ura prihoda? Popravi"
                   fix={{
-                    id: todayEntries.find((e) => e.clock_out == null)!.id,
-                    date: todayLjubljana(),
+                    id: openEntry.id,
+                    date: openEntry.date,
                     clockInIso: openSince,
                     clockOutIso: null,
                     breakMinutes: 0,
