@@ -5,7 +5,8 @@ import { clientIp, rateBlocked, rateRecord, rateRetryAfter } from "@/lib/rateLim
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { clockInEmployee, clockOutEmployee } from "@/lib/clock";
-import { autostopHoursFor, isShiftRunning, workerCategory } from "@/lib/workLimits";
+import { autostopHoursFor, isOpenShift, workerCategory } from "@/lib/workLimits";
+import { todayLjubljana } from "@/lib/tzdate";
 import {
   connectThisDevice,
   fmtTimeLj,
@@ -127,15 +128,16 @@ export type KioskStatus = { error?: string; wrongPin?: boolean; disconnected?: b
 export async function checkPin(employeeId: string, pin: string): Promise<KioskStatus> {
   const v = await verify(employeeId, pin);
   if ("error" in v) return v;
-  // Izmena v teku = odprt vnos, mlajši od dnevne meje (tudi čez polnoč).
+  // Izmena v teku = odprt vnos od danes ali mlajši od dnevne meje (tudi čez polnoč).
   const { data: open } = await v.ctx.db
     .from("time_entries")
-    .select("clock_in")
+    .select("date, clock_in")
     .eq("employee_id", v.employee.id)
     .is("clock_out", null)
     .order("clock_in", { ascending: false });
   const capH = autostopHoursFor(workerCategory(v.employee.worker_type, v.employee.birth_date));
-  const running = (open ?? []).find((e) => isShiftRunning(e.clock_in, capH));
+  const today = todayLjubljana();
+  const running = (open ?? []).find((e) => isOpenShift(e, capH, today));
   return { name: v.employee.full_name, openSince: running?.clock_in ?? null };
 }
 

@@ -69,6 +69,18 @@ export function isShiftRunning(clockInIso: string | null, capHours: number, now:
   return now - new Date(clockInIso).getTime() < capHours * 3_600_000;
 }
 
+// Odprt vnos je izmena v teku, če je začet DANES (kot doslej: tudi dolga izmena nad
+// pragom ostane odprta do odhoda, ki jo zapre ob meji in označi za pregled) ALI pa
+// mlajši od praga (izmena čez polnoč, začeta včeraj). today = todayLjubljana().
+export function isOpenShift(
+  entry: { date: string; clock_in: string | null },
+  capHours: number,
+  today: string,
+  now: number = Date.now(),
+): boolean {
+  return entry.date === today || isShiftRunning(entry.clock_in, capHours, now);
+}
+
 // Najdaljši prag samodejne zapore (za poizvedbe, kjer kategorija delavca ni znana).
 export const MAX_AUTOSTOP_HOURS = Math.max(...Object.values(AUTOSTOP_HOURS));
 

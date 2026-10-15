@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { CalendarClock, Loader2, Pencil, LogIn, LogOut } from "lucide-react";
 import { selfCreateEntry, selfFixEntry } from "./actions";
 import { todayLjubljana, shiftDays, dayLabel } from "@/lib/tzdate";
-import { isShiftRunning, MAX_AUTOSTOP_HOURS } from "@/lib/workLimits";
+import { isOpenShift, MAX_AUTOSTOP_HOURS } from "@/lib/workLimits";
 
 const TZ = "Europe/Ljubljana";
 
@@ -72,7 +72,11 @@ export function SelfEntry({
 
   // Pri izmeni, ki še teče (tudi čez polnoč), sme odhod ostati prazen.
   const [outOptional] = useState(
-    () => mode === "fix" && fix?.clockOutIso == null && isShiftRunning(fix?.clockInIso ?? null, MAX_AUTOSTOP_HOURS),
+    () =>
+      mode === "fix" &&
+      !!fix &&
+      fix.clockOutIso == null &&
+      isOpenShift({ date: fix.date, clock_in: fix.clockInIso }, MAX_AUTOSTOP_HOURS, today),
   );
   // Odhod ob zgodnejši uri od prihoda = naslednji dan (izmena čez polnoč).
   const overnight = !!inTime && !!outTime && outTime <= inTime;

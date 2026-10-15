@@ -4,7 +4,7 @@ import {
   workerCategory,
   autostopHoursFor,
   autoCapNote,
-  isShiftRunning,
+  isOpenShift,
 } from "@/lib/workLimits";
 import { todayLjubljana } from "@/lib/tzdate";
 
@@ -50,13 +50,13 @@ export async function clockInEmployee(
     .eq("employee_id", employee.id)
     .is("clock_out", null);
 
-  // Izmena še v teku (tudi če se je začela včeraj, npr. nočna) → prepreči dvojni prihod.
+  // Izmena še v teku (današnja ali nočna od včeraj) → prepreči dvojni prihod.
   const capH = autostopHoursFor(workerCategory(employee.worker_type, employee.birth_date));
-  if ((openEntries ?? []).some((e) => isShiftRunning(e.clock_in, capH))) {
+  if ((openEntries ?? []).some((e) => isOpenShift(e, capH, today))) {
     return { error: "Prihod je že zabeležen.", stale: true };
   }
 
-  // Pozabljen odhod (odprt vnos, starejši od dnevne meje) → predlagaj odhod ob meji
+  // Pozabljen odhod (odprt vnos s prejšnjega dne, starejši od dnevne meje) → predlagaj odhod ob meji
   // (auto-stop) in OZNAČI za pregled. Ure se ne odrežejo tiho; delodajalec/delavec popravi.
   const stale = (openEntries ?? []).filter((e) => e.clock_in);
   if (stale.length) {

@@ -95,13 +95,13 @@ export default async function DashboardPage({
       .eq("needs_review", true)
       .order("date", { ascending: false })
       .limit(5),
-    // Kdo je trenutno na delu: odprta izmena, začeta v zadnjih urah dnevne meje
-    // (tudi čez polnoč; starejši odprt vnos je pozabljen odhod, ne "na delu").
+    // Kdo je trenutno na delu: odprta izmena od danes (kot doslej) ali začeta v
+    // zadnjih urah dnevne meje (nočna izmena čez polnoč). Starejši = pozabljen odhod.
     supabase
       .from("time_entries")
       .select("id, clock_in, employees(full_name)")
       .is("clock_out", null)
-      .gte("clock_in", runningShiftCutoffIso())
+      .or(`date.eq.${today},clock_in.gte.${runningShiftCutoffIso()}`)
       .order("clock_in", { ascending: true }),
     // Prošnje za dopust, ki čakajo na odločitev.
     supabase

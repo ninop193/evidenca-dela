@@ -8,7 +8,7 @@ import { Aurora } from "@/components/Aurora";
 import { Wordmark } from "@/components/ui";
 import { ChangePassword } from "@/components/ChangePassword";
 import { signOut } from "../(auth)/actions";
-import { workerCategory, reminderHoursFor, autostopHoursFor, isShiftRunning } from "@/lib/workLimits";
+import { workerCategory, reminderHoursFor, autostopHoursFor, isOpenShift } from "@/lib/workLimits";
 import { todayLjubljana, weekStart } from "@/lib/tzdate";
 import ClockWidget from "./ClockWidget";
 import { SelfEntry } from "./SelfEntryDialog";
@@ -91,7 +91,7 @@ export default async function ZigosanjePage() {
     ]);
     todayEntries = entries ?? [];
     const capH = autostopHoursFor(workerCategory(employee.worker_type, employee.birth_date));
-    const open = (openRows ?? []).find((e) => isShiftRunning(e.clock_in, capH));
+    const open = (openRows ?? []).find((e) => isOpenShift(e, capH, today));
     isOpen = !!open;
     openSince = open?.clock_in ?? null;
     openEntry = open ? { id: open.id, date: open.date } : null;

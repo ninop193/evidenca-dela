@@ -4,7 +4,7 @@ import { getProfile } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getAccess } from "@/lib/billing";
-import { ABSOLUTE_CEILING_HOURS, autostopHoursFor, isShiftRunning, workerCategory } from "@/lib/workLimits";
+import { ABSOLUTE_CEILING_HOURS, autostopHoursFor, isOpenShift, workerCategory } from "@/lib/workLimits";
 import { combineLjubljana, combineShiftEnd, shiftDays } from "@/lib/tzdate";
 import { clockInEmployee, clockOutEmployee } from "@/lib/clock";
 
@@ -202,7 +202,7 @@ export async function selfFixEntry(
   // Odhod lahko ostane prazen samo pri izmeni, ki je še v teku (tudi čez polnoč).
   const stillOpen = clockOut == null;
   const capH = autostopHoursFor(workerCategory(employee.worker_type, employee.birth_date));
-  if (stillOpen && !isShiftRunning(clockIn, capH)) {
+  if (stillOpen && !isOpenShift({ date: entry.date as string, clock_in: clockIn }, capH, today)) {
     return { error: "Vpiši uro odhoda." };
   }
   if (clockOut && new Date(clockOut).getTime() > Date.now()) {
