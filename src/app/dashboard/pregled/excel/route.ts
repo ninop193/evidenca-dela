@@ -141,6 +141,13 @@ export async function GET(req: NextRequest) {
         { text: `${emp.emso ?? "—"}`, font: { size: 10, color: { argb: DARK } } },
         { text: "      Davčna številka:  ", font: { color: { argb: MUTED }, size: 10 } },
         { text: `${emp.tax_id ?? "—"}`, font: { size: 10, color: { argb: DARK } } },
+        // Nastop dela — enako kot v PDF izpisu (le če je vpisan).
+        ...(emp.employment_start_date
+          ? [
+              { text: "      Nastop dela:  ", font: { color: { argb: MUTED }, size: 10 } },
+              { text: fmtDate(emp.employment_start_date), font: { size: 10, color: { argb: DARK } } },
+            ]
+          : []),
         ...(emp.is_management
           ? [{ text: "      (poslovodna oseba — evidenca izrabe se ne vodi)", font: { italic: true, size: 9, color: { argb: MUTED } } }]
           : []),
