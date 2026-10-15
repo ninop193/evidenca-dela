@@ -614,9 +614,18 @@ export function PairScreen({ wasConnected = false }: { wasConnected?: boolean })
               Poveži
             </button>
           </form>
-          <Link href="/login" className="mt-6 inline-block text-sm text-slate-500 hover:text-slate-900">
-            Prijava v Delovit
-          </Link>
+          {/* Samo na prvi povezavi (to vidi delodajalec): brez drugega zaslona se lahko prijavi
+              kar tukaj. Ko naprava ni več povezana, zaslon gledajo zaposleni — tam povezave ni,
+              da se kdo ne prijavi s svojim računom na skupni napravi. */}
+          {!wasConnected && (
+            <p className="mt-6 text-sm text-slate-500">
+              Nimaš kode pri roki?{" "}
+              <Link href="/login" className="font-semibold text-brand-700 underline-offset-4 hover:underline">
+                Prijavi se na tej napravi
+              </Link>{" "}
+              in v Skupna naprava izberi <strong>Uporabi to napravo</strong>.
+            </p>
+          )}
         </div>
       </main>
     </div>
