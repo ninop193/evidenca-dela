@@ -76,7 +76,8 @@ export async function connectAsKiosk(): Promise<Result> {
   if (!(await connectThisDevice(ctx.db, ctx.profile.company_id))) {
     return { error: "Povezava ni uspela. Poskusi znova." };
   }
-  await (await createClient()).auth.signOut();
+  // scope "local": odjavi SAMO ta brskalnik (privzeto bi odjavil delodajalca povsod).
+  await (await createClient()).auth.signOut({ scope: "local" });
   return { ok: true };
 }
 

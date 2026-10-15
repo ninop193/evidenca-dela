@@ -21,7 +21,7 @@ import {
 const NOT_CONNECTED = "Naprava ni več povezana. Delodajalec jo lahko poveže znova.";
 // Zaklep po preveč napačnih kodah: povej, koliko časa je treba počakati.
 const lockedMsg = (seconds: number) =>
-  `Preveč napačnih poskusov. Poskusi znova čez ${Math.max(1, Math.ceil(seconds / 60))} min.`;
+  `Preveč napačnih poskusov. Poskusi znova čez ${Math.max(1, Math.ceil(seconds / 60))}\u00a0min.`;
 
 // Napačne PIN kode: največ 5 na zaposlenega in 20 na napravo v 15 minutah.
 const PIN_MAX_PER_EMPLOYEE = 5;
@@ -64,7 +64,8 @@ export async function pairWithCode(rawCode: string): Promise<{ error?: string }>
   }
   // Na skupni napravi ne sme ostati nihče prijavljen (npr. delodajalec, ki je
   // kodo vpisal v svojem brskalniku) — sicer bi zaposleni odprli nadzorno ploščo.
-  await (await createClient()).auth.signOut();
+  // scope "local": odjavi SAMO ta brskalnik (privzeto bi odjavil delodajalca povsod).
+  await (await createClient()).auth.signOut({ scope: "local" });
   return {};
 }
 

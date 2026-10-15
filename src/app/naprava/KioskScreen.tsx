@@ -66,18 +66,19 @@ function useNow(intervalMs = 1000) {
 function KioskHeader({ companyName }: { companyName?: string }) {
   const now = useNow();
   return (
-    <header className="flex items-start justify-between gap-4 px-5 pt-5 sm:px-8 sm:pt-7">
+    <header className="flex items-start justify-between gap-4 px-5 pt-5 sm:px-8 sm:pt-7 short:pt-3">
       <div>
         <Wordmark />
         {companyName && <p className="mt-1 text-sm font-medium text-slate-500">{companyName}</p>}
       </div>
-      <div className="text-right" suppressHydrationWarning>
-        <p className="font-mono text-3xl font-bold tabular-nums tracking-tight text-slate-900 sm:text-4xl">
+      {/* Ura se lahko med strežnikom in brskalnikom razlikuje za minuto (ni napaka). */}
+      <div className="text-right">
+        <p suppressHydrationWarning className="font-mono text-3xl font-bold tabular-nums tracking-tight text-slate-900 sm:text-4xl">
           {now
             ? new Intl.DateTimeFormat("sl-SI", { timeZone: "Europe/Ljubljana", hour: "2-digit", minute: "2-digit" }).format(now)
             : " "}
         </p>
-        <p className="text-sm text-slate-500 first-letter:uppercase">
+        <p suppressHydrationWarning className="text-sm text-slate-500 first-letter:uppercase">
           {now
             ? new Intl.DateTimeFormat("sl-SI", {
                 timeZone: "Europe/Ljubljana",
@@ -97,7 +98,7 @@ function Avatar({ name, size = "md" }: { name: string; size?: "md" | "lg" }) {
     <span
       className={cn(
         "grid shrink-0 place-items-center rounded-full bg-gradient-to-br from-brand-500 to-brand-700 font-bold text-white shadow-[0_8px_20px_-8px_rgba(29,78,216,0.7)]",
-        size === "lg" ? "h-14 w-14 text-lg sm:h-20 sm:w-20 sm:text-2xl" : "h-14 w-14 text-lg",
+        size === "lg" ? "h-14 w-14 text-lg roomy:h-20 roomy:w-20 roomy:text-2xl" : "h-14 w-14 text-lg",
       )}
     >
       {initials(name)}
@@ -143,7 +144,7 @@ export function KioskScreen({ companyName, employees }: { companyName: string; e
   return (
     <div className="flex min-h-screen flex-col" onPointerDown={() => setLastTouch(Date.now())}>
       <KioskHeader companyName={companyName} />
-      <main className="flex flex-1 flex-col px-5 pb-6 pt-3 sm:px-8 sm:pb-8 sm:pt-6">
+      <main className="flex flex-1 flex-col px-5 pb-6 pt-3 sm:px-8 sm:pb-8 sm:pt-6 short:pb-4 short:pt-1">
         {screen.kind === "home" && (
           <NamePicker employees={employees} onPick={(emp) => setScreen({ kind: "pin", emp })} />
         )}
@@ -183,7 +184,7 @@ function NamePicker({ employees, onPick }: { employees: Employee[]; onPick: (e: 
     <div className="mx-auto w-full max-w-5xl">
       <h1 className="text-center text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">Kdo žigosa?</h1>
       <p className="mt-2 text-center text-lg text-slate-500">Pritisni svoje ime</p>
-      <ul className="mt-8 flex flex-wrap justify-center gap-3">
+      <ul className="mt-8 flex flex-wrap justify-center gap-3 short:mt-4">
         {employees.map((e) => (
           <li key={e.id} className="w-full min-[480px]:w-[calc(50%-0.375rem)] md:w-[calc(33.333%-0.5rem)] lg:w-[calc(25%-0.5625rem)]">
             <button
@@ -191,7 +192,7 @@ function NamePicker({ employees, onPick }: { employees: Employee[]; onPick: (e: 
                 buzz();
                 onPick(e);
               }}
-              className="glass-strong iris-edge flex w-full items-center gap-4 rounded-3xl p-4 text-left transition active:scale-[0.97] sm:p-5"
+              className="glass-strong iris-edge flex h-full w-full items-center gap-4 rounded-3xl p-4 text-left transition active:scale-[0.97] sm:p-5"
             >
               <Avatar name={e.name} />
               <span className="text-lg font-semibold leading-tight text-slate-900">{e.name}</span>
@@ -263,33 +264,38 @@ function PinPad({
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-sm flex-col">
-      <div>
-        <BackButton onClick={onBack} />
-      </div>
-      <div className="mt-2 flex flex-col items-center text-center">
-        <Avatar name={emp.name} size="lg" />
-        <p className="mt-2 text-2xl font-bold text-slate-900 sm:mt-3">{emp.name}</p>
-        <p className="mt-1 text-slate-500">Vpiši svojo osebno kodo</p>
+    // Ležeča tablica / telefon: ime levo, tipkovnica desno (sicer tipka 0 pade pod rob).
+    <div className="mx-auto flex w-full max-w-sm flex-col land:my-auto land:max-w-3xl land:flex-row land:items-center land:gap-12">
+      <div className="land:flex-1">
+        <div>
+          <BackButton onClick={onBack} />
+        </div>
+        <div className="mt-2 flex flex-col items-center text-center">
+          <div className="short:hidden">
+            <Avatar name={emp.name} size="lg" />
+          </div>
+          <p className="mt-2 text-2xl font-bold text-slate-900 sm:mt-3 short:mt-0">{emp.name}</p>
+          <p className="mt-1 text-slate-500">Vpiši svojo osebno kodo</p>
+        </div>
+
+        <div key={shake} className={cn("mt-4 flex justify-center gap-4 sm:mt-6", shake > 0 && "kiosk-shake")}>
+          {[0, 1, 2, 3].map((i) => (
+            <span
+              key={i}
+              className={cn(
+                "h-4 w-4 rounded-full ring-2 transition",
+                i < pin.length ? "bg-brand-600 ring-brand-600" : "bg-white/60 ring-slate-300",
+                loading && "animate-pulse",
+              )}
+            />
+          ))}
+        </div>
+        <p className={cn("mt-3 min-h-10 text-center text-sm font-medium", error ? "text-rose-600" : "text-transparent")}>
+          {error ?? "."}
+        </p>
       </div>
 
-      <div key={shake} className={cn("mt-4 flex justify-center gap-4 sm:mt-6", shake > 0 && "kiosk-shake")}>
-        {[0, 1, 2, 3].map((i) => (
-          <span
-            key={i}
-            className={cn(
-              "h-4 w-4 rounded-full ring-2 transition",
-              i < pin.length ? "bg-brand-600 ring-brand-600" : "bg-white/60 ring-slate-300",
-              loading && "animate-pulse",
-            )}
-          />
-        ))}
-      </div>
-      <p className={cn("mt-3 min-h-10 text-center text-sm font-medium", error ? "text-rose-600" : "text-transparent")}>
-        {error ?? "."}
-      </p>
-
-      <div className="mt-2 grid grid-cols-3 gap-3">
+      <div className="mt-2 grid grid-cols-3 gap-3 land:mt-0 land:flex-1">
         {["1", "2", "3", "4", "5", "6", "7", "8", "9"].map((d) => (
           <KeyButton key={d} onClick={() => press(d)} disabled={loading}>
             {d}
@@ -324,7 +330,7 @@ function KeyButton({
     <button
       type="button"
       className={cn(
-        "grid h-14 place-items-center rounded-2xl text-3xl sm:h-[4.5rem] font-semibold text-slate-900 transition active:scale-[0.94] disabled:opacity-40",
+        "grid h-14 place-items-center rounded-2xl text-3xl font-semibold land:h-16 short:h-12 roomy:h-[4.5rem] text-slate-900 transition active:scale-[0.94] disabled:opacity-40",
         subtle ? "text-slate-500" : "glass-strong iris-edge",
         className,
       )}
@@ -391,51 +397,61 @@ function ClockAction({
   const firstName = emp.name.split(/\s+/)[0];
 
   return (
-    <div className="mx-auto flex w-full max-w-md flex-col">
-      <div>
-        <BackButton onClick={onBack} />
-      </div>
-      <div className="mt-2 text-center">
-        <p className="text-2xl font-bold text-slate-900">Živjo, {firstName}</p>
-        <p className="mt-1 text-lg text-slate-500">
-          {isOut ? `Na delu si od ${fmtTime(openSince)}` : "Trenutno nisi na delu"}
-        </p>
-      </div>
-
-      {/* Neobvezna zabeležka odmora — enako kot pri žigosanju s telefonom */}
-      {isOut && (
-        <div className="mt-6">
-          <p className="text-center text-xs font-semibold uppercase tracking-wide text-slate-400">
-            Odmor danes (neobvezno)
-          </p>
-          <div className="mt-2 grid grid-cols-4 gap-2">
-            {[
-              [0, "Brez"],
-              [15, "15 min"],
-              [30, "30 min"],
-              [45, "45 min"],
-            ].map(([min, label]) => (
-              <button
-                key={min}
-                type="button"
-                onClick={() => setBreakMin(min as number)}
-                className={cn(
-                  "h-12 rounded-full text-sm font-semibold transition",
-                  breakMin === min ? "bg-brand-600 text-white" : "glass text-slate-700",
-                )}
-              >
-                {label as string}
-              </button>
-            ))}
-          </div>
+    // Ležeče: pozdrav in odmor levo, velik gumb desno.
+    <div className="mx-auto flex w-full max-w-md flex-col land:my-auto land:max-w-4xl land:flex-row land:items-center land:gap-12">
+      <div className="land:flex-1">
+        <div>
+          <BackButton onClick={onBack} />
         </div>
-      )}
+        <div className="mt-2 text-center">
+          <p className="text-2xl font-bold text-slate-900">Živjo, {firstName}</p>
+          <p className="mt-1 text-lg text-slate-500">
+            {isOut ? `Na delu si od ${fmtTime(openSince)}` : "Trenutno nisi na delu"}
+          </p>
+        </div>
+
+        {/* Neobvezna zabeležka odmora — enako kot pri žigosanju s telefonom */}
+        {isOut && (
+          <div className="mt-6 short:mt-4">
+            <p className="text-center text-xs font-semibold uppercase tracking-wide text-slate-400">
+              Odmor danes (neobvezno)
+            </p>
+            <div className="mt-2 grid grid-cols-4 gap-2">
+              {[
+                [0, "Brez"],
+                [15, "15 min"],
+                [30, "30 min"],
+                [45, "45 min"],
+              ].map(([min, label]) => (
+                <button
+                  key={min}
+                  type="button"
+                  onClick={() => setBreakMin(min as number)}
+                  className={cn(
+                    "h-12 rounded-full text-sm font-semibold transition",
+                    breakMin === min ? "bg-brand-600 text-white" : "glass text-slate-700",
+                  )}
+                >
+                  {label as string}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {error && (
+          <p className="glass mx-auto mt-6 rounded-xl px-4 py-2.5 text-center text-sm font-medium text-rose-600 short:mt-4">{error}</p>
+        )}
+        {info && (
+          <p className="glass mx-auto mt-6 rounded-xl px-4 py-2.5 text-center text-sm font-medium text-slate-700 short:mt-4">{info}</p>
+        )}
+      </div>
 
       <button
         onClick={submit}
         disabled={loading}
         aria-label={isOut ? "Žigosaj odhod" : "Žigosaj prihod"}
-        className="relative mx-auto mt-8 grid h-60 w-60 place-items-center rounded-full outline-none transition-transform duration-300 active:scale-[0.955] disabled:cursor-wait"
+        className="relative mx-auto mt-8 grid h-60 w-60 shrink-0 place-items-center short:mt-5 short:h-44 short:w-44 land:mt-0 rounded-full outline-none transition-transform duration-300 active:scale-[0.955] disabled:cursor-wait"
       >
         <span
           className={cn(
@@ -471,16 +487,9 @@ function ClockAction({
           ) : (
             <Play className="ml-1 h-7 w-7 fill-white" strokeWidth={0} />
           )}
-          <span className="text-[2.2rem] font-bold leading-none tracking-tight">{isOut ? "Odhod" : "Prihod"}</span>
+          <span className="text-[2.2rem] font-bold leading-none tracking-tight short:text-3xl">{isOut ? "Odhod" : "Prihod"}</span>
         </span>
       </button>
-
-      {error && (
-        <p className="glass mx-auto mt-6 rounded-xl px-4 py-2.5 text-center text-sm font-medium text-rose-600">{error}</p>
-      )}
-      {info && (
-        <p className="glass mx-auto mt-6 rounded-xl px-4 py-2.5 text-center text-sm font-medium text-slate-700">{info}</p>
-      )}
     </div>
   );
 }
@@ -493,16 +502,16 @@ function Done({ screen, onClose }: { screen: Extract<Screen, { kind: "done" }>; 
     <button onClick={onClose} className="m-auto flex w-full max-w-md flex-col items-center text-center">
       <span
         className={cn(
-          "grid h-24 w-24 place-items-center rounded-full text-white shadow-[0_16px_40px_-14px_rgba(16,185,129,0.8)]",
+          "grid h-24 w-24 place-items-center rounded-full text-white short:h-16 short:w-16 shadow-[0_16px_40px_-14px_rgba(16,185,129,0.8)]",
           "bg-gradient-to-br from-emerald-400 to-emerald-600",
         )}
       >
         <Check className="h-12 w-12" strokeWidth={3} />
       </span>
-      <p className="mt-6 text-3xl font-bold tracking-tight text-slate-900">
+      <p className="mt-6 text-3xl font-bold tracking-tight text-slate-900 short:mt-3">
         {isIn ? "Prihod zabeležen" : "Odhod zabeležen"}
       </p>
-      {screen.time && <p className="mt-2 font-mono text-5xl font-bold tabular-nums text-slate-900">{screen.time}</p>}
+      {screen.time && <p className="mt-2 font-mono text-5xl font-bold tabular-nums text-slate-900 short:text-4xl">{screen.time}</p>}
       <p className="mt-3 text-lg text-slate-500">
         {screen.name}
         {!isIn && screen.hours != null && ` · opravljeno ${fmtHours(screen.hours)}`}
@@ -513,8 +522,8 @@ function Done({ screen, onClose }: { screen: Extract<Screen, { kind: "done" }>; 
           in popravil.
         </p>
       )}
-      <p className="mt-6 text-lg font-medium text-slate-700">{isIn ? "Lep delovni dan!" : "Hvala in lep dan!"}</p>
-      <span className="mt-8 h-1 w-40 overflow-hidden rounded-full bg-slate-200/70">
+      <p className="mt-6 text-lg font-medium text-slate-700 short:mt-3">{isIn ? "Lep delovni dan!" : "Hvala in lep dan!"}</p>
+      <span className="mt-8 h-1 w-40 overflow-hidden short:mt-4 rounded-full bg-slate-200/70">
         <span className="kiosk-countdown block h-full rounded-full bg-emerald-500" />
       </span>
     </button>

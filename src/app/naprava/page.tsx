@@ -9,6 +9,8 @@ export const metadata: Metadata = {
   title: "Skupna naprava",
   robots: { index: false, follow: false },
   manifest: "/naprava/manifest.webmanifest",
+  // iPhone/iPad ime ikone na začetnem zaslonu vzame od tu (ne iz manifesta).
+  appleWebApp: { capable: true, statusBarStyle: "default", title: "Žigosanje" },
 };
 
 // Skupna naprava na delovnem mestu. Nepovezan brskalnik vidi samo vnos kode za

@@ -101,6 +101,15 @@ function TurnOn() {
   );
 }
 
+// Ko se odpre potrditev ali navodila pod robom zaslona (telefon), jih pomakni v vidno polje.
+function useReveal<T extends HTMLElement>(open: boolean) {
+  const ref = useRef<T>(null);
+  useEffect(() => {
+    if (open) ref.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }, [open]);
+  return ref;
+}
+
 // --- Povezane naprave -------------------------------------------------------------
 
 function Devices({ devices }: { devices: Device[] }) {
@@ -391,6 +400,8 @@ function PairPanel({ canCancel, onCancel }: { canCancel: boolean; onCancel: () =
   const [loadingCode, setLoadingCode] = useState(true);
   const [confirmThis, setConfirmThis] = useState(false);
   const [usingThis, setUsingThis] = useState(false);
+  const panelRef = useReveal<HTMLDivElement>(canCancel);
+  const confirmRef = useReveal<HTMLDivElement>(confirmThis);
 
   const showCode = (res: Awaited<ReturnType<typeof createPairCode>>) => {
     setLoadingCode(false);
@@ -428,7 +439,7 @@ function PairPanel({ canCancel, onCancel }: { canCancel: boolean; onCancel: () =
   const step = "grid h-7 w-7 shrink-0 place-items-center rounded-full bg-brand-600 text-sm font-bold text-white";
 
   return (
-    <div className="relative mt-4 rounded-2xl bg-white/60 p-5 ring-1 ring-white/80 sm:p-6">
+    <div ref={panelRef} className="relative mt-4 scroll-mt-24 rounded-2xl bg-white/60 p-5 ring-1 ring-white/80 sm:p-6">
       {canCancel && (
         <button
           onClick={onCancel}
@@ -505,7 +516,7 @@ function PairPanel({ canCancel, onCancel }: { canCancel: boolean; onCancel: () =
 
       <div className="mt-5 border-t border-slate-200/70 pt-4">
         {confirmThis ? (
-          <div className="rounded-2xl bg-amber-50/80 p-4 ring-1 ring-amber-200/70">
+          <div ref={confirmRef} className="scroll-mb-4 rounded-2xl bg-amber-50/80 p-4 ring-1 ring-amber-200/70">
             <p className="font-semibold text-slate-900">Ta naprava bo postala skupna naprava za žigosanje.</p>
             <p className="mt-1 text-sm text-slate-600">
               Zaradi varnosti te bomo na njej odjavili, da zaposleni ne pridejo do tvoje nadzorne plošče. Svoj račun
@@ -627,6 +638,7 @@ function TurnOff() {
   const router = useRouter();
   const [confirm, setConfirm] = useState(false);
   const [loading, setLoading] = useState(false);
+  const confirmRef = useReveal<HTMLDivElement>(confirm);
 
   async function turnOff() {
     setLoading(true);
@@ -637,7 +649,7 @@ function TurnOff() {
   return (
     <div className="px-1 text-sm">
       {confirm ? (
-        <div className="rounded-2xl bg-red-50/70 p-4 ring-1 ring-red-100">
+        <div ref={confirmRef} className="scroll-mb-4 rounded-2xl bg-red-50/70 p-4 ring-1 ring-red-100">
           <p className="font-semibold text-slate-900">Izklopim skupno napravo?</p>
           <p className="mt-1 text-slate-600">
             Vse naprave se odklopijo. Žigosanje s telefonom in vsi že zabeleženi žigi ostanejo. Osebne kode zaposlenih
