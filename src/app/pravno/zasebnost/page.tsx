@@ -66,7 +66,7 @@ export default function ZasebnostPage() {
       <LSection title="5. Obdelovalci in lokacija podatkov">
         <p>Pri zagotavljanju storitve sodelujejo naslednji obdelovalci:</p>
         <p>
-          <strong>Supabase</strong> (baza podatkov in prijava, EU, Frankfurt),{" "}
+          <strong>Supabase</strong> (baza podatkov in prijava, EU, Irska),{" "}
           <strong>Vercel</strong> (gostovanje aplikacije) in <strong>Stripe</strong> (obdelava
           plačil). Podatki uporabniških evidenc so shranjeni v Evropski uniji.
         </p>

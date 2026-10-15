@@ -53,7 +53,7 @@ const FAQ: FaqItem[] = [
   },
   {
     q: "Kje so shranjeni podatki?",
-    a: "V EU (Frankfurt), skladno z GDPR. Vsako podjetje vidi izključno svoje podatke. Med podjetji velja stroga izolacija od prve sekunde.",
+    a: "V EU (Irska), skladno z GDPR. Vsako podjetje vidi izključno svoje podatke. Med podjetji velja stroga izolacija od prve sekunde.",
   },
   {
     q: "Ali lahko izvozim evidenco za inšpekcijo?",
