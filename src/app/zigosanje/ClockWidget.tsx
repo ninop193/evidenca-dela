@@ -124,7 +124,7 @@ export default function ClockWidget({
 
   const totalToday = todayEntries.reduce((a, e) => a + (Number(e.total_worked_hours) || 0), 0);
 
-  // Opomnik: če je odprta izmena presegla zakonsko dnevno mejo, spomni na odhod.
+  // Opomnik: če je odprta izmena presegla prag opomnika (workLimits), spomni na odhod.
   const overLimit =
     activeOpen &&
     activeSince != null &&

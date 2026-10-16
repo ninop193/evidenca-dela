@@ -3,7 +3,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { sendEmail, companyAdmin } from "@/lib/email/send";
 import {
   shiftLimitEmployeeEmail,
-  shiftLimitEmployerEmail,
+  openEntriesAlertEmail,
 } from "@/lib/email/templates";
 import {
   workerCategory,
@@ -16,16 +16,17 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 const TZ = "Europe/Ljubljana";
+const fmtDate = (d: string) =>
+  new Intl.DateTimeFormat("sl-SI", { timeZone: TZ }).format(new Date(d + "T00:00:00"));
 const fmtTime = (iso: string) =>
   new Intl.DateTimeFormat("sl-SI", { timeZone: TZ, hour: "2-digit", minute: "2-digit" })
     .format(new Date(iso));
 
 // Faza 1.5: pravočasna eskalacija ob predolgi odprti izmeni. Kliče Supabase
-// pg_cron vsakih 15 minut. Trije sloji (vsak največ enkrat na vnos):
-//   1. elapsed >= zakonska meja (8h/10h)   → opomnik ZAPOSLENEMU (email)
-//   2. elapsed >= meja + 30 min            → 2. opomnik zaposlenemu + obvestilo DELODAJALCU
-//   3. elapsed >= auto-stop (10h/12h)      → vnos se zapre ob meji + označi "za pregled"
-//      (brez dodatnega maila: delodajalec je bil obveščen v sloju 2; ure se ne odrežejo tiho)
+// pg_cron vsakih 15 minut. Dva sloja (vsak največ enkrat na vnos):
+//   1. elapsed >= prag opomnika (8h/12h)   → EN opomnik ZAPOSLENEMU (email)
+//   2. elapsed >= auto-stop (10h/13h)      → vnos se zapre ob meji + označi "za pregled"
+//      + obvestilo DELODAJALCU (en mail na podjetje; ure se ne odrežejo tiho)
 export async function GET(req: NextRequest) {
   // Brez nastavljenega CRON_SECRET endpoint ostane ZAKLENJEN (ne odprt).
   const secret = process.env.CRON_SECRET;
@@ -38,7 +39,7 @@ export async function GET(req: NextRequest) {
 
   const { data: open, error } = await admin
     .from("time_entries")
-    .select("id, company_id, employee_id, date, clock_in, limit_alert_sent_at, escalation_sent_at")
+    .select("id, company_id, employee_id, date, clock_in, limit_alert_sent_at")
     .is("clock_out", null)
     .not("clock_in", "is", null);
 
@@ -64,7 +65,9 @@ export async function GET(req: NextRequest) {
     : { data: [] as { id: string; email: string | null }[] };
   const emailByUser = new Map((users ?? []).map((u) => [u.id, u.email]));
 
-  let l1 = 0, l2 = 0, l3 = 0;
+  let reminded = 0, closed = 0;
+  // Zaprti vnosi po podjetju → en povzetek delodajalcu.
+  const perCompany = new Map<string, { name: string; date: string; clockIn: string }[]>();
 
   for (const e of entries) {
     const emp = empById.get(e.employee_id);
@@ -77,7 +80,7 @@ export async function GET(req: NextRequest) {
     const clockIn = fmtTime(e.clock_in as string);
     const empEmail = emp?.user_id ? emailByUser.get(emp.user_id) ?? null : null;
 
-    // Sloj 3: presežena auto-stop meja → zapri ob meji + označi za pregled.
+    // Sloj 2: presežena auto-stop meja → zapri ob meji + označi za pregled.
     if (elapsedH >= capH) {
       const capOut = new Date(new Date(e.clock_in as string).getTime() + capH * 3_600_000);
       const { error: upErr } = await admin
@@ -90,45 +93,15 @@ export async function GET(req: NextRequest) {
           notes: autoCapNote(),
         })
         .eq("id", e.id);
-      if (!upErr) l3++;
+      if (upErr) continue;
+      closed++;
+      const list = perCompany.get(e.company_id) ?? [];
+      list.push({ name: emp?.full_name ?? "Zaposleni", date: fmtDate(e.date), clockIn });
+      perCompany.set(e.company_id, list);
       continue;
     }
 
-    // Sloj 2: meja + 30 min → 2. opomnik zaposlenemu + obvestilo delodajalcu.
-    if (elapsedH >= remH + 0.5 && e.limit_alert_sent_at && !e.escalation_sent_at) {
-      if (empEmail) {
-        await sendEmail(
-          empEmail,
-          shiftLimitEmployeeEmail({
-            fullName: emp?.full_name,
-            clockIn,
-            hours: elapsedH,
-            second: true,
-          }),
-        );
-      }
-      const boss = await companyAdmin(e.company_id);
-      // Delodajalec, ki žigosa sam, je že dobil opomnik zgoraj — brez podvojenega maila.
-      if (boss && boss.email !== empEmail) {
-        await sendEmail(
-          boss.email,
-          shiftLimitEmployerEmail({
-            fullName: boss.fullName,
-            employeeName: emp?.full_name ?? "Zaposleni",
-            clockIn,
-            hours: elapsedH,
-          }),
-        );
-      }
-      await admin
-        .from("time_entries")
-        .update({ escalation_sent_at: new Date().toISOString() })
-        .eq("id", e.id);
-      l2++;
-      continue;
-    }
-
-    // Sloj 1: zakonska meja → opomnik zaposlenemu.
+    // Sloj 1: prag opomnika → en opomnik zaposlenemu.
     if (!e.limit_alert_sent_at) {
       if (empEmail) {
         await sendEmail(
@@ -136,14 +109,19 @@ export async function GET(req: NextRequest) {
           shiftLimitEmployeeEmail({ fullName: emp?.full_name, clockIn, hours: elapsedH }),
         );
       }
-      // Žig nastavimo tudi brez emaila (zaposleni brez računa), da sloj 2 lahko sledi.
       await admin
         .from("time_entries")
         .update({ limit_alert_sent_at: new Date().toISOString() })
         .eq("id", e.id);
-      l1++;
+      reminded++;
     }
   }
 
-  return NextResponse.json({ checked: entries.length, reminded: l1, escalated: l2, closed: l3 });
+  // Obvesti delodajalce o zaprtih vnosih (en mail na podjetje).
+  for (const [companyId, items] of perCompany) {
+    const boss = await companyAdmin(companyId);
+    if (boss) await sendEmail(boss.email, openEntriesAlertEmail({ fullName: boss.fullName, items }));
+  }
+
+  return NextResponse.json({ checked: entries.length, reminded, closed });
 }

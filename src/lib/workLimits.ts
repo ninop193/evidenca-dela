@@ -8,24 +8,26 @@
 //   - Mladoletni (<18): največ 8 ur, brez nadur (146/2), brez nočnega dela (193).
 //
 // Dva PRAGA — namenoma ločena:
-//   REMINDER = zakonska meja → OPOMNIK delavcu (samo obvestilo, nič se ne zapre).
+//   REMINDER = en OPOMNIK delavcu (samo obvestilo, nič se ne zapre).
 //   AUTOSTOP = višji prag → sistem PREDLAGA odhod pri pozabljenem žigosanju.
 //              Vnos se OZNAČI za pregled in je popravljiv. Ura se NIKOLI ne odreže tiho.
-// AUTOSTOP je nad zakonsko mejo, da poštena dolga izmena (npr. neenakomerna
-// razporeditev do 13 ur, 155/2) ni skrita — presežek se pokaže, ne odreže.
+// Polnoletni: opomnik šele pri 12 h (ne pri zakonskih 10 h) — npr. v gradbeništvu
+// so izmene po 10–11 h običajne in dnevni opomnik bi motil. Zapora pri 13 h
+// (neenakomerna razporeditev do 13 ur, 155/2), da poštena dolga izmena ni skrita.
+// Mladoletni ostanejo pri zakonski meji 8 h.
 
 export type WorkerCategory = "minor" | "student" | "employee";
 
 export const REMINDER_HOURS: Record<WorkerCategory, number> = {
   minor: 8,
-  student: 10,
-  employee: 10,
+  student: 12,
+  employee: 12,
 };
 
 export const AUTOSTOP_HOURS: Record<WorkerCategory, number> = {
   minor: 10,
-  student: 12,
-  employee: 12,
+  student: 13,
+  employee: 13,
 };
 
 // Absolutni strop za nastavitev auto-stopa (ne dovolimo višje).

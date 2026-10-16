@@ -48,7 +48,7 @@ export default async function ZigosanjePage() {
     devicePin = row?.pin ?? (await assignPin(db, profile.company_id, employee.id));
   }
 
-  // Zakonska dnevna meja za opomnik ("Ne pozabi žigosati odhoda").
+  // Prag opomnika ("Ne pozabi žigosati odhoda"), glej workLimits.
   const reminderHours = employee
     ? reminderHoursFor(workerCategory(employee.worker_type, employee.birth_date))
     : 10;
