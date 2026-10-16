@@ -427,8 +427,9 @@ function PairPanel({ canCancel, onCancel }: { canCancel: boolean; onCancel: () =
   async function useThis() {
     setUsingThis(true);
     setError(null);
+    // Ob uspehu strežnik sam preusmeri na /naprava (vrne se samo napaka).
     const res = await connectAsKiosk();
-    if (res.error) {
+    if (res?.error) {
       setUsingThis(false);
       setError(res.error);
       return;

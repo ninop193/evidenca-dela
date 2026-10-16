@@ -2,6 +2,7 @@
 
 import { randomInt } from "node:crypto";
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { getProfile } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -78,7 +79,9 @@ export async function connectAsKiosk(): Promise<Result> {
   }
   // scope "local": odjavi SAMO ta brskalnik (privzeto bi odjavil delodajalca povsod).
   await (await createClient()).auth.signOut({ scope: "local" });
-  return { ok: true };
+  // Preusmeritev naredi strežnik: sicer bi brskalnik po odjavi osvežil to (zaščiteno)
+  // stran, ki preusmeri na prijavo — Safari jo izvede, preden pride do /naprava.
+  redirect("/naprava");
 }
 
 export async function disconnectDevice(deviceId: string): Promise<Result> {
