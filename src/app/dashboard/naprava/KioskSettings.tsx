@@ -427,11 +427,26 @@ function PairPanel({ canCancel, onCancel }: { canCancel: boolean; onCancel: () =
   async function useThis() {
     setUsingThis(true);
     setError(null);
-    // Ob uspehu strežnik sam preusmeri na /naprava (vrne se samo napaka).
-    const res = await connectAsKiosk();
-    if (res?.error) {
-      setUsingThis(false);
-      setError(res.error);
+    // Ob uspehu strežnik sam preusmeri na /naprava (vrne se samo napaka). Nekateri
+    // brskalniki (Firefox) preusmeritev javijo kot izjemo NEXT_REDIRECT — to je uspeh.
+    try {
+      const res = await connectAsKiosk();
+      if (res?.error) {
+        setUsingThis(false);
+        setError(res.error);
+        return;
+      }
+    } catch (e) {
+      const redirected = String((e as { digest?: unknown })?.digest ?? (e as Error)?.message ?? "").startsWith("NEXT_REDIRECT");
+      if (!redirected) {
+        setUsingThis(false);
+        setError("Povezava ni uspela. Preveri internet in poskusi znova.");
+        return;
+      }
+      // Aplikacija že gre na /naprava; skočimo sami le, če se to po 3 s še ni zgodilo.
+      setTimeout(() => {
+        if (window.location.pathname !== "/naprava") window.location.assign("/naprava");
+      }, 3000);
       return;
     }
     window.location.assign("/naprava");
